@@ -1,0 +1,86 @@
+// server_globals.c - Implementations of server global-scope variables
+//
+
+#include "stdafx.h"
+
+#include "server_globals.h"
+
+///////////////////////////////////////////////////////////////////////////////
+// Global variables and their starting values
+
+BOOL g_bDiagnosticMode = FALSE;
+POSITION* g_pClientList = NULL;
+HMUTEX g_hClientListMutex = INVALID_HANDLE_VALUE;
+HTHREAD g_hMasterThread = INVALID_HANDLE_VALUE;
+int g_nServerPort = 9000;
+int g_nServerSocket = INVALID_SOCKET_VALUE;
+
+///////////////////////////////////////////////////////////////////////////////
+// GetClientListMutex function
+
+HMUTEX GetClientListMutex() {
+	return g_hClientListMutex;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// GetMasterThreadHandle function
+
+HTHREAD GetMasterThreadHandle() {
+	return g_hMasterThread;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// GetServerPort function
+
+int GetServerPort() {
+	return g_nServerPort;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// GetServerSocket function
+
+int GetServerSocket() {
+	return g_nServerSocket;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// IsDiagnosticMode function
+
+BOOL IsDiagnosticMode() {
+	return g_bDiagnosticMode;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// SetClientListMutex function
+
+void SetClientListMutex(HMUTEX value) {
+	g_hClientListMutex = value;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// SetDiagnosticMode function
+
+void SetDiagnosticMode(BOOL value) {
+	g_bDiagnosticMode = value;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// SetMasterThreadHandle function
+
+void SetMasterThreadHandle(HTHREAD value) {
+	g_hMasterThread = value;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// SetServerPort function
+
+void SetServerPort(int value) {
+	g_nServerPort = value;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// SetServerSocket function
+
+void SetServerSocket(int value) {
+	g_nServerSocket = value;
+}
