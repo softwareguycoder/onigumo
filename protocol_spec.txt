@@ -129,3 +129,17 @@ machine.
 -------------------------------------------------------------------------------
 EXAMPLE SESSION
 -------------------------------------------------------------------------------
+
+C: HELO
+<server creates new client session internally>
+S: 200 OK. Welcome to the onigumo server.  Be careful what you wish for!
+C: CODE
+S: 201 OK, send your shellcode.  Terminate with a '.' on a line by itself.
+C: \x55
+C: \x48\x89\xe5
+C: \x48\x8d\x3d\x00\x00\x00\x00
+C: \xe8\x00\x00\x00\x00
+C: \xb8\x00\x00\x00\x00
+C: \x5d
+C: \xc3
+
