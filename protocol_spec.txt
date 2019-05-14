@@ -1,79 +1,131 @@
-Chat server protocol spec
+onigumo server protocol spec
+Last Updated: 05.14.2019
 
-Each client connects separately to the chat server's IP address and port
+-------------------------------------------------------------------------------
+INTRODUCTION
+-------------------------------------------------------------------------------
 
-Server accepts the socket from the client and then adds an entry to its internal
-list of clients so it can retrieve that socket again for later use
-Client issues HELO command followed by a CRLF to say hello (LF on Linux)
-Server replies 200 OK CRLF indicating that it has successfully accepted the
-new client connection and registered the client in its list of clients
-Client issues NICK <nickname> command to register the nickname with the server
-of the current chatter.  Nicknames cannot be greater than 15 chars in length, and
-may not contain spaces or '@' characters.
+onigumo is a server that facilitates the execution of shellcode on a remote
+machine.  Up to 500 clients can connect simulatenously to an instance of an
+ongiumo server.
 
-Replies:
-    201 OK your nickname is <nickname>.   (i.e., success)
-    401 Nickname in use.  Choose another.
-    402 Nickname is invalid format or length.
-    501 No nickname value specified after NICK command.  
+Onigumo is the name of a character from the anime "InuYasha," one of the author's
+favorite shows.  In the show, the bandit Onigumo was so evil, he was burned and
+maimed by his fellow bandits.  Nursed by the priestess Kikyo, he soon fell in
+love with her.  When Kikyo loved InuYasha (the show's titular character) instead,
+Onigumo grew jealous, and longed to have a healed body that could walk again. 
+In his effort to walk again, he called forth a great number of evil demons,
+who came and possessed his body, making it able to walk again.  However, instead
+of Onigumo getting to fulfill his wish, the demons had other plans.  Double-
+crossing Onigumo, the demons conspired to make him kill Kikyo in a most brutal
+fashion.
 
-NOTE: A client will not receive broadcasted messages until it's issued the HELO command to the server.
-A client will not be introduced to the rest of the chat room until the NICK command has been sent
-and a 200 OK response was received by that client.
+Like the show, the onigumo server is capable of being utilized by several
+clients at once.  The onigumo server calls forth client connections and these 
+clients can send the server shellcode to be then executed on the destination
+machine, in a sense, "possessing" the machine the server is being executed on
+and causing the machine to either do things it is not supposed to do etc. as 
+the shellcode directs.
 
-Our chat server has at-mentions and hashtags.  At-mentions begin with '@' followed
-by the nickname of another chatter; hashtags can be any phrase with no spaces and no
-'@' char preceded by a pound sign '#'.
+-------------------------------------------------------------------------------
+PROTOCOL SUMMARY
+-------------------------------------------------------------------------------
 
-To send a chat message the client simply sends the content.  The client ends the chat
-message by sending a dot (.) by itself on one line.  Each individual line of a chat message
-may be no more than 80 characters long.  If the client has not sent the NICK command yet, 
-the server will send a "501 No nickname value specified after NICK command" reply in response.
-Client SHALL send the NICK command prior to sending ANY chat messages.
+This server exposes a traditional TCP/IP-based command-and-control protocol. 
+The protocol consists of the client sending commands with names that are all
+four uppercase characters.  Optional arguments may sometimes be specified after
+a space that always follows the command's name.  Not all commands have arguments.
 
-All chat messages are sent to all connected clients, including the client that sent it.
+A command string is terminated by a single LF character.  The server will respond
+with a distinctive 3-digit number that is customized for each response. This is the
+command's status code.  The 3-digit number will be followed by a space and some
+helpful text.  All commands have their own unique set of possible return status
+codes.  All server responses will be terminated by a newline (LF).
 
-To DM another chatter directly, you must send the command
-DM <nickname-of-recipient>\r\n
+All server responses will begin with a single line that has a status code, a space,
+optional text, and then a terminating LF character.  If the server needs to issue
+a multiline response, the server will continue sending lines of text, with each
+line terminating with a single LF character.  The message sent by the server will
+terminate, as a whole, when a line containing a single period (.) and a LF character
+only is sent.  All multiline command input or response, whether sent by the server
+to the client, or the reverse, will work in this way.
 
-To which the server replies the same as the NICK command.  If '200 OK' is received, then
-it's time to send the direct message you want.  Clients simply send the message itself,
-followed by a CRLF, and then a dot by itself on a line with another CRLF (this ends the message
-and tells the server it's time to send it to the recipient.)  For a DM, only the chatter
-with the nickname specified will receive the message.
+If the client needs to send multiline data, the client must first issue the proper
+command to the server.  The server will respond.  If the response has the proper
+status code, then the client may reply by sending its input, again as text strings
+terminated by newlines, one by one, until the input is done.  When the client is
+done transmitting lines, the client will send one file line consisting only of a 
+period (.) and a LF character.  This shall signal the server that the client is 
+finished transmitting.
 
-Final command for a client to end its chat session is:
-QUIT\r\n
-The server replies:
-    200 Goodbye.\r\n
-and then disconnects from that chatter and also throws away the internal entry for that
-client in its database.
+-------------------------------------------------------------------------------
+STATUS CODE RANGES
+-------------------------------------------------------------------------------
 
-NOTE: Messages from the server beginning with a bang character (i.e., '!') indicate system admin
-messages indicating channel status etc.
+Even though there are distinct status codes for each response to each command, 
+the status codes will all fall within the numeric ranges given below:
 
-A typical session is as follows:
+	i. 200-299:   Command completed successfully.  No further input
+	   required for this command.  Other commands may need to come next.
+	ii. 300-399:  Command completed successfully, but further input (such
+	   as data transmission) is required before the server can act.
+	iii. 400-499: Command received but its arguments or other data is in
+	   an invalid format, or the values transmitted are outside a valid
+	   range.  The client (or the client's user) will need to correct the
+	   error and try again.
+	iv. 500-599:  Command invalid or the action that is required is impossible.
+	   Sometimes the server will send a error code 5xx message to the client
+	   without the client having sent a command; typically, this in the case
+	   that a user of the machine on which the server is based has killed 
+	   the server's process.
 
-C:<connects to server on IP and port number 9000>
-C: HELO
-S: 200 OK
-S: <to all> !Hey everyone, @ENS_Schwartz joined the chat room.
-C: NICK astrohart
-S: 200 OK your nickname is astrohart.
-S: <to all> !Hey everyone, @astrohart joined the chat room.
-S: <to all> !Hey everyone, @birdguy343 joined the chat room.
-S: <to all> !Hey everyone, @effeater6 left the chat room.
-C: The quick #brownfox jumped over the lazy dog.
-C: .
-S: <to all> @astrohart: The quick #brownfox jumped over the lazy dog.
-S: <to all> @ENS_Schwartz: Hahaha @astrohart that is #toofunny. :-)
-C: DM ENS_Schwartz
-S: <to @astrohart only> 200 OK, what do you want to tell @ENS_Schwartz?
-C: You're a psycho.
-C: .
-S: <to @ENS_Schwartz only> @astrohart: You're a psycho.
-C: QUIT
-S: <to all EXCEPT @astrohart> !Hey everyone, @astrohart left the chat room.
-S: <to @astrohart only> 200 Goodbye.
-S: <disconnects>
-C: <disconnects>
+-------------------------------------------------------------------------------
+LIST OF COMMANDS
+-------------------------------------------------------------------------------
+
+The commands supported by the onigumo server are:
+
+1. HELO
+
+Activates this particular client's session with the server.  The server marks 
+this client as being permitted to send further commands.  Except for QUIT, no
+other commands in this specification shall be accepted by the server until the 
+HELO command has been sent.
+
+2. CODE
+
+To be followed by one or more lines of shellcode to be executed on the target
+machine.  The target machine is the machine on which the server process itself
+is running.  When this command is received, servers shall store the data
+sent after this command in a buffer for later use.
+
+3. EXEC
+
+Upon receiving this command, servers shall execute the shellcode having previously
+been transmitted by CODE.  The shellcode shall not take any parameters or arguments.
+A status message shall be sent back to the client upon successful execution of the
+shellcode containing the value returned by the shellcode. Since shellcode executed 
+on the server by the EXEC command may force the host machine to shut down or reboot, 
+thus ending the server's process, clients must be prepared for a broken pipe error on 
+further sends to the socket maintained by clients.
+
+4. LIST
+
+Returns a list of processes (obtained using the system command 'ps -a') running on
+the machine that is hosting the server's process.
+
+5. QUIT
+
+Ends a client's session with the server.  After this command has been processed, the
+server will sever the TCP/IP connection with the client and reset its internal state
+variables.  The client will be marked as no longer being permitted to send commands
+or data.  
+
+6. USRS
+
+Causes the server to return a list of currently-logged-in users on the target
+machine.
+
+-------------------------------------------------------------------------------
+EXAMPLE SESSION
+-------------------------------------------------------------------------------

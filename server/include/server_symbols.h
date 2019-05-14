@@ -222,7 +222,7 @@
  * @brief Path to the log file.
  */
 #ifndef LOG_FILE_PATH
-#define LOG_FILE_PATH				"/home/bhart/logs/chattr/server.log"
+#define LOG_FILE_PATH				"/home/bhart/logs/onigumo/server.log"
 #endif //LOG_FILE_PATH
 
 #ifndef MAX_ALLOWED_CONNECTIONS
