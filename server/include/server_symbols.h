@@ -212,6 +212,13 @@
 #endif //IPADDRLEN
 
 /**
+ * @brief Default log file directory.
+ */
+#ifndef LOG_FILE_DIR
+#define LOG_FILE_DIR "~/logs/onigumo"
+#endif //LOG_FILE_DIR
+
+/**
  * @brief fopen() mode for opening the log file.
  */
 #ifndef LOG_FILE_OPEN_MODE
@@ -222,7 +229,7 @@
  * @brief Path to the log file.
  */
 #ifndef LOG_FILE_PATH
-#define LOG_FILE_PATH				"/home/bhart/logs/onigumo/server.log"
+#define LOG_FILE_PATH				"~/logs/onigumo/server.log"
 #endif //LOG_FILE_PATH
 
 #ifndef MAX_ALLOWED_CONNECTIONS
@@ -428,7 +435,7 @@
  * @brief Title of this software for displaying on the console.
  */
 #ifndef SOFTWARE_TITLE
-#define SOFTWARE_TITLE              "Chattr TCP chat server v1.0\n"
+#define SOFTWARE_TITLE              "onigumo Remote Exploit Server v1.0\n"
 #endif //SOFTWARE_TITLE
 
 /**

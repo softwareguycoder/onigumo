@@ -25,6 +25,7 @@
 #include <netdb.h>
 #include <signal.h>
 #include <uuid/uuid.h>
+#include <sys/stat.h>
 
 // Bringing in libraries defined by us
 #include <../../../api_core/api_core/include/api_core.h>

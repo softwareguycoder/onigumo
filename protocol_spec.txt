@@ -92,12 +92,47 @@ this client as being permitted to send further commands.  Except for QUIT, no
 other commands in this specification shall be accepted by the server until the 
 HELO command has been sent.
 
+	a. Command
+		
+		i. HELO\n
+
+		The HELO command should be issued immediately following successful
+		socket connection.  The word "HELO", all caps, should be sent, fol-
+		lowed by an LF character.
+
+		Nothing else should be transmitted.  If any string other than the
+		above is sent, such as HELO <text>\n, the command will be ignored
+		or will receive a 500 response.
+
+	b. Responses
+
+		i. 200 OK Welcome to the onigumo server.
+
+		Indicates that a new session has been activated successfully
+		for you on the server.
+
+		ii. 500 Not accepting new clients right now.
+
+		For some reason, although I do not know why, this response may
+		potentially be issued.
+
+		iii. errno = EPIPE or errno = EBADF
+
+		Occurs if the client is attempting to connect to a machine that
+		is known to host an instance of the onigumo server and the server
+		process is not operational on the machine (either the exploit was
+		discovered and/or the process was otherwise terminated).
+
 2. CODE
 
 To be followed by one or more lines of shellcode to be executed on the target
 machine.  The target machine is the machine on which the server process itself
 is running.  When this command is received, servers shall store the data
 sent after this command in a buffer for later use.
+
+	a. Responses
+
+	
 
 3. EXEC
 

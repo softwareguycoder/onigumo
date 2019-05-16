@@ -13,6 +13,7 @@
 		<project>uuid_core</project>
 		<project>console_core</project>
 		<project>api_core</project>
+		<project>file_core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

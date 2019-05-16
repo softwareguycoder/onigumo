@@ -69,7 +69,20 @@ void CleanupServer(int nExitCode) {
 // ConfigureLogFile function - Removes the old log file from disk (if
 // applicable) and sets up the file pointers and handles for the new one
 
+void CreateDirIfNotExists(const char* pszPathName) {
+	if (IsNullOrWhiteSpace(pszPathName)) {
+		return;
+	}
+
+	struct stat st = {0};
+	if (-1 == stat(pszPathName, &st)) {
+		mkdir(pszPathName, 0700);
+	}
+}
+
 void ConfigureLogFile() {
+	CreateDirIfNotExists(LOG_FILE_DIR);
+
     remove(LOG_FILE_PATH);
     SetLogFileHandle(fopen(LOG_FILE_PATH, LOG_FILE_OPEN_MODE));
     SetErrorLogFileHandle(GetLogFileHandle());
