@@ -131,11 +131,6 @@
     "Required parameter lpSendingClient not specified.\n"
 #endif //ERROR_NO_SENDING_CLIENT_SPECIFIED
 
-#ifndef NICK_ALREADY_REGISTERED
-#define NICK_ALREADY_REGISTERED \
-	"505 Changing chat nickname is not allowed.\n"
-#endif //NICK_ALREADY_REGISTERED
-
 /**
  * @brief Error reply that is sent to clients when a nickname is proposed
  * for a chatter and it's an invalid format or length.
