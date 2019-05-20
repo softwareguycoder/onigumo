@@ -29,13 +29,6 @@ typedef struct _tagCLIENTSTRUCT {
 	char szIPAddress[IPADDRLEN];
 
 	/**
-	 * @name pszNickname
-	 * @brief Address of a buffer that tracks the current chat nickname
-	 * the client's user wants.
-	 */
-	char* pszNickname;
-
-	/**
 	 * @name nSocket
 	 * @brief Value of the socket file descriptor to use when communicating
 	 * with this client.

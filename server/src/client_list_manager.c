@@ -37,38 +37,6 @@ BOOL FindClientByID(void* pvClientId, void* pvClientStruct) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FindClientByNickname function - Searches the list for a client with the
-// specified nickname.  Does a case-sensitive comparison.  This is because, in
-// the realm of chat software, bob and BoB can be recognizable as two different
-// chatters
-
-BOOL FindClientByNickname(void* pvNickname, void* pvClientStruct) {
-    if (pvNickname == NULL) {
-        return FALSE;	// Required parameter
-    }
-
-    if (pvClientStruct == NULL) {
-        return FALSE;	// Required parameter
-    }
-
-    const char* pszNickname = (char*) pvNickname;
-    if (IsNullOrWhiteSpace(pszNickname)) {
-        return FALSE;	// Required parameter
-    }
-
-    LPCLIENTSTRUCT lpCS = (LPCLIENTSTRUCT) pvClientStruct;
-    if (lpCS == NULL) {
-        return FALSE;	// Required parameter
-    }
-
-    if (IsNullOrWhiteSpace(lpCS->pszNickname)) {
-        return FALSE;	// Required parameter
-    }
-
-    return Equals(pszNickname, lpCS->pszNickname);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // ForceDisconnectionOfClient function - A callback that is called for every
 // currently-connected client in the client list, to disconnect them when the
 // server is exited by the server console's user.

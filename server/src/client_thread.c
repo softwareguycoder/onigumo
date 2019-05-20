@@ -54,13 +54,6 @@ void *ClientThread(void* pData) {
 			if (HandleProtocolCommand(lpSendingClient, pszData))
 				continue;
 
-			/* IF we are here, then the pszData was not found to contain a protocol-
-			 * required command string; rather, this is simply text.  We prepend the
-			 * 'chat handle' of the person who sent the message and then send it to
-			 * all the chatters except the person who sent the message.
-			 */
-			BroadcastChatMessage(pszData, lpSendingClient);
-
 			/* TODO: Add other protocol handling here */
 
 			/* Free the received data so it does not leak memory */

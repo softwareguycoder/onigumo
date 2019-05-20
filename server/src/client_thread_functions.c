@@ -20,7 +20,6 @@
 #include "client_list_manager.h"
 #include "client_thread.h"
 #include "client_thread_functions.h"
-#include "nickname_manager.h"
 #include "server_functions.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,63 +43,6 @@ void SendMultilineDataTerminator(LPCLIENTSTRUCT lpSendingClient) {
 
 BOOL AreTooManyClientsConnected() {
 	return GetConnectedClientCount() > MAX_ALLOWED_CONNECTIONS;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// BroadcastChatMessage function
-
-void BroadcastChatMessage(const char* pszChatMessage,
-		LPCLIENTSTRUCT lpSendingClient) {
-	if (IsNullOrWhiteSpace(pszChatMessage)) {
-		return;
-	}
-
-	if (lpSendingClient == NULL || !IsSocketValid(lpSendingClient->nSocket)) {
-		return;
-	}
-
-	if (IsNullOrWhiteSpace(lpSendingClient->pszNickname)) {
-		return;
-	}
-
-	if (lpSendingClient->bConnected == FALSE) {
-		return;
-	}
-
-	// Compute the size of a buffer for holding the prefix to a server-emitted
-	// chat message (that we are broadcasting to all clients.  The prefix is
-	// as follows: "!<nickname>: ".  We need a buffer that contains all the
-	// chars of the nickname itself, plus a bang ('!'), a colon (':'), a
-	// space (' ') character, and don't forget the null-terminator
-	const int NICKNAME_PREFIX_SIZE = strlen(lpSendingClient->pszNickname) + 4;
-
-	if (NICKNAME_PREFIX_SIZE == MIN_NICKNAME_PREFIX_SIZE) {
-		return; // Nickname is blank, but we can't work with that
-		// since we need a value here.
-	}
-
-	// Make a buffer for putting a bang, the nickname, a colon, and then
-	// a space into.  Clients look for strings prefixed with a bang (!) and
-	// strip the bang and do not show an "S: " before it in their UIs.
-	char szNicknamePrefix[NICKNAME_PREFIX_SIZE];
-
-	sprintf(szNicknamePrefix, "!%s: ", lpSendingClient->pszNickname);
-
-	char *pszMessageToBroadcast = NULL;
-
-	PrependTo(&pszMessageToBroadcast, szNicknamePrefix, pszChatMessage);
-
-	if (pszMessageToBroadcast != NULL) {
-		// Send the message to be broadcast to all the connected
-		// clients except for the sender (per the requirements)
-		BroadcastToAllClientsExceptSender(pszMessageToBroadcast,
-				lpSendingClient);
-
-		/* the block of memory referenced by pszMessageToBroadcast is
-		 * dynamically-allocated.  Free it. */
-		free(pszMessageToBroadcast);
-		pszMessageToBroadcast = NULL;
-	}
 }
 
 void CleanupClientConnection(LPCLIENTSTRUCT lpSendingClient) {
@@ -158,9 +100,9 @@ void CleanupClientConnection(LPCLIENTSTRUCT lpSendingClient) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// EndChatSession function
+// EndClientSession function
 
-BOOL EndChatSession(LPCLIENTSTRUCT lpSendingClient) {
+BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
 	if (lpSendingClient == NULL) {
 		return FALSE;
 	}
@@ -172,16 +114,6 @@ BOOL EndChatSession(LPCLIENTSTRUCT lpSendingClient) {
 
 	//fprintf(stdout, "Ending chat session with client '{%s}'...\n", pszID);
 
-	if (!IsNullOrWhiteSpace(lpSendingClient->pszNickname)) {
-		sprintf(szReplyBuffer, NEW_CHATTER_LEFT, lpSendingClient->pszNickname);
-
-		//fprintf(stdout, "Informing other clients that @%s has left"
-		//      " the chat room...\n", lpSendingClient->pszNickname);
-		/* Give ALL connected clients the heads up that this particular chatter
-		 * is leaving the chat room (i.e., Elvis has left the building) */
-		BroadcastToAllClientsExceptSender(szReplyBuffer, lpSendingClient);
-	}
-
 	/* Tell the client who told us they want to quit,
 	 * "Good bye sucka!" */
 	lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient, OK_GOODBYE);
@@ -190,17 +122,6 @@ BOOL EndChatSession(LPCLIENTSTRUCT lpSendingClient) {
 
 	// Mark this client as no longer being connected.
 	lpSendingClient->bConnected = FALSE;
-
-	// If storage has been allocated for this client's nickname, blank
-	// the value out so that the server does not get confused about a nickname
-	// already being used.
-	if (lpSendingClient->pszNickname != NULL) {
-		memset((char*) (lpSendingClient->pszNickname), 0,
-				MAX_NICKNAME_LEN + 1);
-
-		free(lpSendingClient->pszNickname);
-		lpSendingClient->pszNickname = NULL;
-	}
 
 	CleanupClientConnection(lpSendingClient);
 
@@ -278,7 +199,7 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient, char* pszBuffer) {
 	/* per protocol, client says bye bye server by sending the QUIT
 	 * command */
 	if (StartsWith(pszBuffer, PROTOCOL_QUIT_COMMAND)) {
-		return EndChatSession(lpSendingClient);
+		return EndClientSession(lpSendingClient);
 	}
 
 	/* Check whether the sending client is in the connected state.
@@ -303,11 +224,6 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient, char* pszBuffer) {
 		ProcessListCommand(lpSendingClient);
 
 		return TRUE; /* command successfully handled */
-	}
-
-	// StartsWith function is declared/defined in utils.h/.c
-	if (StartsWith(pszBuffer, PROTOCOL_NICK_COMMAND)) {
-		return RegisterClientNickname(lpSendingClient, pszBuffer);
 	}
 
 	//char szReplyBuffer[BUFLEN];
@@ -412,7 +328,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
 		lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
 		OK_FOLLOW_WITH_NICK_REPLY);
 	} else {
-		TellClientTooManyPeopleChatting(lpSendingClient);
+		TellClientTooManyPeopleConnected(lpSendingClient);
 	}
 }
 
@@ -454,12 +370,15 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
 				continue;
 			}
 
-			sprintf(szReplyBuffer, "!@%s\n", lpCS->pszNickname);
+			// TODO: Add code here to send the current line of the multi-line
+			// response
+
+			/*sprintf(szReplyBuffer, "!@%s\n", lpCS->pszNickname);
 
 			lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
 					szReplyBuffer);
 
-			memset(szReplyBuffer, 0, MAX_NICKNAME_LEN + 4);
+			memset(szReplyBuffer, 0, MAX_NICKNAME_LEN + 4);*/
 		} while ((pos = GetNextPosition(pos)) != NULL);
 	}
 	UnlockMutex(GetClientListMutex());
@@ -577,9 +496,9 @@ int SendToClient(LPCLIENTSTRUCT lpCurrentClient, const char* pszMessage) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// TellClientTooManyPeopleChatting function
+// TellClientTooManyPeopleConnected function
 
-void TellClientTooManyPeopleChatting(LPCLIENTSTRUCT lpSendingClient) {
+void TellClientTooManyPeopleConnected(LPCLIENTSTRUCT lpSendingClient) {
 	if (lpSendingClient == NULL) {
 		return;
 	}
@@ -595,25 +514,14 @@ void TellClientTooManyPeopleChatting(LPCLIENTSTRUCT lpSendingClient) {
 	LogError(ERROR_TOO_MANY_CLIENTS, MAX_ALLOWED_CONNECTIONS);
 
 	if (GetErrorLogFileHandle() != stderr) {
-		fprintf(stderr,
-		ERROR_TOO_MANY_CLIENTS, MAX_ALLOWED_CONNECTIONS);
+		fprintf(stderr, ERROR_TOO_MANY_CLIENTS, MAX_ALLOWED_CONNECTIONS);
 	}
 
 	lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-	ERROR_MAX_CONNECTIONS_EXCEEDED);
+	    ERROR_MAX_CONNECTIONS_EXCEEDED);
 
 	// Make the current client not connected
 	lpSendingClient->bConnected = FALSE;
-
-	// If storage has been allocated for this client's nickname, blank
-	// the value out so that the server does not get confused about a nickname
-	// already being used by a client that actually has, in fact, ended their
-	// session (i.e., when clients stop chatting, their nickname goes back
-	// into the 'pool of all available nicknames')
-	if (lpSendingClient->pszNickname != NULL) {
-		memset((char*) (lpSendingClient->pszNickname), 0,
-		MAX_NICKNAME_LEN + 1);
-	}
 
 	// Cleanup system resources used by the client connection.
 	// This uses part of the logic from ending a chat session.

@@ -24,21 +24,6 @@ extern BOOL g_bShouldTerminateClientThread;
 BOOL AreTooManyClientsConnected();
 
 /**
- * @brief Takes the specified chat message and prepends the nickname of the
- * sending client to it
- * @param pszChatMessage Address of the character array containing the chat
- * message.
- * @param lpSendingClient Reference to a CLIENTSTRUCT instance containing data
- * on the client who sent the chat message.
- * @remarks When a particular chatter in a chat room sends a message, the
- * other people want to know who sent the message, so we prepend the message
- * with the sender's chat handle (aka nickname) prior to sending to the other
- * clients.
- */
-void BroadcastChatMessage(const char* pszChatMessage,
-        LPCLIENTSTRUCT lpSendingClient);
-
-/**
  * @brief Throws away resources (such as threads, sockets, and such) that are
  * associated with the client specified.
  * @remarks Kills and destroys the client thread, and closes the socket that
@@ -53,7 +38,7 @@ void CleanupClientConnection(LPCLIENTSTRUCT lpSendingClient);
  * marks the client entry in the client list as non-connected and then kills
  * the client's comms thread.
  */
-BOOL EndChatSession(LPCLIENTSTRUCT lpSendingClient);
+BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient);
 
 /**
  * @brief Determines the count of client entries in the linked list that are
@@ -163,7 +148,7 @@ int SendToClient(LPCLIENTSTRUCT lpCurrentClient, const char* pszMessage);
  * of connected clients exceed the maximum allowed.
  * @param lpSendingClient Reference to a CLIENTSTRUCT instance containing
  * information about the newly-connected client. */
-void TellClientTooManyPeopleChatting(LPCLIENTSTRUCT lpSendingClient);
+void TellClientTooManyPeopleConnected(LPCLIENTSTRUCT lpSendingClient);
 
 /**
  * @brief Semaphore that gets signaled to indicate that this client thread

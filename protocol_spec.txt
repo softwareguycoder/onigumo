@@ -50,6 +50,9 @@ terminate, as a whole, when a line containing a single period (.) and a LF chara
 only is sent.  All multiline command input or response, whether sent by the server
 to the client, or the reverse, will work in this way.
 
+Status codes are matched to identical error conditions.  For example, a 501 code al-
+ways indicates the server cannot parse input it is given as an integer.
+
 If the client needs to send multiline data, the client must first issue the proper
 command to the server.  The server will respond.  If the response has the proper
 status code, then the client may reply by sending its input, again as text strings
@@ -83,9 +86,37 @@ the status codes will all fall within the numeric ranges given below:
 LIST OF COMMANDS
 -------------------------------------------------------------------------------
 
-The commands supported by the onigumo server are:
+1. Case-sensitivity of commands
 
-1. HELO
+	a. All four-character command names must be supplied as all-caps strings.  
+	Command names in any other case are ignored.
+
+	The commands supported by the onigumo server are:
+
+		i.	HELO
+		ii.	CODE
+		iii.	EXEC
+		iv.	QUIT
+		v. 	USRS
+
+	Documentation of each command follows.
+
+2. Server replies
+
+	a. Once a command string is transmitted, the server (who is listening for
+	data from clients) responds with a message.  
+
+	a. At any time, the server could send the following string to the client:
+
+	503 Server forcibly shut down by its operator.
+
+	If this string is received by the client, the client must immediately 
+	terminate the connection with the server and/or release TCP endpoint 
+	resources back to the operating system, as this indicates that the 
+	executable process that the server is implemented with has been 
+	terminated.
+
+3. HELO
 
 Activates this particular client's session with the server.  The server marks 
 this client as being permitted to send further commands.  Except for QUIT, no
@@ -123,18 +154,56 @@ HELO command has been sent.
 		process is not operational on the machine (either the exploit was
 		discovered and/or the process was otherwise terminated).
 
-2. CODE
+4. CODE
 
 To be followed by one or more lines of shellcode to be executed on the target
 machine.  The target machine is the machine on which the server process itself
 is running.  When this command is received, servers shall store the data
-sent after this command in a buffer for later use.
+sent after this command in a buffer for later use.  The CODE command has a 
+single required argument.  The argument must be a positive integer that gives the
+number of shellcode bytes that the client wants to send.
 
-	a. Responses
-
+	a. Command
 	
+		i. CODE <number of shellcode bytes>\n
 
-3. EXEC
+	b. Responses
+
+		i. 201 OK. Send your shellcode.  Terminate with a '.' on a 
+		   line by itself.
+
+		Indicates that the server is ready to receive the shellcode
+		bytes.  Use ASCII characters, or \x escape codes.  Multiple
+		lines can be sent.  The maximum characters, including the '\'
+		and 'x' of escape code, of any one line, is 255 characters,
+		including the terminating LF.  Characters past this limit
+		are not guaranteed to be retained.  Whether one line is 
+		sent or many, a period ('.') followed by an LF should be
+		sent to indicate the termination of the shellcode.  If shell-
+		code has already been sent, then the data transmitted now
+		will replace anything that has not already been executed. Shell-
+		code must always be a series of instructions that accept a
+		single 32-bit integer as input and places a value in register
+		EAX.  Shellcode instructions not conforming to this spec
+		will still be run, but the result is not guaranteed.
+
+		After clients receive the 201 response and send the shellcode,
+		clients should issue the EXEC command (see below).  The EXEC
+		command orders the server to execute any shellcode it has received.
+
+		ii. 501 Failed.  Cannot parse input as integer.
+
+		The argument passed to CODE is not able to be converted from an ASCII 
+		string representation of a 32-bit integer into a numeric value.
+
+		iii. 502 Failed.  Integer argument must be a positive, 32-bit quanity..
+
+		CODE must be called followed by a space, and then the ASCII represent-
+		ation of a positive integer. This response code indicates that the 
+		number passed is parsable, but it is either zero or negative, which is
+		invalid. 
+
+5. EXEC
 
 Upon receiving this command, servers shall execute the shellcode having previously
 been transmitted by CODE.  The shellcode shall not take any parameters or arguments.
@@ -144,32 +213,133 @@ on the server by the EXEC command may force the host machine to shut down or reb
 thus ending the server's process, clients must be prepared for a broken pipe error on 
 further sends to the socket maintained by clients.
 
-4. LIST
+	a. Command
+		
+		i. EXEC <integer1> <integer2>\n
+
+		The EXEC command has as its parameters the ASCII representations
+		of any two positive or negative whole numbers, or zero, representable by
+		a 32-bit type.  The command will return an error response if two 
+		values are not supplied, or the server is unable to parse them.
+		
+	
+	b. Responses
+
+		i. 202 <integer return value.>
+
+		EXEC runs the shellcode on the host machine and returns the value
+		the shell code has placed into register EAX.  If the shellcode runs
+		in another fashion, no response may be issued by the server at all,
+		because the thread of execution being used by the server to comm-
+		unicate with the client is blocked by the instructions executed by
+		the shellcode.
+
+		ii. 501 Failed.  Cannot parse input as integer.
+
+		One or the other of the argument(s) to EXEC is not able to be 
+		converted from an ASCII string representation of a 32-bit integer 
+		into a numeric value.
+
+		iii. 504 Failed.  Two numbers must be passed to EXEC as arguments.
+
+		EXEC must be called followed by a space-separated list of two integers.	
+		This response code indicates that the 
+
+6. LIST
 
 Returns a list of processes (obtained using the system command 'ps -a') running on
 the machine that is hosting the server's process.
 
-5. QUIT
+	a. Command
+
+		i. LIST\n
+	
+		THe LIST command is simply sent by itself with a terminating newline.
+
+	b. Responses
+
+		i. 203 OK. List of processes running on this machine follows.
+
+		This message is sent to indicate that the server is about to tranmit
+		a multiline response to the client.  The end of the multiline repsonse
+		will be denoted by the transmission of a single period ('.') on a line
+		by itself.  Each line of the response will be the PID of a process, a
+		tab, then the command utilized to launch the process, and a LF character.
+
+		ii. 505 Host operating system denied us access to the list of processes.
+
+		Exactly as it says on the tin -- the onigumo server process attempted to
+		gather information on the processes running on its host machine, but access
+		was denied to the onigumo process to run this command.  Could also indicate
+		that the user account under which the onigumo server's process is executing
+		does not have sufficient access to the host system.
+
+7. QUIT
 
 Ends a client's session with the server.  After this command has been processed, the
 server will sever the TCP/IP connection with the client and reset its internal state
 variables.  The client will be marked as no longer being permitted to send commands
 or data.  
 
-6. USRS
+	a. Command
+	
+		i. QUIT\n
+
+		The QUIT command is four uppercase-only characters and a terminating LF. This
+		command terminates the client's session with the server.  Clients must issue
+		this command when they are finished talking with the server.
+
+	b. Response
+	
+		ii. 204 Goodbye.
+
+		Indicates that the server has processed the QUIT command successfully. The
+		client's session with the server is now over.
+
+8. USRS
 
 Causes the server to return a list of currently-logged-in users on the target
 machine.
+
+	a. Command
+	
+		i. USRS\n
+
+		Clients issue the USRS command as just the command name followed by a LF.
+		This causes the server to query the host for the list of all the currently
+		logged in users.
+
+	b. Response
+
+		
+		i. 205 OK. List of local users follows.
+
+		This response indicates that the command succeeded and that the server is 
+		about to tranmit a multiline response.  Each line of the response consists
+		of each user's username, followed by a LF character.  The end of the response
+		is signaled by the server transmitting a period ('.') on a line by itself.
+
+		ii. 506 Failed. Host operating system denied us access to the list of users.
+
+		Exactly as it says on the tin -- the ongiumo server attempted to obtain the 
+		list of currently active users; however, the operating system of the host
+		machine denied the user account under which onigumo's server process is running
+		access to the list of users.
 
 -------------------------------------------------------------------------------
 EXAMPLE SESSION
 -------------------------------------------------------------------------------
 
+1. The following example session is provided for educational purposes only. For
+the sake of argument, pretend that the shellcode bytes transmitted are actually
+for a function that takes two numbers as arguments, and returns the result of 
+adding them.  That is not actually what the shellcode does; however, bear with us.
+
 C: HELO
 <server creates new client session internally>
 S: 200 OK. Welcome to the onigumo server.  Be careful what you wish for!
-C: CODE
-S: 201 OK, send your shellcode.  Terminate with a '.' on a line by itself.
+C: CODE 23
+S: 201 OK. Send your shellcode.  Terminate with a '.' on a line by itself.
 C: \x55
 C: \x48\x89\xe5
 C: \x48\x8d\x3d\x00\x00\x00\x00
@@ -177,4 +347,14 @@ C: \xe8\x00\x00\x00\x00
 C: \xb8\x00\x00\x00\x00
 C: \x5d
 C: \xc3
+C: .
+C: EXEC 5 2
+S: 202 7
+C: QUIT
 
+Notice that on the line 'C: CODE 23' above, the value 23 is passed as the argument to
+the CODE command.  There are more than 23 characters if you add up all the individual
+characters in the shellcode lines, including the occurrences of '\x' (which, in
+principle, is two characters -- a '\' and a 'x' -- long, even though it's an escape
+code).  Really, what the 23 is counting are the number of opcodes in your shellcode,
+which are the two-digit hex numbers.

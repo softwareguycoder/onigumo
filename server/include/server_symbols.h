@@ -314,7 +314,7 @@
  * server that their user is done chatting.
  */
 #ifndef OK_GOODBYE
-#define OK_GOODBYE					"200 Goodbye.\n"
+#define OK_GOODBYE					"204 Goodbye.\n"
 #endif //OK_GOODBYE
 
 /**
@@ -357,11 +357,6 @@
 #ifndef PROTOCOL_LIST_COMMAND
 #define PROTOCOL_LIST_COMMAND	"LIST\n"
 #endif //PROTOCOL_LIST_COMMAND
-
-// Protocol command that registers this user's chat handle with the server
-#ifndef PROTOCOL_NICK_COMMAND
-#define PROTOCOL_NICK_COMMAND	"NICK "
-#endif //PROTOCOL_NICK_COMMAND
 
 /**
  * @brief Protocol command that 'logs the client off' from the chat server.
