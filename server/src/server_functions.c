@@ -79,7 +79,7 @@ void ConfigureLogFile() {
 	FILE* fpLogFile =
 	    fopen(LOG_FILE_PATH, LOG_FILE_OPEN_MODE);
 	if(fpLogFile == NULL) {
-	  fprintf(stderr, "ERROR: Failed to open log file.\n");
+	  fprintf(stderr, FAILED_OPEN_LOG_FILE);
 	  perror("server[ConfigureLogFile]");
 	  exit(EXIT_FAILURE);
 	}
