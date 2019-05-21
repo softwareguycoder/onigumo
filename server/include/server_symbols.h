@@ -175,6 +175,10 @@
 									"channel.\n"
 #endif //FAILED_LAUNCH_CLIENT_THREAD
 
+#ifndef FAILED_OPEN_LOG_FILE
+#define FAILED_OPEN_LOG_FILE \
+  "ERROR: Failed to open log file.\n"
+#endif //FAILED_OPEN_LOG_FILE
 /**
  * @brief Error message to display when we've failed to receive text from the
  * client.
