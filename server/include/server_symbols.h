@@ -226,7 +226,7 @@
  * @brief fopen() mode for opening the log file.
  */
 #ifndef LOG_FILE_OPEN_MODE
-#define LOG_FILE_OPEN_MODE			"ab+"
+#define LOG_FILE_OPEN_MODE			"a+"
 #endif //LOG_FILE_OPEN_MODE
 
 /**
