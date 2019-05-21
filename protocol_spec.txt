@@ -137,7 +137,7 @@ HELO command has been sent.
 
 	b. Responses
 
-		i. 200 OK Welcome to the onigumo server.
+		i. 200 OK. Welcome to the onigumo server.  Be careful what you wish for!
 
 		Indicates that a new session has been activated successfully
 		for you on the server.
