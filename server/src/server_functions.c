@@ -74,10 +74,13 @@ void CleanupServer(int nExitCode) {
 void ConfigureLogFile() {
 	CreateDirIfNotExists(LOG_FILE_DIR);
 
-	remove(LOG_FILE_PATH);
+  char szExpandedPathName[MAX_PATH + 1];
+  ShellExpand(LOG_FILE_PATH, szExpandedPathName, MAX_PATH + 1);
+
+	remove(szExpandedPathName);
 
 	FILE* fpLogFile =
-	    fopen(LOG_FILE_PATH, LOG_FILE_OPEN_MODE);
+	    fopen(szExpandedPathName, LOG_FILE_OPEN_MODE);
 	if(fpLogFile == NULL) {
 	  fprintf(stderr, FAILED_OPEN_LOG_FILE);
 	  perror("server[ConfigureLogFile]");
