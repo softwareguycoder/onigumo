@@ -298,10 +298,10 @@
  * by a proper NICK command, no chat messages will be echoed to that particular
  * client if other users chat.
  */
-#ifndef OK_FOLLOW_WITH_NICK_REPLY
-#define OK_FOLLOW_WITH_NICK_REPLY	"201 Welcome!  Now use the NICK command" \
-									" to tell me your nickname.\n"
-#endif //OK_FOLLOW_WITH_NICK_REPLY
+#ifndef OK_WELCOME
+#define OK_WELCOME \
+    "200 OK. Welcome to the onigumo server.  Be careful what you wish for!\n"
+#endif //OK_WELCOME
 
 /**
  * @brief Response to the QUIT command indicating operation succeeded.
@@ -324,15 +324,6 @@
 #define OK_LIST_FOLLOWS \
 	"203 OK. List of chatters follows.  Ends with .\n"
 #endif //OK_LIST_FOLLOWS
-
-/**
- * @brief Response to the NICK command signifying operation succeeded.
- * @remarks The NICK command is issued by clients to register a "chat handle"
- * for their user.
- */
-#ifndef OK_NICK_REGISTERED
-#define OK_NICK_REGISTERED			"202 OK your nickname is %s.\n"
-#endif //OK_NICK_REGISTERED
 
 #ifndef OUT_OF_MEMORY
 #define OUT_OF_MEMORY \
