@@ -75,8 +75,19 @@ void ConfigureLogFile() {
 	CreateDirIfNotExists(LOG_FILE_DIR);
 
 	remove(LOG_FILE_PATH);
-	SetLogFileHandle(fopen(LOG_FILE_PATH, LOG_FILE_OPEN_MODE));
-	SetErrorLogFileHandle(GetLogFileHandle());
+
+	FILE* fpLogFile =
+	    fopen(LOG_FILE_PATH, LOG_FILE_OPEN_MODE);
+	if(fpLogFile == NULL) {
+	  fprintf(stderr, "ERROR: Failed to open log file.\n");
+	}
+
+	SetLogFileHandle(fpLogFile);
+
+	FILE* fpCurrentLogFileHandle =
+	    GetLogFileHandle();
+
+	SetErrorLogFileHandle(fpCurrentLogFileHandle);
 
 	/*set_log_file(stdout);
 	 set_error_log_file(stderr);*/
