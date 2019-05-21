@@ -64,6 +64,11 @@
 	"server: Client thread ending.\n"
 #endif // CLIENT_THREAD_ENDING
 
+#ifndef COMMAND_INCORRECT
+#define COMMAND_INCORRECT \
+  "500 Error.  Command syntax incorrect or server error.\n"
+#endif //COMMAND_INCORRECT
+
 /**
  * @brief Copyright message to display on the server's console.
  */

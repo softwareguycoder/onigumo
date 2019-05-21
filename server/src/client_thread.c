@@ -54,8 +54,6 @@ void *ClientThread(void* pData) {
 			if (HandleProtocolCommand(lpSendingClient, pszData))
 				continue;
 
-			/* TODO: Add other protocol handling here */
-
 			/* Free the received data so it does not leak memory */
 			FreeBuffer((void**) &pszData);
 
