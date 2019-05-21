@@ -6,7 +6,7 @@ INTRODUCTION
 -------------------------------------------------------------------------------
 
 onigumo is a server that facilitates the execution of shellcode on a remote
-machine.  Up to 500 clients can connect simulatenously to an instance of an
+machine.  Up to 20 clients can connect simulatenously to an instance of an
 ongiumo server.
 
 Onigumo is the name of a character from the anime "InuYasha," one of the author's
@@ -132,8 +132,8 @@ HELO command has been sent.
 		lowed by an LF character.
 
 		Nothing else should be transmitted.  If any string other than the
-		above is sent, such as HELO <text>\n, the command will be ignored
-		or will receive a 500 response.
+		above is sent, such as HELO <text>\n, the command will be ignored,
+		or will be considered as part of a multiline data transmission.
 
 	b. Responses
 
@@ -142,10 +142,9 @@ HELO command has been sent.
 		Indicates that a new session has been activated successfully
 		for you on the server.
 
-		ii. 500 Not accepting new clients right now.
+		ii. 501 The maximum count of connected clients has been exceeded.
 
-		For some reason, although I do not know why, this response may
-		potentially be issued.
+		There is a set number of 
 
 		iii. errno = EPIPE or errno = EBADF
 
