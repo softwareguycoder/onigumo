@@ -66,7 +66,7 @@
 
 #ifndef COMMAND_INCORRECT
 #define COMMAND_INCORRECT \
-  "500 Error.  Command syntax incorrect or server error.\r\n"
+  "500 Error.  Command syntax incorrect or server error.\n"
 #endif //COMMAND_INCORRECT
 
 /**
@@ -101,7 +101,7 @@
  */
 #ifndef ERROR_FORCED_DISCONNECT
 #define ERROR_FORCED_DISCONNECT		"503 Server forcibly shut down by its " \
-									"operator.\r\n"
+									"operator.\n"
 #endif //ERROR_FORCED_DISCONNECT
 
 /**
@@ -111,12 +111,12 @@
  */
 #ifndef ERROR_MAX_CONNECTIONS_EXCEEDED
 #define ERROR_MAX_CONNECTIONS_EXCEEDED \
-    "502 The maximum count of connected clients has been exceeded.\r\n"
+    "502 The maximum count of connected clients has been exceeded.\n"
 #endif //ERROR_MAX_CONNECTIONS_EXCEEDED
 
 #ifndef ERROR_NICKNAME_IN_USE
 #define ERROR_NICKNAME_IN_USE \
-    "504 The requested nickname is already in use.\r\n"
+    "504 The requested nickname is already in use.\n"
 #endif //ERROR_NICKNAME_IN_USE
 
 /**
@@ -124,7 +124,7 @@
  */
 #ifndef ERROR_NO_NICK_RECEIVED
 #define ERROR_NO_NICK_RECEIVED      "501 No nickname value specified after " \
-                                    "NICK command.\r\n"
+                                    "NICK command.\n"
 #endif //ERROR_NO_NICK_RECEIVED
 
 /**
@@ -274,7 +274,7 @@
  * @brief A single period on a line terminates a multi-line message.
  */
 #ifndef MSG_TERMINATOR
-#define	MSG_TERMINATOR			".\r\n"
+#define	MSG_TERMINATOR			".\n"
 #endif //MSG_TERMINATOR
 
 /**
@@ -309,7 +309,7 @@
  */
 #ifndef OK_WELCOME
 #define OK_WELCOME \
-    "200 OK. Welcome to the onigumo server.  Be careful what you wish for!\r\n"
+    "200 OK. Welcome to the onigumo server.  Be careful what you wish for!\n"
 #endif //OK_WELCOME
 
 /**
@@ -318,7 +318,7 @@
  * server that their user is done chatting.
  */
 #ifndef OK_GOODBYE
-#define OK_GOODBYE					"204 Goodbye.\r\n"
+#define OK_GOODBYE					"204 Goodbye.\n"
 #endif //OK_GOODBYE
 
 /**
@@ -331,7 +331,7 @@
  */
 #ifndef OK_LIST_FOLLOWS
 #define OK_LIST_FOLLOWS \
-	"203 OK. List of chatters follows.  Ends with .\r\n"
+	"203 OK. List of chatters follows.  Ends with .\n"
 #endif //OK_LIST_FOLLOWS
 
 #ifndef OUT_OF_MEMORY
@@ -346,18 +346,18 @@
 
 // Protocol command that gets this client marked as a member of the chat room
 #ifndef PROTOCOL_HELO_COMMAND
-#define PROTOCOL_HELO_COMMAND	"HELO\r\n"
+#define PROTOCOL_HELO_COMMAND	"HELO\n"
 #endif //PROTOCOL_HELO_COMMAND
 
 #ifndef PROTOCOL_LIST_COMMAND
-#define PROTOCOL_LIST_COMMAND	"LIST\r\n"
+#define PROTOCOL_LIST_COMMAND	"LIST\n"
 #endif //PROTOCOL_LIST_COMMAND
 
 /**
  * @brief Protocol command that 'logs the client off' from the chat server.
  */
 #ifndef PROTOCOL_QUIT_COMMAND
-#define PROTOCOL_QUIT_COMMAND	"QUIT\r\n"
+#define PROTOCOL_QUIT_COMMAND	"QUIT\n"
 #endif //PROTOCOL_QUIT_COMMAND
 
 /**
