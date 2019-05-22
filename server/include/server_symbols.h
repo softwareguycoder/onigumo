@@ -162,6 +162,11 @@
     "Failed to allocate memory for client list entry structure.\n"
 #endif //FAILED_ALLOC_CLIENT_STRUCT
 
+#ifndef FAILED_ALLOC_SHELLCODE_STORAGE
+#define FAILED_ALLOC_SHELLCODE_STORAGE \
+    "ERROR: Failed to allocate storage for shellcode.\n"
+#endif //FAILED_ALLOC_SHELLCODE_STORAGE
+
 #ifndef FAILED_CREATE_NEW_CLIENT
 #define FAILED_CREATE_NEW_CLIENT	"server: Failed to create new client " \
 									"list entry.\n"
