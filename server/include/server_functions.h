@@ -29,7 +29,6 @@ void InstallSigintHandler();
 void ParseCommandLine(int argc, char *argv[],
 	int* pnPort, BOOL* pbDiagnosticMode);
 void PrintSoftwareTitleAndCopyright();
-void QuitServer();
 void ServerCleanupHandler(int signum);
 void SetUpServerOnPort(int nPort);
 

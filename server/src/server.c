@@ -62,9 +62,5 @@ int main(int argc, char *argv[]) {
         WaitThread(GetMasterThreadHandle());
     }
 
-    /* We might never get here; but if we do, we arrive here when the master
-     * acceptor thread has terminated. */
-    CleanupServer(OK);
-
     return OK;
 }

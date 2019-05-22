@@ -307,26 +307,6 @@ void PrintSoftwareTitleAndCopyright() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// QuitServer function - Called to conduct an orderly shutdown of the server,
-// stopping all threads and releasing operating system resources in an orderly
-// fashion.
-
-void QuitServer() {
-
-
-
-
-
-
-  DestroyInterlock();
-
-
-  ClearList(&g_pClientList, FreeClient);
-
-  DestroyClientListMutex();
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // ServerCleanupHandler function - Called when the user presses CTRL+C.  This
 // function initiates an orderly shut down of the server application.
 
