@@ -32,8 +32,7 @@ int main(int argc, char *argv[]) {
     // pass on the command line and then quit
     if (!CheckCommandLineArgs(argc, argv)) {
         fprintf(stderr, USAGE_STRING);
-
-        exit(ERROR);    /* we can just exit here, no spiffy cleanup needed. */
+        CleanupServer(EXIT_FAILURE);
     }
 
     int nPort = 0;

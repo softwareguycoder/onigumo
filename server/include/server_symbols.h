@@ -64,6 +64,11 @@
 	"server: Client thread ending.\n"
 #endif // CLIENT_THREAD_ENDING
 
+#ifndef CLOSING_SERVER_TCP_ENDPOINT
+#define CLOSING_SERVER_TCP_ENDPOINT \
+  "server: Closing TCP endpoint...\n"
+#endif //CLOSING_SERVER_TCP_ENDPOINT
+
 #ifndef COMMAND_INCORRECT
 #define COMMAND_INCORRECT \
   "500 Error.  Command syntax incorrect or server error.\n"
@@ -179,6 +184,12 @@
 #define FAILED_OPEN_LOG_FILE \
   "ERROR: Failed to open log file.\n"
 #endif //FAILED_OPEN_LOG_FILE
+
+#ifndef FORCIBLY_CLOSING_ALL_CLIENT_CONNECTIONS
+#define FORCIBLY_CLOSING_ALL_CLIENT_CONNECTIONS \
+  "server: Forcibly closing all client connections...\n"
+#endif //FORCIBLY_CLOSING_ALL_CLIENT_CONNECTIONS
+
 /**
  * @brief Error message to display when we've failed to receive text from the
  * client.
@@ -421,6 +432,10 @@
 #define SERVER_SHUTTING_DOWN        "server: Shutting down...\n"
 #endif //SERVER_SHUTTING_DOWN
 
+#ifndef SERVER_SHUTTING_DOWN_MAT
+#define SERVER_SHUTTING_DOWN_MAT \
+  "server: Shutting down master client connection thread...\n"
+#endif //SERVER_SHUTTING_DOWN_MAT
 /**
  * @brief Title of this software for displaying on the console.
  */

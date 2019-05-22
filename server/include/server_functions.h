@@ -17,11 +17,13 @@ BOOL CheckCommandLineArgs(int argc, char *argv[]);
  * program is terminated.
  */
 void CleanupServer(int nExitCode);
+void CloseServerEndpoint();
 void ConfigureLogFile();
 void CreateClientListMutex();
 void CreateMasterAcceptorThread();
 struct sockaddr_in* CreateSockAddr();
 void DestroyClientListMutex();
+void ForceDisconnectionOfAllClients();
 BOOL InitializeApplication();
 void InstallSigintHandler();
 void ParseCommandLine(int argc, char *argv[],

@@ -35,6 +35,12 @@ void AddClientToList(LPCLIENTSTRUCT lpCS) {
 // CleanupMasterAcceptorThread function
 
 void CleanupMasterAcceptorThread() {
+  LogInfo(SERVER_SHUTTING_DOWN_MAT);
+
+  if (GetLogFileHandle() != stdout) {
+    fprintf(stdout, SERVER_SHUTTING_DOWN_MAT);
+  }
+
   if (INVALID_HANDLE_VALUE != GetMasterThreadHandle()) {
     KillThread(GetMasterThreadHandle());
   }
