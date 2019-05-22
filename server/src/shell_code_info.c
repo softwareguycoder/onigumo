@@ -2,11 +2,10 @@
 // of SHELLCODEINFO structures
 //
 
-#include "shell_code_info.c"
-
 #include "stdafx.h"
 #include "server.h"
 
+#include "shell_code_info.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Internal-use-only functions

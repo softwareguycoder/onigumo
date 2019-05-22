@@ -7,8 +7,7 @@
 #ifndef __MAT_H__
 #define __MAT_H__
 
-// Count of how many currently-connected clients there are
-extern int g_nClientCount;
+extern HMUTEX g_hShellCodeListMutex;
 
 extern BOOL g_bShouldTerminateMasterThread;
 

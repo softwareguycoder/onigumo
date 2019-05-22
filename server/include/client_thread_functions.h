@@ -58,6 +58,15 @@ int GetConnectedClientCount();
 LPCLIENTSTRUCT GetSendingClientInfo(void* pvClientThreadUserState);
 
 /**
+ * @brief Gets a HMUTEX value that is an opaque handle to the mutex used
+ * for synchronizing access to the linked list of shellcode lines that
+ * are currently being processed.
+ * @return HMUTEX handle to the shell code list mutex, or INVALID_HANDLE_VALUE
+ * if the mutex has not been initialized.
+ */
+HMUTEX GetShellCodeListMutex();
+
+/**
  * @brief Checks received data for protocol-specific commands and handles them.
  * @param lpSendingClient Address of a CLIENTSTRUCT instance that contains
  * information on the client who sent the command.
@@ -118,13 +127,13 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient);
 /**
  * @brief Performs a synchronous recieve operation from the client, looking for
  * data until a newline has been receieved.
- * @param lpSendingClient Pointer to a CLIENTSTRUCT instance that refers to the
+ * @param pvSendingClient Pointer to a CLIENTSTRUCT instance that refers to the
  * client who is sending the data.  Required.
  * @param ppszReplyBuffer Address of a pointer to be used to refer to memory
  * storage that is allocated character-by-character for the received text.
  * @returns Number of bytes received; negative value if an error occurred.
  */
-int ReceiveFromClient(LPCLIENTSTRUCT lpSendingClient, char** ppszReplyBuffer);
+int ReceiveFromClient(void* pvSendingClient, char** ppszReplyBuffer);
 
 /**
  * @brief Reports statistics to the server log and console for the client

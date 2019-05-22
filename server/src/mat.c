@@ -18,6 +18,8 @@
 #include "mat_functions.h"
 #include "server_functions.h"
 
+HMUTEX g_hShellCodeListMutex = INVALID_HANDLE_VALUE;
+
 BOOL g_bShouldTerminateMasterThread = FALSE;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,6 +36,8 @@ void* MasterAcceptorThread(void* pThreadData) {
     // function's return value is guaranteed to be valid.
     int nServerSocket = GetServerSocketFileDescriptor(pThreadData);
 
+    CreateShellCodeLinesMutex();
+
     // This thread procedure runs an infinite loop which runs while the server
     // socket is listening for new connections.  This thread's sole mission in
     // life is to wait for incoming client connections, accept them as they come
@@ -46,6 +50,7 @@ void* MasterAcceptorThread(void* pThreadData) {
 
         // If we have been signaled to stop, then abort
         if (g_bShouldTerminateMasterThread) {
+            DestroyShellCodeLinesMutex();
             return NULL;
         }
 
@@ -73,6 +78,8 @@ void* MasterAcceptorThread(void* pThreadData) {
     }
 
     fprintf(stdout, "Master thread ending.\n");
+
+    DestroyShellCodeLinesMutex();
 
     return NULL;
 }
