@@ -220,6 +220,18 @@
 #endif //INVALID_PTR_ARG
 
 /**
+ * @brief Error response sent to clients requesting the list of processes
+ * running on the host.
+ * @remarks If the operation does not work, then it's most likely because the
+ * user account under which the onigumo server is executing does not have
+ * sufficient permissions to run ps -a.
+ */
+#ifndef HOST_PROC_LIST_ACCESS_DENIED
+#define HOST_PROC_LIST_ACCESS_DENIED \
+  "505 Host operating system denied us access to the list of processes.\n"
+#endif //HOST_PROC_LIST_ACCESS_DENIED
+
+/**
  * @brief Maximum length of a string containing a valid IPv4 IP address.
  */
 #ifndef IPADDRLEN
@@ -342,7 +354,7 @@
  */
 #ifndef OK_LIST_FOLLOWS
 #define OK_LIST_FOLLOWS \
-	"203 OK. List of chatters follows.  Ends with .\n"
+	"203 OK. List of processes running on this machine follows.\n"
 #endif //OK_LIST_FOLLOWS
 
 #ifndef OUT_OF_MEMORY
