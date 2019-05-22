@@ -1,4 +1,4 @@
-// shell_code_info.h - Implementations of functions that manipulate instances
+// shell_code_info.c - Implementations of functions that manipulate instances
 // of SHELLCODEINFO structures
 //
 
