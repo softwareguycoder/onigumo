@@ -66,7 +66,8 @@ LPCLIENTSTRUCT GetSendingClientInfo(void* pvClientThreadUserState);
  * @returns TRUE if the text received contained a protocol command and no
  * further processing is needed; FALSE otherwise.
  */
-BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient, char* pszBuffer);
+BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
+    const char* pszBuffer);
 
 /**
  * @brief Callback that is called for each entry in the client list to kill

@@ -165,7 +165,8 @@ LPCLIENTSTRUCT GetSendingClientInfo(void* pvClientThreadUserState) {
 // to be commands that are specific to the chat protocol itself.
 //
 
-BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient, char* pszBuffer) {
+BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
+    const char* pszBuffer) {
 	if (g_bShouldTerminateClientThread) {
 		return TRUE;    // Means, "yes this protocol command got handled"
 	}
