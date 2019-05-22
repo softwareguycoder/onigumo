@@ -44,5 +44,11 @@ void DestroyShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo);
  */
 BOOL IsShellCodeInfoValid(LPSHELLCODEINFO lpShellCodeInfo);
 
+/**
+ * @brief Callback to trigger the logic in DestroyShellCodeInfo.
+ * @param pvData Address of the data to be released.
+ */
+void ReleaseShellCodeInfo(void* pvData);
+
 
 #endif //__SHELL_CODE_INFO_H__

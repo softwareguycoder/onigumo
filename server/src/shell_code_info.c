@@ -97,3 +97,18 @@ BOOL IsShellCodeInfoValid(LPSHELLCODEINFO lpShellCodeInfo) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// ReleaseShellCodeInfo function
+
+void ReleaseShellCodeInfo(void* pvData) {
+  if (pvData == NULL) {
+    return;
+  }
+
+  LPSHELLCODEINFO lpSCI = (LPSHELLCODEINFO)pvData;
+  if (lpSCI == NULL) {
+    return;
+  }
+  DestroyShellCodeInfo(&lpSCI);
+}
+
+///////////////////////////////////////////////////////////////////////////////
