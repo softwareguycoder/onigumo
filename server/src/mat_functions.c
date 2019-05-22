@@ -30,6 +30,18 @@ void AddClientToList(LPCLIENTSTRUCT lpCS) {
 	}
 	UnlockMutex(GetClientListMutex());
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// CleanupMasterAcceptorThread function
+
+void CleanupMasterAcceptorThread() {
+  if (INVALID_HANDLE_VALUE != GetMasterThreadHandle()) {
+    KillThread(GetMasterThreadHandle());
+  }
+
+  sleep(1); /* induce a context switch */
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // GetClientCount function
 

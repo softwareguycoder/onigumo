@@ -14,6 +14,8 @@
 
 void AddNewlyConnectedClientToList(LPCLIENTSTRUCT lpCS);
 
+void CleanupMasterAcceptorThread();
+
 int GetServerSocketFileDescriptor(void* pThreadData);
 
 BOOL IsClientCountZero();
