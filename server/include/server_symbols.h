@@ -142,6 +142,16 @@
     "402 Nickname is invalid format or length."
 #endif //ERROR_NICK_TOO_LONG
 
+#ifndef ERROR_QTY_MUST_BE_POS_32BIT_INT
+#define ERROR_QTY_MUST_BE_POS_32BIT_INT \
+  "502 Failed.  Integer argument must be a positive, 32-bit quanity.\n"
+#endif //ERROR_QTY_MUST_BE_POS_32BIT_INT
+
+#ifndef ERROR_FAILED_TO_PARSE_INT
+#define ERROR_FAILED_TO_PARSE_INT \
+    "501 Failed.  Cannot parse input as integer.\n"
+#endif //ERROR_FAILED_TO_PARSE_INT
+
 #ifndef ERROR_TOO_MANY_CLIENTS
 #define ERROR_TOO_MANY_CLIENTS \
     "ERROR: Maximum number of connected clients (%d) exceeded.\n"
