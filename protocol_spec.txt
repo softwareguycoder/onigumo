@@ -95,7 +95,7 @@ LIST OF COMMANDS
 
 		i.	HELO
 		ii.	CODE
-		iii.	EXEC
+		iii.EXEC
 		iv.	QUIT
 		v. 	USRS
 
@@ -164,7 +164,7 @@ number of shellcode bytes that the client wants to send.
 
 	a. Command
 	
-		i. CODE <number of shellcode bytes><LF>
+		i. CODE <number of Base64-encoded shellcode bytes><LF>
 
 	b. Responses
 
@@ -172,23 +172,29 @@ number of shellcode bytes that the client wants to send.
 		   line by itself.<LF>
 
 		Indicates that the server is ready to receive the shellcode
-		bytes.  Use ASCII characters, or \x escape codes.  Multiple
-		lines can be sent.  The maximum characters, including the '\'
-		and 'x' of escape code, of any one line, is 255 characters,
-		including the terminating LF.  Characters past this limit
-		are not guaranteed to be retained.  Whether one line is 
-		sent or many, a period ('.') followed by an LF should be
-		sent to indicate the termination of the shellcode.  If shell-
-		code has already been sent, then the data transmitted now
-		will replace anything that has not already been executed. Shell-
-		code must always be a series of instructions that accept a
-		single 32-bit integer as input and places a value in register
-		EAX.  Shellcode instructions not conforming to this spec
-		will still be run, but the result is not guaranteed.
+		bytes.  Only ASCII characters are acceptable.  Clients should
+		Base64-encode the opcodes before sending them.  Servers should
+		Base64-decode the opcodes when receiving.  More than one line of
+		data may be submitted to the server by clients.  Each line of 
+		data can not exceed 255 characters (excluding the terminating
+		LF).  If the Base64-encoded version of the shellcode is longer
+		than this limit, the data must be broken up into multiple lines.
+		Each line must termiante with a <LF>.  When the client is finished
+		sending data, clients should indicate this to the server by sending
+		a period ('.') on a line by itself, followed by <LF>.  This command's
+		sole argument must be a nonzero, positive integer that specifies
+		the total number of Base64-encoded bytes it's transmitting.
 
 		After clients receive the 201 response and send the shellcode,
 		clients should issue the EXEC command (see below).  The EXEC
 		command orders the server to execute any shellcode it has received.
+		
+		ii. 202 OK. X bytes of shellcode received.
+		
+		This response is sent to clients after clients send the terminating 
+		'.<LF>' line.  This is to confirm that the server received all the 
+		shellcode.  X is the number of bytes of shellcode processed, minus
+		the <LF> characters and the period at the end.
 
 		ii. 501 Failed.  Cannot parse input as integer.<LF>
 
@@ -214,35 +220,29 @@ further sends to the socket maintained by clients.
 
 	a. Command
 		
-		i. EXEC <integer1> <integer2><LF>
+		i. EXEC<LF>
 
-		The EXEC command has as its parameters the ASCII representations
-		of any two positive or negative whole numbers, or zero, representable by
-		a 32-bit type.  The command will return an error response if two 
-		values are not supplied, or the server is unable to parse them.
+		To tell the server to execute the shellcode you have just sent it,
+		send the server the EXEC command followed with a <LF>.
 		
 	
 	b. Responses
 
-		i. 202 <integer return value.><LF>
+		i. 202 Shellcode ran without errors.<LF>
 
-		EXEC runs the shellcode on the host machine and returns the value
-		the shell code has placed into register EAX.  If the shellcode runs
-		in another fashion, no response may be issued by the server at all,
-		because the thread of execution being used by the server to comm-
-		unicate with the client is blocked by the instructions executed by
-		the shellcode.
+		Indicates that the instructions in the shellcode ran successfully
+		on the destination machine without problems.
 
-		ii. 501 Failed.  Cannot parse input as integer.<LF>
+		ii. 504 Failed.<LF>
 
-		One or the other of the argument(s) to EXEC is not able to be 
-		converted from an ASCII string representation of a 32-bit integer 
-		into a numeric value.
+		Due to either a remote OS error or problem with your shellcode, 
+		execution failed.
 
-		iii. 504 Failed.  Two numbers must be passed to EXEC as arguments.<LF>
+		iii. <nothing> 
 
-		EXEC must be called followed by a space-separated list of two integers.	
-		This response code indicates that the 
+		Perhaps stack-smashing in the shellcode caused an OS fault or some
+		other general-protection condition, and perhaps led the server
+		itself to crash. 
 
 6. LIST
 
@@ -324,6 +324,11 @@ machine.
 		list of currently active users; however, the operating system of the host
 		machine denied the user account under which onigumo's server process is running
 		access to the list of users.
+		
+Note, the server also sends the following response any time a client action
+has resulted in a heretofore-unknown failure on the server's part:
+
+550 Failed. Unknown server or OS error.<LF>
 
 -------------------------------------------------------------------------------
 EXAMPLE SESSION
@@ -337,24 +342,19 @@ adding them.  That is not actually what the shellcode does; however, bear with u
 C: HELO<LF>
 <server creates new client session internally>
 S: 200 OK. Welcome to the onigumo server.  Be careful what you wish for!<LF>
-C: CODE 23<LF>
+C: CODE 244<LF>
 S: 201 OK. Send your shellcode.  Terminate with a '.' on a line by itself.<LF>
-C: \x55<LF>
-C: \x48\x89\xe5<LF>
-C: \x48\x8d\x3d\x00\x00\x00\x00<LF>
-C: \xe8\x00\x00\x00\x00<LF>
-C: \xb8\x00\x00\x00\x00<LF>
-C: \x5d<LF>
-C: \xc3<LF>
+C: Tm93IGlzIHRoZSB0aW1lIGZvciBhbGwgZ29vZCBtZW4gdG8gY29tZSB0byB0aGUgYWlkIG9mIHRoZWl<LF>
+C: yIGNvdW50cnkuICBBbmQgdG8gdGhlIFJlcHVibGljLCBmb3Igd2hpY2ggaXQgc3RhbmRzLCBvbmUgTmF<LF>
+C: 0aW9uLCB1bmRlciBHb2QsIGluZGl2aXNpYmxlLCB3aXRoIGxpYmVydHkgYW5kIGp1c3RpY2UgZm9yIGF<LF>
+C: sbCEh<LF>
 C: .<LF>
 C: EXEC 5 2<LF>
 S: 202 7<LF>
 C: QUIT<LF>
 S: 204 Goodbye.<LF>
 
-Notice that on the line 'C: CODE 23' above, the value 23 is passed as the argument to
-the CODE command.  There are more than 23 characters if you add up all the individual
-characters in the shellcode lines, including the occurrences of '\x' (which, in
-principle, is two characters -- a '\' and a 'x' -- long, even though it's an escape
-code).  Really, what the 23 is counting are the number of opcodes in your shellcode,
-which are the two-digit hex numbers.
+Notice that on the line 'C: CODE 244' above, the value 23 is passed as the argument to
+the CODE command.  There are more than 244 characters if you add up all the individual
+characters in the shellcode lines, including the <LF>'s.  Really, what the 244 is 
+counting are the number of Base64-encoded characters in your shellcode transmission.
