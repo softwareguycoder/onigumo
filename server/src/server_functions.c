@@ -35,6 +35,7 @@ BOOL CheckCommandLineArgs(int argc, char *argv[]) {
 // threads in an orderly way
 
 void CleanupServer(int nExitCode) {
+  fprintf(stdout, CALLING_CLEANUP_HANDLER);
 
   if (g_bHasServerQuit) {
     return;
@@ -127,7 +128,7 @@ void CreateClientListMutex() {
 
   SetClientListMutex(CreateMutex());
   if (INVALID_HANDLE_VALUE == GetClientListMutex()) {
-    CleanupServer(ERROR);
+    CleanupServer(EXIT_FAILURE);
   }
 }
 
@@ -138,13 +139,14 @@ void CreateClientListMutex() {
 
 void CreateMasterAcceptorThread() {
 
-  int nServerSocket = GetServerSocket();
+  int nServerSocket = INVALID_SOCKET_VALUE;
+  nServerSocket = GetServerSocket();
   SetMasterThreadHandle(CreateThreadEx(MasterAcceptorThread, &nServerSocket));
 
   if (INVALID_HANDLE_VALUE == GetMasterThreadHandle()) {
     fprintf(stderr, SERVER_FAILED_START_MAT);
 
-    CleanupServer(ERROR);
+    CleanupServer(EXIT_FAILURE);
   }
 }
 
@@ -159,7 +161,7 @@ struct sockaddr_in* CreateSockAddr() {
     fprintf(stderr, OUT_OF_MEMORY);
 
     // Failed to allocate memory
-    CleanupServer(ERROR);
+    CleanupServer(EXIT_FAILURE);
   }
 
   // Zero out the memory occupied by the structure
@@ -311,9 +313,7 @@ void PrintSoftwareTitleAndCopyright() {
 // function initiates an orderly shut down of the server application.
 
 void ServerCleanupHandler(int signum) {
-  fprintf(stdout, CALLING_CLEANUP_HANDLER);
-
-  CleanupServer(OK);
+  CleanupServer(EXIT_SUCCESS);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

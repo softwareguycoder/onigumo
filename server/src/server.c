@@ -22,7 +22,8 @@
 
 int main(int argc, char *argv[]) {
     if (!InitializeApplication()) {
-        CleanupServer(ERROR);
+        CleanupServer(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     PrintSoftwareTitleAndCopyright();
@@ -33,6 +34,7 @@ int main(int argc, char *argv[]) {
     if (!CheckCommandLineArgs(argc, argv)) {
         fprintf(stderr, USAGE_STRING);
         CleanupServer(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     int nPort = 0;
@@ -62,5 +64,7 @@ int main(int argc, char *argv[]) {
         WaitThread(GetMasterThreadHandle());
     }
 
-    return OK;
+    sleep(1);   /* force context switch */
+
+    return EXIT_SUCCESS;
 }
