@@ -125,24 +125,24 @@ HELO command has been sent.
 
 	a. Command
 		
-		i. HELO\n
+		i. HELO<LF>
 
 		The HELO command should be issued immediately following successful
 		socket connection.  The word "HELO", all caps, should be sent, fol-
 		lowed by an LF character.
 
 		Nothing else should be transmitted.  If any string other than the
-		above is sent, such as HELO <text>\n, the command will be ignored,
+		above is sent, such as HELO <text><LF>, the command will be ignored,
 		or will be considered as part of a multiline data transmission.
 
 	b. Responses
 
-		i. 200 OK. Welcome to the onigumo server.  Be careful what you wish for!
+		i. 200 OK. Welcome to the onigumo server.  Be careful what you wish for!<LF>
 
 		Indicates that a new session has been activated successfully
 		for you on the server.
 
-		ii. 501 The maximum count of connected clients has been exceeded.
+		ii. 501 The maximum count of connected clients has been exceeded.<LF>
 
 		There is a set number of 
 
@@ -164,12 +164,12 @@ number of shellcode bytes that the client wants to send.
 
 	a. Command
 	
-		i. CODE <number of shellcode bytes>\n
+		i. CODE <number of shellcode bytes><LF>
 
 	b. Responses
 
 		i. 201 OK. Send your shellcode.  Terminate with a '.' on a 
-		   line by itself.
+		   line by itself.<LF>
 
 		Indicates that the server is ready to receive the shellcode
 		bytes.  Use ASCII characters, or \x escape codes.  Multiple
@@ -190,12 +190,12 @@ number of shellcode bytes that the client wants to send.
 		clients should issue the EXEC command (see below).  The EXEC
 		command orders the server to execute any shellcode it has received.
 
-		ii. 501 Failed.  Cannot parse input as integer.
+		ii. 501 Failed.  Cannot parse input as integer.<LF>
 
 		The argument passed to CODE is not able to be converted from an ASCII 
 		string representation of a 32-bit integer into a numeric value.
 
-		iii. 502 Failed.  Integer argument must be a positive, 32-bit quanity..
+		iii. 502 Failed.  Integer argument must be a positive, 32-bit quanity.<LF>
 
 		CODE must be called followed by a space, and then the ASCII represent-
 		ation of a positive integer. This response code indicates that the 
@@ -214,7 +214,7 @@ further sends to the socket maintained by clients.
 
 	a. Command
 		
-		i. EXEC <integer1> <integer2>\n
+		i. EXEC <integer1> <integer2><LF>
 
 		The EXEC command has as its parameters the ASCII representations
 		of any two positive or negative whole numbers, or zero, representable by
@@ -224,7 +224,7 @@ further sends to the socket maintained by clients.
 	
 	b. Responses
 
-		i. 202 <integer return value.>
+		i. 202 <integer return value.><LF>
 
 		EXEC runs the shellcode on the host machine and returns the value
 		the shell code has placed into register EAX.  If the shellcode runs
@@ -233,13 +233,13 @@ further sends to the socket maintained by clients.
 		unicate with the client is blocked by the instructions executed by
 		the shellcode.
 
-		ii. 501 Failed.  Cannot parse input as integer.
+		ii. 501 Failed.  Cannot parse input as integer.<LF>
 
 		One or the other of the argument(s) to EXEC is not able to be 
 		converted from an ASCII string representation of a 32-bit integer 
 		into a numeric value.
 
-		iii. 504 Failed.  Two numbers must be passed to EXEC as arguments.
+		iii. 504 Failed.  Two numbers must be passed to EXEC as arguments.<LF>
 
 		EXEC must be called followed by a space-separated list of two integers.	
 		This response code indicates that the 
@@ -251,13 +251,13 @@ the machine that is hosting the server's process.
 
 	a. Command
 
-		i. LIST\n
+		i. LIST<LF>
 	
 		THe LIST command is simply sent by itself with a terminating newline.
 
 	b. Responses
 
-		i. 203 OK. List of processes running on this machine follows.
+		i. 203 OK. List of processes running on this machine follows.<LF>
 
 		This message is sent to indicate that the server is about to tranmit
 		a multiline response to the client.  The end of the multiline repsonse
@@ -265,7 +265,7 @@ the machine that is hosting the server's process.
 		by itself.  Each line of the response will be the PID of a process, a
 		tab, then the command utilized to launch the process, and a LF character.
 
-		ii. 505 Host operating system denied us access to the list of processes.
+		ii. 505 Host operating system denied us access to the list of processes.<LF>
 
 		Exactly as it says on the tin -- the onigumo server process attempted to
 		gather information on the processes running on its host machine, but access
@@ -282,7 +282,7 @@ or data.
 
 	a. Command
 	
-		i. QUIT\n
+		i. QUIT<LF>
 
 		The QUIT command is four uppercase-only characters and a terminating LF. This
 		command terminates the client's session with the server.  Clients must issue
@@ -290,7 +290,7 @@ or data.
 
 	b. Response
 	
-		ii. 204 Goodbye.
+		ii. 204 Goodbye.<LF>
 
 		Indicates that the server has processed the QUIT command successfully. The
 		client's session with the server is now over.
@@ -302,7 +302,7 @@ machine.
 
 	a. Command
 	
-		i. USRS\n
+		i. USRS<LF>
 
 		Clients issue the USRS command as just the command name followed by a LF.
 		This causes the server to query the host for the list of all the currently
@@ -311,14 +311,14 @@ machine.
 	b. Response
 
 		
-		i. 205 OK. List of local users follows.
+		i. 205 OK. List of local users follows.<LF>
 
 		This response indicates that the command succeeded and that the server is 
 		about to tranmit a multiline response.  Each line of the response consists
 		of each user's username, followed by a LF character.  The end of the response
 		is signaled by the server transmitting a period ('.') on a line by itself.
 
-		ii. 506 Failed. Host operating system denied us access to the list of users.
+		ii. 506 Failed. Host operating system denied us access to the list of users.<LF>
 
 		Exactly as it says on the tin -- the ongiumo server attempted to obtain the 
 		list of currently active users; however, the operating system of the host
@@ -334,22 +334,23 @@ the sake of argument, pretend that the shellcode bytes transmitted are actually
 for a function that takes two numbers as arguments, and returns the result of 
 adding them.  That is not actually what the shellcode does; however, bear with us.
 
-C: HELO
+C: HELO<LF>
 <server creates new client session internally>
-S: 200 OK. Welcome to the onigumo server.  Be careful what you wish for!
-C: CODE 23
-S: 201 OK. Send your shellcode.  Terminate with a '.' on a line by itself.
-C: \x55
-C: \x48\x89\xe5
-C: \x48\x8d\x3d\x00\x00\x00\x00
-C: \xe8\x00\x00\x00\x00
-C: \xb8\x00\x00\x00\x00
-C: \x5d
-C: \xc3
-C: .
-C: EXEC 5 2
-S: 202 7
-C: QUIT
+S: 200 OK. Welcome to the onigumo server.  Be careful what you wish for!<LF>
+C: CODE 23<LF>
+S: 201 OK. Send your shellcode.  Terminate with a '.' on a line by itself.<LF>
+C: \x55<LF>
+C: \x48\x89\xe5<LF>
+C: \x48\x8d\x3d\x00\x00\x00\x00<LF>
+C: \xe8\x00\x00\x00\x00<LF>
+C: \xb8\x00\x00\x00\x00<LF>
+C: \x5d<LF>
+C: \xc3<LF>
+C: .<LF>
+C: EXEC 5 2<LF>
+S: 202 7<LF>
+C: QUIT<LF>
+S: 204 Goodbye.<LF>
 
 Notice that on the line 'C: CODE 23' above, the value 23 is passed as the argument to
 the CODE command.  There are more than 23 characters if you add up all the individual

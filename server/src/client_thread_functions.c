@@ -330,6 +330,18 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
 		    OK_WELCOME);
 	} else {
 		TellClientTooManyPeopleConnected(lpSendingClient);
+
+		/* In the case that too many poeple are connected, tell
+		 * the latest client to connect so.  Then, unmark its connected
+		 * flag.
+		 */
+		lpSendingClient->bConnected = FALSE;
+
+		/*
+		 * Make sure to end the client's session and remove the session from
+		 * the linked list.
+		 */
+		EndClientSession(lpSendingClient);
 	}
 }
 
@@ -341,48 +353,23 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
 		return;
 	}
 
+  int nLineCount = 0;
+  char** ppszOutputLines = NULL;
+
+  GetSystemCommandOutput("ps -a", &ppszOutputLines, &nLineCount);
+
+  if (ppszOutputLines == NULL || nLineCount <= 0){
+    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+        HOST_PROC_LIST_ACCESS_DENIED);
+
+  }
+  for(int i = 0;i < nLineCount; i++) {
+
+  }
+
 	lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
 			OK_LIST_FOLLOWS);
 
-	char szReplyBuffer[MAX_NICKNAME_LEN + 4];
-	memset(szReplyBuffer, 0, MAX_NICKNAME_LEN + 4);
-
-	LPPOSITION pos = GetHeadPosition(g_pClientList);
-	if (pos == NULL) {
-		SendMultilineDataTerminator(lpSendingClient);
-		return;
-	}
-
-	/* Iterate through the clients in the list, skipping the
-	 * client who sent the command in the first place.  List out
-	 * the nicknames of all the other clients and then send the terminating
-	 * dot-on-a-line-by-itself per protocol. */
-
-	LockMutex(GetClientListMutex());
-	{
-		do {
-			LPCLIENTSTRUCT lpCS = (LPCLIENTSTRUCT) (pos->pvData);
-			if (lpCS == NULL) {
-				continue;
-			}
-
-			if (AreUUIDsEqual(&(lpSendingClient->clientID),
-					&(lpCS->clientID))) {
-				continue;
-			}
-
-			// TODO: Add code here to send the current line of the multi-line
-			// response
-
-			/*sprintf(szReplyBuffer, "!@%s\n", lpCS->pszNickname);
-
-			lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-					szReplyBuffer);
-
-			memset(szReplyBuffer, 0, MAX_NICKNAME_LEN + 4);*/
-		} while ((pos = GetNextPosition(pos)) != NULL);
-	}
-	UnlockMutex(GetClientListMutex());
 
 	SendMultilineDataTerminator(lpSendingClient);
 }
