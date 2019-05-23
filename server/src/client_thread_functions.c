@@ -68,7 +68,7 @@ void GatherShellCodeLine(void* pvSendingClient,
     LPSHELLCODEINFO lpShellCodeInfo = NULL;
 
     CreateShellCodeInfo(&lpShellCodeInfo,
-        lpSendingClient->clientID,
+        &(lpSendingClient->clientID),
         GetLineCharCount(pszShellCodeLine),
         nShellCodeBytes,
         pszShellCodeLine);
@@ -109,7 +109,7 @@ int GetCurrentShellCodeInfoBytes(void* pvShellCodeInfo) {
 ///////////////////////////////////////////////////////////////////////////////
 // IsMultilineResponseTerminator function
 
-BOOL IsMultilineResponseTerminator(void* pvUserState,
+BOOL IsMultilineResponseTerminator(void* pvUserState /* not used */,
     const char* pszMessage) {
   if (IsNullOrWhiteSpace(pszMessage)) {
     return FALSE;
@@ -569,7 +569,10 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
       GatherShellCodeLine,
       IsMultilineResponseTerminator);
 
-  int total = SumElements(g_pShellCodeLines, GetCurrentShellCodeInfoBytes);
+  int total = SumElementsWhere(g_pShellCodeLines,
+      GetCurrentShellCodeInfoBytes,
+      &(lpSendingClient->clientID),
+      FindShellCodeBlockForClient);
 
   if (total == -1) {
     // Unknown error during computation of total bytes received.
@@ -755,8 +758,7 @@ void ReportClientSessionStats(LPCLIENTSTRUCT lpSendingClient) {
         lpSendingClient->nBytesSent);
   }
 
-  free(pszClientID);
-  pszClientID = NULL;
+  FreeBuffer((void**)&pszClientID);
 }
 
 int SendToClient(LPCLIENTSTRUCT lpCurrentClient, const char* pszMessage) {

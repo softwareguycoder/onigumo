@@ -43,7 +43,7 @@ typedef struct _tagSHELLCODEINFO {
 /**
  * @brief Allocates storage for, and initializes, a new instance of
  * SHELLCODEINFO in memory.
- * @param clientID Universally-unique identifier (ID) of the client who
+ * @param pClientID Universally-unique identifier (ID) of the client who
  * owns the shellcode block defined by this structure.
  * @param lppShellCodeInfo Address of a pointer that will receive the location
  * of the new SHELLCODEINFO instance.
@@ -59,7 +59,7 @@ typedef struct _tagSHELLCODEINFO {
  * the same.
  */
 void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
-    UUID clientID, int nEncodedShellCodeBytes,
+    UUID* pClientID, int nEncodedShellCodeBytes,
     int nTotalEncodedShellCodeBytes,
     const char* pszEncodedShellCodeBytes);
 

@@ -17,10 +17,14 @@
 // CreateShellCodeInfo function
 
 void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
-    UUID clientID, int nEncodedShellCodeBytes,
+    UUID* pClientID, int nEncodedShellCodeBytes,
     int nTotalEncodedShellCodeBytes,
     const char* pszEncodedShellCodeBytes) {
   if (lppShellCodeInfo == NULL) {
+    return; // Required parameter
+  }
+
+  if (!IsUUIDValid(pClientID)) {
     return; // Required parameter
   }
 
@@ -71,6 +75,12 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
   (*lppShellCodeInfo)->nEncodedShellCodeBytes = nEncodedShellCodeBytes;
   (*lppShellCodeInfo)->nTotalEncodedShellCodeBytes
       = nTotalEncodedShellCodeBytes;
+
+  char *pszClientID = UUIDToString(pClientID);
+
+  UUIDFromString(pszClientID, &((*lppShellCodeInfo)->clientID));
+
+  FreeBuffer((void**)&pszClientID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
