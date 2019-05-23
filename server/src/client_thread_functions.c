@@ -137,7 +137,7 @@ void JoinAllShellCodeBytes(char** ppszResult, int* pnTotalShellCodeBytes) {
 
     // TODO: Add functionality here to glue together all the lines of
     // shellcode into one big array
-    *pnTotalShellCodeBytes = Sum(g_pShellCodeLines,
+    *pnTotalShellCodeBytes = SumElements(g_pShellCodeLines,
         GetCurrentShellCodeInfoBytes);
     if (*pnTotalShellCodeBytes <= 0) {
       return; // No shell code bytes to process
@@ -558,7 +558,7 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
       GatherShellCodeLine,
       IsMultilineResponseTerminator);
 
-  int total = Sum(g_pShellCodeLines, GetCurrentShellCodeInfoBytes);
+  int total = SumElements(g_pShellCodeLines, GetCurrentShellCodeInfoBytes);
 
   if (total == -1) {
     // Unknown error during computation of total bytes received.
