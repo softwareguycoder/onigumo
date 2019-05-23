@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef FAILED_ALLOC_SHELLCODEINFO
+#define FAILED_ALLOC_SHELLCODEINFO \
+  "Failed to allocate memory for SHELLCODEINFO instance.\n"
+#endif //FAILED_ALLOC_SHELLCODEINFO
+
 /**
  * @brief Standardized size for buffers.
  */
