@@ -49,6 +49,7 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
         FAILED_ALLOC_SHELLCODEINFO);
     exit(EXIT_FAILURE);
   }
+  memset(*lppShellCodeInfo, 0, sizeof(SHELLCODEINFO));
 
   (*lppShellCodeInfo)->pszEncodedShellCodeBytes =
   (char*)malloc(((size_t)nEncodedShellCodeBytes)*sizeof(char));
@@ -124,6 +125,10 @@ BOOL FindShellCodeBlockForClient(void* pvClientUUID, void* pvShellCodeBlock)
 
 BOOL IsShellCodeInfoValid(LPSHELLCODEINFO lpShellCodeInfo) {
   if (lpShellCodeInfo == NULL) {
+    return FALSE;
+  }
+
+  if (!IsUUIDValid(&(lpShellCodeInfo->clientID))) {
     return FALSE;
   }
 
