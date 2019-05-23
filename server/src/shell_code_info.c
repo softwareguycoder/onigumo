@@ -90,6 +90,14 @@ void DestroyShellCodeInfo(LPSHELLCODEINFO lpShellCodeInfo) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// FindShellCodeBlockForClient function
+
+BOOL FindShellCodeBlockForClient(void* pvClientUUID, void* pvShellCodeBlock)
+{
+  return FALSE;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // IsShellCodeInfoValid function
 
 BOOL IsShellCodeInfoValid(LPSHELLCODEINFO lpShellCodeInfo) {

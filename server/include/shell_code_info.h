@@ -72,6 +72,22 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
 void DestroyShellCodeInfo(LPSHELLCODEINFO lpShellCodeInfo);
 
 /**
+ * @name FindShellCodeBlockForClient
+ * @brief Tells whether the specified block belongs to the client whose UUID
+ * is referenced by the search key.
+ * @param pvClientUUID Address of the UUID of the client whose shellcode blocks
+ * are being searched for.
+ * @param pvShellCodeBlock Address of the current element of the linked
+ * list of shell-code blocks.
+ * @return TRUE if the shell code block in question is owned by the client
+ * whose UUID matches the search key; FALSE otherwise.
+ * @remarks This function serves as a callback for use, e.g., by the
+ * SumElementsWhere function to locate just those shellcode blocks that
+ * belong to a specific client.
+ */
+BOOL FindShellCodeBlockForClient(void* pvClientUUID, void* pvShellCodeBlock);
+
+/**
  * @brief Validates the information in the members of the instance of
  * SHELLCODEINFO referred to by this function's argument.
  * @param lpShellCodeInfo Address of an instance of SHELLCODEINFO whose
