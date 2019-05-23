@@ -121,7 +121,16 @@ BOOL IsMultilineResponseTerminator(void* pvUserState,
 ///////////////////////////////////////////////////////////////////////////////
 // JoinAllShellCodeBytes function
 
-void JoinAllShellCodeBytes(char** ppszResult, int* pnTotalShellCodeBytes) {
+void JoinAllShellCodeBytes(LPCLIENTSTRUCT lpSendingClient,
+    char** ppszResult, int* pnTotalShellCodeBytes) {
+  if (lpSendingClient == NULL) {
+    return; // Required parameter
+  }
+
+  if (!IsUUIDValid(&(lpSendingClient->clientID))) {
+    return; // Required parameter
+  }
+
   if (ppszResult == NULL) {
     return; // Required parameter
   }
@@ -139,8 +148,10 @@ void JoinAllShellCodeBytes(char** ppszResult, int* pnTotalShellCodeBytes) {
 
     // TODO: Add functionality here to glue together all the lines of
     // shellcode into one big array
-    *pnTotalShellCodeBytes = SumElements(g_pShellCodeLines,
-        GetCurrentShellCodeInfoBytes);
+    *pnTotalShellCodeBytes = SumElementsWhere(g_pShellCodeLines,
+        GetCurrentShellCodeInfoBytes, &(lpSendingClient->clientID),
+        FindShellCodeBlockForClient);
+
     if (*pnTotalShellCodeBytes <= 0) {
       return; // No shell code bytes to process
     }
