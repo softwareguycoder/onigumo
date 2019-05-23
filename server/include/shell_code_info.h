@@ -27,12 +27,6 @@ typedef struct _tagSHELLCODEINFO {
   int nEncodedShellCodeBytes;
 
   /**
-   * @name nTotalEncodedShellCodeBytes
-   * @brief Total bytes of Base-64 encoded shellcode across all blocks.
-   */
-  int nTotalEncodedShellCodeBytes;
-
-  /**
    * @name pszEncodedShellCodeBytes
    * @brief Address of a character array containing Base64-encoded version
    * of the shellcode block.
@@ -49,8 +43,6 @@ typedef struct _tagSHELLCODEINFO {
  * of the new SHELLCODEINFO instance.
  * @param nEncodedShellCodeBytes Count of Base64-encoded bytes of shellcode
  * in this block.
- * @param nTotalEncodedShellCodeBytes Total count of Base64-encoded bytes
- * of shellcode across all blocks.
  * @param pszEncodedShellCodeBytes The Base64-encoded version of the
  * shellcode block.
  * @remarks Constructs a new instance of SHELLCODEINFO and sets its members
@@ -60,7 +52,6 @@ typedef struct _tagSHELLCODEINFO {
  */
 void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
     UUID* pClientID, int nEncodedShellCodeBytes,
-    int nTotalEncodedShellCodeBytes,
     const char* pszEncodedShellCodeBytes);
 
 /**
@@ -103,7 +94,7 @@ BOOL IsShellCodeInfoValid(LPSHELLCODEINFO lpShellCodeInfo);
  * implemented in the list_core library.  All this function is, is an alias
  * for DestroyShellCodeInfo.
  */
-void ReleaseShellCodeInfo(void* pvData);
+void ReleaseShellCodeBlock(void* pvData);
 
 
 #endif //__SHELL_CODE_INFO_H__

@@ -260,7 +260,7 @@ void TerminateMasterThread(int signum) {
 
   LockMutex(GetShellCodeListMutex());
   {
-    ClearList(&g_pShellCodeLines, ReleaseShellCodeInfo);
+    ClearList(&g_pShellCodeLines, ReleaseShellCodeBlock);
   }
   UnlockMutex(GetShellCodeListMutex());
 

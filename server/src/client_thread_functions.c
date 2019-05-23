@@ -67,12 +67,12 @@ void GatherShellCodeLine(void* pvSendingClient,
   {
     LPSHELLCODEINFO lpShellCodeInfo = NULL;
 
+    int nEncodedShellCodeBytes = GetLineCharCount(pszShellCodeLine);
     CreateShellCodeInfo(&lpShellCodeInfo,
         &(lpSendingClient->clientID),
-        GetLineCharCount(pszShellCodeLine),
-        nShellCodeBytes,
+        nEncodedShellCodeBytes,
         pszShellCodeLine);
-    if (lpShellCodeInfo == NULL) {
+    if (!IsShellCodeInfoValid(lpShellCodeInfo)) {
       UnlockMutex(GetShellCodeListMutex());
       fprintf(stderr,
           FAILED_ADD_SHELLCODE_BLOCK);
@@ -146,8 +146,6 @@ void JoinAllShellCodeBytes(LPCLIENTSTRUCT lpSendingClient,
       return;
     }
 
-    // TODO: Add functionality here to glue together all the lines of
-    // shellcode into one big array
     *pnTotalShellCodeBytes = SumElementsWhere(g_pShellCodeLines,
         GetCurrentShellCodeInfoBytes, &(lpSendingClient->clientID),
         FindShellCodeBlockForClient);
@@ -161,17 +159,23 @@ void JoinAllShellCodeBytes(LPCLIENTSTRUCT lpSendingClient,
       return;
     }
 
+    const int TOTAL_SHELLCODE_SIZE = *pnTotalShellCodeBytes + 1;
+
+    /* Allocate a block of memory that is one bigger than the total
+     * number of encoded shellcode bytes that we just calculated --
+     * this is to leave room for the null-terminator. */
     *ppszResult = (char*)
-        malloc((*pnTotalShellCodeBytes) * sizeof(char));
+        malloc(TOTAL_SHELLCODE_SIZE * sizeof(char));
     if (*ppszResult == NULL) {
       fprintf(stderr, FAILED_ALLOC_SHELLCODE_STORAGE);
       CleanupServer(EXIT_FAILURE);
       return;
     }
+    memset(*ppszResult, 0, TOTAL_SHELLCODE_SIZE * sizeof(char));
 
     do {
       LPSHELLCODEINFO lpInfo = (LPSHELLCODEINFO) (pos->pvData);
-      if (lpInfo == NULL) {
+      if (!IsShellCodeInfoValid(lpInfo)) {
         FreeBuffer((void**) ppszResult);
         fprintf(stderr, FAILED_ALLOC_SHELLCODE_STORAGE);
         CleanupServer(EXIT_FAILURE);
@@ -302,7 +306,7 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
 
   LockMutex(GetShellCodeListMutex());
   {
-    ClearList(&g_pShellCodeLines, ReleaseShellCodeInfo);
+    ClearList(&g_pShellCodeLines, ReleaseShellCodeBlock);
   }
   UnlockMutex(GetShellCodeListMutex());
 
@@ -578,7 +582,7 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
     // Unknown error during computation of total bytes received.
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
-    ClearList(&g_pShellCodeLines, ReleaseShellCodeInfo);
+    ClearList(&g_pShellCodeLines, ReleaseShellCodeBlock);
     return;
   }
 
@@ -600,8 +604,20 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
   int nTotalEncodedShellCodeBytes = 0;
   char *pszEncodedShellCode = NULL;
 
+  /* Find all the shellcode blocks for this client and
+   * 'marry' their Base64-encoded content into one big ol'
+   * block. */
   JoinAllShellCodeBytes(lpSendingClient,
       &pszEncodedShellCode, &nTotalEncodedShellCodeBytes);
+
+  /* Remove all the shellcode blocks for this client from the
+   * linked list. This prevents this command from being re-issued
+   * successfully. */
+
+  RemoveElementWhere(&g_pShellCodeLines, &(lpSendingClient->clientID),
+      FindShellCodeBlockForClient, ReleaseShellCodeBlock);
+
+  FreeBuffer((void**)&pszEncodedShellCode);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

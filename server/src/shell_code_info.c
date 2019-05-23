@@ -18,7 +18,6 @@
 
 void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
     UUID* pClientID, int nEncodedShellCodeBytes,
-    int nTotalEncodedShellCodeBytes,
     const char* pszEncodedShellCodeBytes) {
   if (lppShellCodeInfo == NULL) {
     return; // Required parameter
@@ -29,10 +28,6 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
   }
 
   if (nEncodedShellCodeBytes <= 0) {
-    return; // Count must be a positive number.
-  }
-
-  if (nTotalEncodedShellCodeBytes <= 0) {
     return; // Count must be a positive number.
   }
 
@@ -73,14 +68,12 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
 
   /* Other structure member initialization here. */
   (*lppShellCodeInfo)->nEncodedShellCodeBytes = nEncodedShellCodeBytes;
-  (*lppShellCodeInfo)->nTotalEncodedShellCodeBytes
-      = nTotalEncodedShellCodeBytes;
 
-  char *pszClientID = UUIDToString(pClientID);
-
-  UUIDFromString(pszClientID, &((*lppShellCodeInfo)->clientID));
-
-  FreeBuffer((void**)&pszClientID);
+  /* Set the clientID structure member to be the same value as the clientID
+   * in pClientID.  This is the UUID that tags the client who sent this
+   * shellcode, so we can reassemble that client's shellcode blocks later
+   * when the client calls the EXEC command. */
+  CopyUUID(&((*lppShellCodeInfo)->clientID), pClientID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -146,10 +139,6 @@ BOOL IsShellCodeInfoValid(LPSHELLCODEINFO lpShellCodeInfo) {
     return FALSE;
   }
 
-  if (lpShellCodeInfo->nTotalEncodedShellCodeBytes <= 0) {
-    return FALSE;
-  }
-
   if (IsNullOrWhiteSpace(lpShellCodeInfo->pszEncodedShellCodeBytes)) {
     return FALSE;
   }
@@ -160,7 +149,7 @@ BOOL IsShellCodeInfoValid(LPSHELLCODEINFO lpShellCodeInfo) {
 ///////////////////////////////////////////////////////////////////////////////
 // ReleaseShellCodeInfo function
 
-void ReleaseShellCodeInfo(void* pvData) {
+void ReleaseShellCodeBlock(void* pvData) {
   if (pvData == NULL) {
     return;
   }
