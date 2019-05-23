@@ -86,7 +86,8 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
  * @return TRUE if the message is the multiline-response terminator; FALSE
  * otherwise.
  */
-BOOL IsMultilineResponseTerminator(const char* pszMessage);
+BOOL IsMultilineResponseTerminator(void* pvUserState /*not used*/,
+    const char* pszMessage);
 
 /**
  * @brief Callback that is called for each entry in the client list to kill

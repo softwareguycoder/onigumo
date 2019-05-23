@@ -48,7 +48,8 @@ void GatherShellCodeLine(void* pvSendingClient,
     return; // Required parameter
   }
 
-  if (IsMultilineResponseTerminator(pszShellCodeLine)) {
+  if (IsMultilineResponseTerminator(pvSendingClient,
+      pszShellCodeLine)) {
     return; // Cannot process a line containing the message terminator
   }
 
@@ -108,7 +109,8 @@ int GetCurrentShellCodeInfoBytes(void* pvShellCodeInfo) {
 ///////////////////////////////////////////////////////////////////////////////
 // IsMultilineResponseTerminator function
 
-BOOL IsMultilineResponseTerminator(const char* pszMessage) {
+BOOL IsMultilineResponseTerminator(void* pvUserState,
+    const char* pszMessage) {
   if (IsNullOrWhiteSpace(pszMessage)) {
     return FALSE;
   }
