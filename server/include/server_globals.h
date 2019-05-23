@@ -14,7 +14,13 @@
  * is necessary to pass its address to several functions, as it points to
  * the 'current element' of a linked list; working much like a file pointer.
  */
-extern POSITION* g_pClientList;
+extern LPPOSITION g_pClientList;
+
+/**
+ * @brief Reference to a linked list that serves as a temporary repository
+ * for shellcode.
+ */
+extern LPPOSITION g_pShellCodeLines;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Getter and setter accessors for file-scoped globals

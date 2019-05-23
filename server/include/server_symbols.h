@@ -109,6 +109,11 @@
 									"operator.\n"
 #endif //ERROR_FORCED_DISCONNECT
 
+#ifndef ERROR_GENERAL_SERVER_FAILURE
+#define ERROR_GENERAL_SERVER_FAILURE \
+  "550 Failed. Unknown server or OS error.\n"
+#endif //ERROR_GENERAL_SERVER_FAILURE
+
 /**
  * @brief Protocol response sent when too many clients are already connected.
  * @remarks Error reply to a HELO command from a client when more than the
@@ -119,11 +124,6 @@
     "502 The maximum count of connected clients has been exceeded.\n"
 #endif //ERROR_MAX_CONNECTIONS_EXCEEDED
 
-#ifndef ERROR_NICKNAME_IN_USE
-#define ERROR_NICKNAME_IN_USE \
-    "504 The requested nickname is already in use.\n"
-#endif //ERROR_NICKNAME_IN_USE
-
 /**
  * @brief Error message to displayed when a function receives a NULL pointer
  * for a LPCLIENTSTRUCT parameter.
@@ -132,15 +132,6 @@
 #define ERROR_NO_SENDING_CLIENT_SPECIFIED \
     "Required parameter lpSendingClient not specified.\n"
 #endif //ERROR_NO_SENDING_CLIENT_SPECIFIED
-
-/**
- * @brief Error reply that is sent to clients when a nickname is proposed
- * for a chatter and it's an invalid format or length.
- */
-#ifndef ERROR_NICK_TOO_LONG
-#define ERROR_NICK_TOO_LONG \
-    "402 Nickname is invalid format or length."
-#endif //ERROR_NICK_TOO_LONG
 
 #ifndef ERROR_QTY_MUST_BE_POS_32BIT_INT
 #define ERROR_QTY_MUST_BE_POS_32BIT_INT \
@@ -207,6 +198,18 @@
 #endif //FAILED_RECEIVE_TEXT_FROM_CLIENT
 
 /**
+ * @brief Error response sent to clients requesting the list of processes
+ * running on the host.
+ * @remarks If the operation does not work, then it's most likely because the
+ * user account under which the onigumo server is executing does not have
+ * sufficient permissions to run ps -a.
+ */
+#ifndef HOST_PROC_LIST_ACCESS_DENIED
+#define HOST_PROC_LIST_ACCESS_DENIED \
+  "505 Host operating system denied us access to the list of processes.\n"
+#endif //HOST_PROC_LIST_ACCESS_DENIED
+
+/**
  * @brief Error message that is displayed when a function is given a NULL
  * pointer for its pvData parameter.
  */
@@ -225,18 +228,6 @@
     "ERROR: A NULL pointer was passed to a function that " \
     "wasn't expecting it.\n"
 #endif //INVALID_PTR_ARG
-
-/**
- * @brief Error response sent to clients requesting the list of processes
- * running on the host.
- * @remarks If the operation does not work, then it's most likely because the
- * user account under which the onigumo server is executing does not have
- * sufficient permissions to run ps -a.
- */
-#ifndef HOST_PROC_LIST_ACCESS_DENIED
-#define HOST_PROC_LIST_ACCESS_DENIED \
-  "505 Host operating system denied us access to the list of processes.\n"
-#endif //HOST_PROC_LIST_ACCESS_DENIED
 
 /**
  * @brief Maximum length of a string containing a valid IPv4 IP address.
@@ -364,6 +355,11 @@
 	"203 OK. List of processes running on this machine follows.\n"
 #endif //OK_LIST_FOLLOWS
 
+#ifndef OK_SEND_SHELLCODE
+#define OK_SEND_SHELLCODE \
+  "201 OK. Send your shellcode.  Terminate with a '.' on a line by itself.\n"
+#endif //OK_SEND_SHELLCODE
+
 #ifndef OUT_OF_MEMORY
 #define OUT_OF_MEMORY \
     "server: Insufficient operating system memory.\n"
@@ -373,6 +369,15 @@
 #define PORT_NUMBER_NOT_VALID \
         "server: Port number must be in the range 1024-49151 inclusive.\n"
 #endif //PORT_NUMBER_NOT_VALID
+
+// Protocol command that gets this client marked as a member of the chat room
+#ifndef PROTOCOL_CODE_COMMAND
+#define PROTOCOL_CODE_COMMAND "CODE "
+#endif //PROTOCOL_CODE_COMMAND
+
+#ifndef PROTOCOL_EXEC_COMMAND
+#define PROTOCOL_EXEC_COMMAND "EXEC\n"
+#endif //PROTOCOL_EXEC_COMMAND
 
 // Protocol command that gets this client marked as a member of the chat room
 #ifndef PROTOCOL_HELO_COMMAND

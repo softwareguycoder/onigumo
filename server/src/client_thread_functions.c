@@ -34,10 +34,17 @@ BOOL g_bShouldTerminateClientThread = FALSE;
 ///////////////////////////////////////////////////////////////////////////////
 // Internal-use-only functions
 
+///////////////////////////////////////////////////////////////////////////////
+// GatherShellCodeLine function
+
 void GatherShellCodeLine(const char* pszShellCodeLine,
     int nShellCodeBytes) {
   if (pszShellCodeLine == NULL) {
     return; // Required parameter
+  }
+
+  if (IsMultilineResponseTerminator(pszShellCodeLine)) {
+    return;
   }
 
   if (nShellCodeBytes <= 0) {
@@ -50,10 +57,34 @@ void GatherShellCodeLine(const char* pszShellCodeLine,
     CreateShellCodeInfo(&lpShellCodeInfo,
         nShellCodeBytes, pszShellCodeLine);
 
-     AddElementToTail(&g_pShellCodeLines, lpShellCodeInfo);
+    AddElementToTail(&g_pShellCodeLines, lpShellCodeInfo);
   }
   UnlockMutex(GetShellCodeListMutex());
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// GetCurrentShellCodeInfoBytes function
+
+int GetCurrentShellCodeInfoBytes(void* pvShellCodeInfo) {
+  int result = 0;
+  if (pvShellCodeInfo == NULL) {
+    return result; // Required parameter
+  }
+
+  LPSHELLCODEINFO lpShellCodeInfo = (LPSHELLCODEINFO) pvShellCodeInfo;
+  if (lpShellCodeInfo == NULL) {
+    return result;
+  }
+
+  if (!IsShellCodeInfoValid(lpShellCodeInfo)) {
+    return result;
+  }
+
+  return lpShellCodeInfo->nShellCodeBytes;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// IsMultilineResponseTerminator function
 
 BOOL IsMultilineResponseTerminator(const char* pszMessage) {
   if (pszMessage == NULL) {
@@ -62,6 +93,9 @@ BOOL IsMultilineResponseTerminator(const char* pszMessage) {
 
   return strcmp(pszMessage, MSG_TERMINATOR) == 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// JoinAllShellCodeBytes function
 
 void JoinAllShellCodeBytes(char** ppszResult, int* pnTotalShellCodeBytes) {
   if (ppszResult == NULL) {
@@ -72,13 +106,59 @@ void JoinAllShellCodeBytes(char** ppszResult, int* pnTotalShellCodeBytes) {
     return; // Required parameter
   }
 
-  if (GetElementCount(g_pShellCodeLines) == 0) {
-    return;
-  }
+  LockMutex(GetShellCodeListMutex());
+  {
+    if (GetElementCount(g_pShellCodeLines) == 0) {
+      UnlockMutex(GetShellCodeListMutex());
+      return;
+    }
 
-  // TODO: Add functionality here to glue together all the lines of
-  // shellcode into one big array
+    // TODO: Add functionality here to glue together all the lines of
+    // shellcode into one big array
+    *pnTotalShellCodeBytes = Sum(g_pShellCodeLines,
+        GetCurrentShellCodeInfoBytes);
+    if (*pnTotalShellCodeBytes <= 0) {
+      return; // No shell code bytes to process
+    }
+
+    LPPOSITION pos = GetHeadPosition(g_pShellCodeLines);
+    if (pos == NULL) {
+      return;
+    }
+
+    *ppszResult = (char*)
+        malloc((*pnTotalShellCodeBytes) * sizeof(char));
+    if (*ppszResult == NULL) {
+      fprintf(stderr, FAILED_ALLOC_SHELLCODE_STORAGE);
+      CleanupServer(EXIT_FAILURE);
+      return;
+    }
+
+    int nResultIndex = 0;
+    do {
+      LPSHELLCODEINFO lpInfo = (LPSHELLCODEINFO) (pos->pvData);
+      if (lpInfo == NULL) {
+        FreeBuffer((void**) ppszResult);
+        fprintf(stderr, FAILED_ALLOC_SHELLCODE_STORAGE);
+        CleanupServer(EXIT_FAILURE);
+        break;
+      }
+
+      for (int i = 0; i < lpInfo->nShellCodeBytes; i++) {
+        if ((lpInfo->pszShellCodeBytes)[i] == '\n') {
+          continue;
+        }
+        (*ppszResult)[nResultIndex] = (lpInfo->pszShellCodeBytes)[i];
+        nResultIndex++;
+      }
+
+    } while ((pos = GetNextPosition(pos)) != NULL);
+  }
+  UnlockMutex(GetShellCodeListMutex());
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// SendMultilineDataTerminator function
 
 void SendMultilineDataTerminator(LPCLIENTSTRUCT lpSendingClient) {
   if (lpSendingClient == NULL) {
@@ -86,7 +166,7 @@ void SendMultilineDataTerminator(LPCLIENTSTRUCT lpSendingClient) {
   }
 
   lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, ".\n"); // end of data
+      ReplyToClient(lpSendingClient, MSG_TERMINATOR); // end of data
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -169,7 +249,8 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
 
   /* Tell the client who told us they want to quit,
    * "Good bye sucka!" */
-  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient, OK_GOODBYE);
+  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+  OK_GOODBYE);
 
   //fprintf(stdout, "Marking client as not connected...\n");
 
@@ -190,6 +271,12 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
     }
   }
   UnlockMutex(GetClientListMutex());
+
+  LockMutex(GetShellCodeListMutex());
+  {
+    ClearList(&g_pShellCodeLines, ReleaseShellCodeInfo);
+  }
+  UnlockMutex(GetShellCodeListMutex());
 
   return TRUE;
 }
@@ -280,6 +367,12 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
    * of all the chatters who are currently active on the server. */
   if (EqualsNoCase(pszBuffer, PROTOCOL_LIST_COMMAND)) {
     ProcessListCommand(lpSendingClient);
+
+    return TRUE; /* command successfully handled */
+  }
+
+  if (StartsWith(pszBuffer, PROTOCOL_CODE_COMMAND)) {
+    ProcessCodeCommand(lpSendingClient, pszBuffer);
 
     return TRUE; /* command successfully handled */
   }
@@ -424,20 +517,33 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
 
   if (lShellcodeBytes <= 0) {
     lpSendingClient->nBytesSent +=
-            ReplyToClient(lpSendingClient,
-                ERROR_QTY_MUST_BE_POS_32BIT_INT);
+        ReplyToClient(lpSendingClient,
+        ERROR_QTY_MUST_BE_POS_32BIT_INT);
 
-        FreeStringArray(&ppszStrings, nStringCount);
-        return;
+    FreeStringArray(&ppszStrings, nStringCount);
+    return;
   }
+
+  lpSendingClient->nBytesSent +=
+      ReplyToClient(lpSendingClient, OK_SEND_SHELLCODE);
 
   /* Receive multiline data from the client.  Stop receiving when
    * data is a period followed by a LF. */
   ReceiveMultilineData2(
-      (void*)lpSendingClient,
+      (void*) lpSendingClient,
       ReceiveFromClient,
       GatherShellCodeLine,
       IsMultilineResponseTerminator);
+
+  int total = Sum(g_pShellCodeLines, GetCurrentShellCodeInfoBytes);
+
+  if (total == -1) {
+    // Unknown error during computation of total bytes received.
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    ClearList(&g_pShellCodeLines, ReleaseShellCodeInfo);
+    return;
+  }
 
   FreeStringArray(&ppszStrings, nStringCount);
 }
@@ -524,7 +630,7 @@ int ReceiveFromClient(void* pvSendingClient, char** ppszReplyBuffer) {
   }
 
   LPCLIENTSTRUCT lpSendingClient =
-      (LPCLIENTSTRUCT)pvSendingClient;
+      (LPCLIENTSTRUCT) pvSendingClient;
 
   // Check whether we have a valid endpoint for talking with the server.
   if (!IsSocketValid(lpSendingClient->nSocket)) {
@@ -572,7 +678,7 @@ int ReceiveFromClient(void* pvSendingClient, char** ppszReplyBuffer) {
   if (GetLogFileHandle() != stdout) {
     fprintf(stdout,
     CLIENT_DATA_FORMAT, lpSendingClient->szIPAddress,
-      lpSendingClient->nSocket, *ppszReplyBuffer);
+        lpSendingClient->nSocket, *ppszReplyBuffer);
   }
 
   // Return the number of received bytes

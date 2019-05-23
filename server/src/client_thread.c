@@ -33,15 +33,18 @@ void *ClientThread(void* pData) {
 	ZERO_BYTES_TOTAL_RECEIVED;
 
 	while (1) {
+    // Receive all the lines of text that the client wants to send,
+    // and put them all into a buffer.
+    char* pszData = NULL;
+
+    /* Free the received data so it does not leak memory */
+    FreeBuffer((void**) &pszData);
+
 		/* Check whether the client's socket endpoint is valid. */
 		if (!IsSocketValid(lpSendingClient->nSocket)) {
 			// Nothing to do.
 			break;
 		}
-
-		// Receive all the lines of text that the client wants to send,
-		// and put them all into a buffer.
-		char* pszData = NULL;
 		int nBytesReceived = 0;
 
 		if ((nBytesReceived = ReceiveFromClient(lpSendingClient, &pszData))

@@ -79,6 +79,16 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     const char* pszBuffer);
 
 /**
+ * @name IsMultilineResponseTerminator
+ * @brief Gets a value indicating whether the specified message is the signal
+ * for the termination of a multiline data transmission.
+ * @param pszMessage Address of the message to be checked.
+ * @return TRUE if the message is the multiline-response terminator; FALSE
+ * otherwise.
+ */
+BOOL IsMultilineResponseTerminator(const char* pszMessage);
+
+/**
  * @brief Callback that is called for each entry in the client list to kill
  * client threads that are no longer needed for communications.
  * @param pClientStruct Address of an instance of CLIENTSTRUCT containing
@@ -104,6 +114,16 @@ void LaunchNewClientThread(LPCLIENTSTRUCT lpCS);
  * @param lpCS Client for whom to write the ID.
  */
 void LogClientID(LPCLIENTSTRUCT lpCS);
+
+/**
+ * @brief Processes the server's behavior upon receiving the CODE command.
+ * @param lpSendingClient Pointer to an instance of CLIENSTRUCT that refers
+ * to the client who sent the command.
+ * @param pszBuffer Address of a string buffer containing the data sent by
+ * the client (for parsing).
+ */
+void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
+    const char* pszBuffer);
 
 /**
  * @brief Processes the server's behavior upon receiveing the HELO comamnd.
