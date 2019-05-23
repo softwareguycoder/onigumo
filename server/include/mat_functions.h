@@ -5,6 +5,8 @@
 #ifndef __MAT_FUNCTIONS_H__
 #define __MAT_FUNCTIONS_H__
 
+#include "client_struct.h"
+
 #define INVALID_SERVER_SOCKET_HANDLE    "Invalid server socket file " \
                                         "descriptor passed.\n"
 #define INVALID_CLIENT_SOCKET_HANDLE    "Invalid client socket file " \

@@ -17,16 +17,22 @@
 // CreateShellCodeInfo function
 
 void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
-    int nShellCodeBytes, const char* pszShellCodeBytes) {
+    UUID clientID, int nEncodedShellCodeBytes,
+    int nTotalEncodedShellCodeBytes,
+    const char* pszEncodedShellCodeBytes) {
   if (lppShellCodeInfo == NULL) {
-    return;
+    return; // Required parameter
   }
 
-  if (nShellCodeBytes <= 0L) {
-    return;
+  if (nEncodedShellCodeBytes <= 0) {
+    return; // Count must be a positive number.
   }
 
-  if (pszShellCodeBytes == NULL) {
+  if (nTotalEncodedShellCodeBytes <= 0) {
+    return; // Count must be a positive number.
+  }
+
+  if (pszEncodedShellCodeBytes == NULL) {
     return;
   }
 
@@ -40,41 +46,47 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
   malloc(1*sizeof(SHELLCODEINFO));
   if (*lppShellCodeInfo == NULL) {
     fprintf(stderr,
-    "Failed to allocate memory for SHELLCODEINFO instance.\n");
+        FAILED_ALLOC_SHELLCODEINFO);
     exit(EXIT_FAILURE);
   }
 
-  (*lppShellCodeInfo)->pszShellCodeBytes =
-  (char*)malloc(((size_t)nShellCodeBytes)*sizeof(char));
-  if ((*lppShellCodeInfo)->pszShellCodeBytes == NULL) {
+  (*lppShellCodeInfo)->pszEncodedShellCodeBytes =
+  (char*)malloc(((size_t)nEncodedShellCodeBytes)*sizeof(char));
+  if ((*lppShellCodeInfo)->pszEncodedShellCodeBytes == NULL) {
     fprintf(stderr,
-    "Failed to allocate memory for shellcode bytes.\n");
+        FAILED_ALLOC_ENCODED_SHELLCODE_BYTES);
     FreeBuffer((void**)lppShellCodeInfo);
     exit(EXIT_FAILURE);
   }
-  memset((*lppShellCodeInfo)->pszShellCodeBytes, 0,
-  nShellCodeBytes);
+  memset((*lppShellCodeInfo)->pszEncodedShellCodeBytes, 0,
+      nEncodedShellCodeBytes);
 
-  for(long i = 0;i < nShellCodeBytes;i++) {
-    ((*lppShellCodeInfo)->pszShellCodeBytes)[i] =
-    pszShellCodeBytes[i];
-  }
+  /* Copy just the encoded bytes, not the terminating <LF>, into the
+   * data structure's buffer. */
+  strncpy((*lppShellCodeInfo)->pszEncodedShellCodeBytes,
+      pszEncodedShellCodeBytes, nEncodedShellCodeBytes);
 
-  (*lppShellCodeInfo)->nShellCodeBytes = nShellCodeBytes;
-
+  /* Other structure member initialization here. */
+  (*lppShellCodeInfo)->nEncodedShellCodeBytes = nEncodedShellCodeBytes;
+  (*lppShellCodeInfo)->nTotalEncodedShellCodeBytes
+      = nTotalEncodedShellCodeBytes;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // DestroyShellCodeInfo function
 
-void DestroyShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo) {
-  if (lppShellCodeInfo == NULL
-      || *lppShellCodeInfo == NULL) {
+void DestroyShellCodeInfo(LPSHELLCODEINFO lpShellCodeInfo) {
+  if (lpShellCodeInfo == NULL) {
     return; // Required parameter
   }
 
-  FreeBuffer((void**)&((*lppShellCodeInfo)->pszShellCodeBytes));
-  FreeBuffer((void**)lppShellCodeInfo);
+  /* First, deallocate the buffer of encoded shellcode bytes,
+   * and then deallocate the entire structure. */
+  FreeBuffer((void**)&(lpShellCodeInfo->pszEncodedShellCodeBytes));
+
+  memset(lpShellCodeInfo, 0, sizeof(SHELLCODEINFO));
+
+  FreeBuffer((void**)&lpShellCodeInfo);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,11 +97,15 @@ BOOL IsShellCodeInfoValid(LPSHELLCODEINFO lpShellCodeInfo) {
     return FALSE;
   }
 
-  if (lpShellCodeInfo->nShellCodeBytes <= 0) {
+  if (lpShellCodeInfo->nEncodedShellCodeBytes <= 0) {
     return FALSE;
   }
 
-  if (lpShellCodeInfo->pszShellCodeBytes == NULL) {
+  if (lpShellCodeInfo->nTotalEncodedShellCodeBytes <= 0) {
+    return FALSE;
+  }
+
+  if (IsNullOrWhiteSpace(lpShellCodeInfo->pszEncodedShellCodeBytes)) {
     return FALSE;
   }
 
@@ -108,7 +124,7 @@ void ReleaseShellCodeInfo(void* pvData) {
   if (lpSCI == NULL) {
     return;
   }
-  DestroyShellCodeInfo(&lpSCI);
+  DestroyShellCodeInfo(lpSCI);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

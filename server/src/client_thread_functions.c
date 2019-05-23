@@ -37,25 +37,47 @@ BOOL g_bShouldTerminateClientThread = FALSE;
 ///////////////////////////////////////////////////////////////////////////////
 // GatherShellCodeLine function
 
-void GatherShellCodeLine(const char* pszShellCodeLine,
+void GatherShellCodeLine(void* pvSendingClient,
+    const char* pszShellCodeLine,
     int nShellCodeBytes) {
-  if (pszShellCodeLine == NULL) {
+  if (pvSendingClient == NULL) {
+    return; // Required parameter
+  }
+
+  if (IsNullOrWhiteSpace(pszShellCodeLine)) {
     return; // Required parameter
   }
 
   if (IsMultilineResponseTerminator(pszShellCodeLine)) {
-    return;
+    return; // Cannot process a line containing the message terminator
   }
 
   if (nShellCodeBytes <= 0) {
-    return; // Required parameter
+    return; // Required parameter and, as a count, must be a positive integer
+  }
+
+  LPCLIENTSTRUCT lpSendingClient =
+      (LPCLIENTSTRUCT)pvSendingClient;
+  if (lpSendingClient == NULL) {
+    return; // Cast not successful?
   }
 
   LockMutex(GetShellCodeListMutex());
   {
     LPSHELLCODEINFO lpShellCodeInfo = NULL;
+
     CreateShellCodeInfo(&lpShellCodeInfo,
-        nShellCodeBytes, pszShellCodeLine);
+        lpSendingClient->clientID,
+        GetLineCharCount(pszShellCodeLine),
+        nShellCodeBytes,
+        pszShellCodeLine);
+    if (lpShellCodeInfo == NULL) {
+      UnlockMutex(GetShellCodeListMutex());
+      fprintf(stderr,
+          FAILED_ADD_SHELLCODE_BLOCK);
+      exit(EXIT_FAILURE);
+      return; // Operation failed
+    }
 
     AddElementToTail(&g_pShellCodeLines, lpShellCodeInfo);
   }
@@ -80,14 +102,14 @@ int GetCurrentShellCodeInfoBytes(void* pvShellCodeInfo) {
     return result;
   }
 
-  return lpShellCodeInfo->nShellCodeBytes;
+  return lpShellCodeInfo->nEncodedShellCodeBytes;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // IsMultilineResponseTerminator function
 
 BOOL IsMultilineResponseTerminator(const char* pszMessage) {
-  if (pszMessage == NULL) {
+  if (IsNullOrWhiteSpace(pszMessage)) {
     return FALSE;
   }
 
@@ -144,11 +166,12 @@ void JoinAllShellCodeBytes(char** ppszResult, int* pnTotalShellCodeBytes) {
         break;
       }
 
-      for (int i = 0; i < lpInfo->nShellCodeBytes; i++) {
-        if ((lpInfo->pszShellCodeBytes)[i] == '\n') {
+      /* Doing a strcat "by hand" */
+      for (int i = 0; i < lpInfo->nEncodedShellCodeBytes; i++) {
+        if ((lpInfo->pszEncodedShellCodeBytes)[i] == '\n') {
           continue;
         }
-        (*ppszResult)[nResultIndex] = (lpInfo->pszShellCodeBytes)[i];
+        (*ppszResult)[nResultIndex] = (lpInfo->pszEncodedShellCodeBytes)[i];
         nResultIndex++;
       }
 

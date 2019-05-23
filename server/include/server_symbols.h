@@ -5,9 +5,19 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef FAILED_ADD_SHELLCODE_BLOCK
+#define FAILED_ADD_SHELLCODE_BLOCK \
+  "ERROR: Failed to add the block of shellcode to the internal structure.\n"
+#endif //FAILED_ADD_SHELLCODE_BLOCK
+
+#ifndef FAILED_ALLOC_ENCODED_SHELLCODE_BYTES
+#define FAILED_ALLOC_ENCODED_SHELLCODE_BYTES \
+  "ERROR: Failed to allocate memory for encoded shellcode bytes.\n"
+#endif //FAILED_ALLOC_ENCODED_SHELLCODE_BYTES
+
 #ifndef FAILED_ALLOC_SHELLCODEINFO
 #define FAILED_ALLOC_SHELLCODEINFO \
-  "Failed to allocate memory for SHELLCODEINFO instance.\n"
+  "ERROR: Failed to allocate memory for SHELLCODEINFO instance.\n"
 #endif //FAILED_ALLOC_SHELLCODEINFO
 
 /**

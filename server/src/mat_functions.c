@@ -2,13 +2,14 @@
 // Acceptor Thread (MAT)
 //
 
-#include <client_thread_functions.h>
 #include "stdafx.h"
 #include "server.h"
 #include "server_functions.h"
 
 #include "mat.h"
 #include "mat_functions.h"
+#include "client_thread_functions.h"
+#include "shell_code_info.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Internal-use-only functions
