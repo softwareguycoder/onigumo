@@ -94,7 +94,29 @@ void DestroyShellCodeInfo(LPSHELLCODEINFO lpShellCodeInfo) {
 
 BOOL FindShellCodeBlockForClient(void* pvClientUUID, void* pvShellCodeBlock)
 {
-  return FALSE;
+  BOOL bResult = FALSE;
+  if (pvClientUUID == NULL) {
+    return bResult;
+  }
+
+  if (pvShellCodeBlock == NULL) {
+    return bResult;
+  }
+
+  UUID* pClientUUID = (UUID*)pvClientUUID;
+  if (!IsUUIDValid(pClientUUID)) {
+    return bResult;
+  }
+
+  LPSHELLCODEINFO lpShellCodeInfo =
+      (LPSHELLCODEINFO)pvShellCodeBlock;
+  if (!IsShellCodeInfoValid(lpShellCodeInfo)) {
+    return bResult;
+  }
+
+  bResult = AreUUIDsEqual(pClientUUID, &(lpShellCodeInfo->clientID));
+
+  return bResult;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
