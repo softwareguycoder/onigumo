@@ -811,14 +811,25 @@ void ReportClientSessionStats(LPCLIENTSTRUCT lpSendingClient) {
 }
 
 void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (!IsUUIDValid(&(lpSendingClient->clientID))) {
+    return;
+  }
+
   LockMutex(GetClientListMutex());
   {
-    LPPOSITION pos = FindElement(g_pClientList,
-        &(lpSendingClient->clientID), FindClientByID);
-    if (pos != NULL) {
-      g_pClientList = pos;
-      RemoveElement(&g_pClientList, FreeClient);
+    if (g_pClientList == NULL
+        || GetElementCount(g_pClientList) == 0) {
+      UnlockMutex(GetClientListMutex());
+      return;
     }
+
+    RemoveElementWhere(&g_pClientList,
+        &(lpSendingClient->clientID), FindClientByID,
+        FreeClient);
   }
   UnlockMutex(GetClientListMutex());
 }
