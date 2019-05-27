@@ -6,7 +6,7 @@
 #define __SERVER_SYMBOLS_H__
 
 #ifndef RECD_SHELLCODE_SUCCESSFULLY
-#define RECD_SHELLCODE_SUCCESSFULLY \
+#define OK_RECD_SHELLCODE_SUCCESSFULLY \
   "202 OK. Encoded shellcode bytes received successfully.\n"
 #endif //RECD_SHELLCODE_SUCCESSFULLY
 
