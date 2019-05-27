@@ -26,10 +26,19 @@ BOOL AreTooManyClientsConnected();
 /**
  * @brief Throws away resources (such as threads, sockets, and such) that are
  * associated with the client specified.
+ * @param lpSendingClient Address of an instance of CLIENTSTRUCT that refers
+ * to the client whose connection needs to be cleaned up.
  * @remarks Kills and destroys the client thread, and closes the socket that
  * leads to the client on the server's end. */
 void CleanupClientConnection(LPCLIENTSTRUCT lpSendingClient);
 
+/**
+ * @brief Removes all lines of shellcode added to the internal database
+ * by the specified client.
+ * @param lpSendingClient Address of an instance of CLIENTSTRUCT that refers
+ * to the particular client whose shellcode should be removed.
+ * @return TRUE if the clear operation was successfull; FALSE otherwise.
+ */
 BOOL ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient);
 
 /**

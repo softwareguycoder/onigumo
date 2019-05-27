@@ -287,8 +287,13 @@ BOOL ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
     if (g_pShellCodeLines == NULL
         || GetElementCount(g_pShellCodeLines) == 0) {
       UnlockMutex(GetShellCodeListMutex());
-      return TRUE;
+      return TRUE;  /* TRUE because zero lines of shellcode in the list for
+                        the current client is what we want. */
     }
+
+    /* Scan the linked list for lines of shell code that are tagged
+     * with the unique ID of the current client.  Then, remove all such
+     * lines. */
 
     RemoveElementWhere(&g_pShellCodeLines,
         &(lpSendingClient->clientID), FindShellCodeBlockForClient,
