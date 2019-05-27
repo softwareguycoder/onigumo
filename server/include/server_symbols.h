@@ -5,6 +5,12 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef OK_PURGD_SUCCESSFULLY
+#define OK_PURGD_SUCCESSFULLY \
+  "203 OK. All shellcode lines being stored for this client " \
+  "have been purged.\n"
+#endif //OK_PURGD_SUCCESSFULLY
+
 #ifndef RECD_SHELLCODE_SUCCESSFULLY
 #define OK_RECD_SHELLCODE_SUCCESSFULLY \
   "202 OK. Encoded shellcode bytes received successfully.\n"
@@ -359,7 +365,7 @@
  * server that their user is done chatting.
  */
 #ifndef OK_GOODBYE
-#define OK_GOODBYE					"204 Goodbye.\n"
+#define OK_GOODBYE					"205 Goodbye.\n"
 #endif //OK_GOODBYE
 
 /**
@@ -372,7 +378,7 @@
  */
 #ifndef OK_LIST_FOLLOWS
 #define OK_LIST_FOLLOWS \
-	"203 OK. List of processes running on this machine follows.\n"
+	"204 OK. List of processes running on this machine follows.\n"
 #endif //OK_LIST_FOLLOWS
 
 #ifndef OK_SEND_SHELLCODE
