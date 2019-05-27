@@ -31,15 +31,15 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
     return; // Count must be a positive number.
   }
 
-  if (pszEncodedShellCodeBytes == NULL) {
+  /* We expect the shellcode bytes to arrive as Base64-encoded values.
+   * We are trying to make sure we have enough space for the shellcode
+   * bytes (with a null-terminator) but we want to strip off any '\n' chars
+   * that might be on the end.  First, we check to make sure that we didn't
+   * get a blank string. */
+
+  if (IsNullOrWhiteSpace(pszEncodedShellCodeBytes)) {
     return;
   }
-
-  /* We just have to assume pszShellCodeBytes contains
-   chars. We cannot validate it with IsNullOrWhiteSpace since
-   shellcode can contain '\0' all over the place.  We just
-   need to trust that the caller of this function told us
-   the correct number of bytes.*/
 
   *lppShellCodeInfo = (LPSHELLCODEINFO)
   malloc(1*sizeof(SHELLCODEINFO));
@@ -50,8 +50,12 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
   }
   memset(*lppShellCodeInfo, 0, sizeof(SHELLCODEINFO));
 
+  int nStringLength = strlen(pszEncodedShellCodeBytes);
+
+  fprintf(stdout, "CreateShellCodeInfo: nStringLength = %d\n", nStringLength);
+
   (*lppShellCodeInfo)->pszEncodedShellCodeBytes =
-  (char*)malloc(((size_t)nEncodedShellCodeBytes)*sizeof(char));
+  (char*)malloc((nEncodedShellCodeBytes + 1)*sizeof(char));
   if ((*lppShellCodeInfo)->pszEncodedShellCodeBytes == NULL) {
     fprintf(stderr,
         FAILED_ALLOC_ENCODED_SHELLCODE_BYTES);
@@ -59,7 +63,7 @@ void CreateShellCodeInfo(LPPSHELLCODEINFO lppShellCodeInfo,
     exit(EXIT_FAILURE);
   }
   memset((*lppShellCodeInfo)->pszEncodedShellCodeBytes, 0,
-      nEncodedShellCodeBytes);
+      nEncodedShellCodeBytes + 1);
 
   /* Copy just the encoded bytes, not the terminating <LF>, into the
    * data structure's buffer. */

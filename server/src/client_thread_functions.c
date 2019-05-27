@@ -543,7 +543,8 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
   }
 
   /* We expect ppszStrings[1] to hold the ASCII representation of a
-   * positive, 32-bit integer. */
+   * positive, 32-bit integer. Convert it to a long, just in case
+   * the string is a really big number */
   long lShellcodeBytes = 0L;
   if (0 > StringToLong(ppszStrings[1], &lShellcodeBytes)) {
     lpSendingClient->nBytesSent +=
@@ -578,7 +579,7 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
       &(lpSendingClient->clientID),
       FindShellCodeBlockForClient);
 
-  if (total == -1) {
+  if (total == -1 || total != (int)lShellcodeBytes) {
     // Unknown error during computation of total bytes received.
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
@@ -617,11 +618,12 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
-  unsigned char szDecodedBytes[nTotalEncodedShellCodeBytes + 1];
-  memset(szDecodedBytes, 0,  nTotalEncodedShellCodeBytes + 1);
+  int nDecodedBytes = GetBase64DecodedDataSize(pszEncodedShellCode);
 
-  Base64Decode(pszEncodedShellCode, szDecodedBytes,
-      nTotalEncodedShellCodeBytes);
+  unsigned char szDecodedBytes[nDecodedBytes];
+  memset(szDecodedBytes, 0,  nDecodedBytes);
+
+  Base64Decode(pszEncodedShellCode, szDecodedBytes, nDecodedBytes);
 
   /* Remove all the shellcode blocks for this client from the
    * linked list. This prevents this command from being re-issued
