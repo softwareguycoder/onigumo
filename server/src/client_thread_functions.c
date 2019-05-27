@@ -378,7 +378,7 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
    * It does not matter whether a client socket has connected; that socket
    * has to say HELO first, so that then that client is marked as being
    * allowed to receive stuff. */
-  if (EqualsNoCase(pszBuffer, PROTOCOL_HELO_COMMAND)) {
+  if (Equals(pszBuffer, PROTOCOL_HELO_COMMAND)) {
     // Only send HELO once.  This command changes the bConnected flag
     // to say TRUE; if it already is TRUE, then do nothing but
     // swallow the command
@@ -404,7 +404,7 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     return FALSE;
   }
 
-  if (EqualsNoCase(pszBuffer, MSG_TERMINATOR)) {
+  if (Equals(pszBuffer, MSG_TERMINATOR)) {
     /* Signal for end of multi-line input received.  However, we
      * do not define this for the chat server (chat messages can only be one
      * line). */
@@ -413,7 +413,7 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
 
   /* per protocol, LIST command is client requesting a list of the nicknames
    * of all the chatters who are currently active on the server. */
-  if (EqualsNoCase(pszBuffer, PROTOCOL_LIST_COMMAND)) {
+  if (Equals(pszBuffer, PROTOCOL_LIST_COMMAND)) {
     ProcessListCommand(lpSendingClient);
 
     return TRUE; /* command successfully handled */
@@ -425,13 +425,17 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     return TRUE; /* command successfully handled */
   }
 
-  if (EqualsNoCase(pszBuffer, PROTOCOL_EXEC_COMMAND)) {
+  if (Equals(pszBuffer, PROTOCOL_EXEC_COMMAND)) {
     ProcessExecCommand(lpSendingClient);
 
     return TRUE; /* command successfully handled */
   }
 
-  //char szReplyBuffer[BUFLEN];
+  if (Equals(pszBuffer, PROTOCOL_PURG_COMMAND)) {
+    ProcessPurgCommand(lpSendingClient);
+
+    return TRUE; /* command successfully handled */
+  }
 
   return FALSE;
 }
@@ -720,6 +724,46 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
   /* release the memory occupied by the output */
   FreeStringArray(&ppszOutputLines, nLineCount);
   ppszOutputLines = NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ProcessPurgCommand
+
+void ProcessPurgCommand(LPCLIENTSTRUCT lpSendingClient) {
+  if (NULL == lpSendingClient) {
+    return;
+  }
+
+  if (!IsUUIDValid(&(lpSendingClient->clientID))) {
+    lpSendingClient->nBytesSent +=
+            ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    return;
+  }
+
+  if (INVALID_HANDLE_VALUE == GetShellCodeListMutex()) {
+    lpSendingClient->nBytesSent +=
+            ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    return;
+  }
+
+  LockMutex(GetShellCodeListMutex());
+  {
+    if (g_pShellCodeLines == NULL
+        || GetElementCount(g_pShellCodeLines) == 0) {
+      UnlockMutex(GetShellCodeListMutex());
+      lpSendingClient->nBytesSent +=
+                  ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
+      return;
+    }
+
+    RemoveElementWhere(&g_pShellCodeLines,
+        &(lpSendingClient->clientID), FindShellCodeBlockForClient,
+        ReleaseShellCodeBlock);
+  }
+  UnlockMutex(GetShellCodeListMutex());
+
+  lpSendingClient->nBytesSent +=
+              ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

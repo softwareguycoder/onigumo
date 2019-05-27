@@ -152,6 +152,8 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient);
  */
 void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient);
 
+void ProcessPurgCommand(LPCLIENTSTRUCT lpSendingClient);
+
 /**
  * @brief Performs a synchronous recieve operation from the client, looking for
  * data until a newline has been receieved.
