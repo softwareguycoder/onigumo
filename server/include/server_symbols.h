@@ -5,6 +5,10 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef PROTOCOL_PURG_COMMAND
+#define PROTOCOL_PURG_COMMAND "PURG\n";
+#endif //PROTOCOL_PURG_COMMAND
+
 #ifndef OK_PURGD_SUCCESSFULLY
 #define OK_PURGD_SUCCESSFULLY \
   "203 OK. All shellcode lines being stored for this client " \
