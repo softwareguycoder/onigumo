@@ -276,11 +276,6 @@ void ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
-  if (g_pShellCodeLines == NULL
-      || GetElementCount(g_pShellCodeLines) == 0) {
-    return;
-  }
-
   /* cycle through the linked list of shellcode lines, where
    * each entry is tagged with the client ID of the client who sent
    * that shellcode, and clear that client's shellcode lines from the
@@ -289,6 +284,12 @@ void ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
 
   LockMutex(GetShellCodeListMutex());
   {
+    if (g_pShellCodeLines == NULL
+        || GetElementCount(g_pShellCodeLines) == 0) {
+      UnlockMutex(GetShellCodeListMutex());
+      return;
+    }
+
     RemoveElementWhere(&g_pShellCodeLines,
         &(lpSendingClient->clientID), FindShellCodeBlockForClient,
         ReleaseShellCodeBlock);
