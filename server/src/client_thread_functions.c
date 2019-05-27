@@ -403,7 +403,8 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
   if (lpSendingClient->bConnected == FALSE) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_MUST_SAY_HELLO_FIRST);
-    return FALSE;
+    return TRUE;  /* command or thing handled by telling client they
+                    need to say HELO first */
   }
 
   if (Equals(pszBuffer, MSG_TERMINATOR)) {
@@ -889,12 +890,6 @@ int SendToClient(LPCLIENTSTRUCT lpCurrentClient, const char* pszMessage) {
   }
 
   if (!IsSocketValid(lpCurrentClient->nSocket)) {
-    return ERROR;
-  }
-
-  if (lpCurrentClient->bConnected == FALSE) {
-    /* client has not issued the HELO command yet, so it does
-     * not get included on broadcasts */
     return ERROR;
   }
 
