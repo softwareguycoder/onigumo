@@ -8,6 +8,8 @@
 #ifndef __SERVER_FUNCTIONS_H__
 #define __SERVER_FUNCTIONS_H__
 
+extern HMUTEX g_hShellCodeListMutex;
+
 BOOL CheckCommandLineArgs(int argc, char *argv[]);
 
 /**
@@ -24,10 +26,21 @@ void CreateMasterAcceptorThread();
 struct sockaddr_in* CreateSockAddr();
 void DestroyClientListMutex();
 void ForceDisconnectionOfAllClients();
+void FreeAllShellCodeBlocks();
+
+/**
+ * @brief Gets a HMUTEX value that is an opaque handle to the mutex used
+ * for synchronizing access to the linked list of shellcode lines that
+ * are currently being processed.
+ * @return HMUTEX handle to the shell code list mutex, or INVALID_HANDLE_VALUE
+ * if the mutex has not been initialized.
+ */
+HMUTEX GetShellCodeListMutex();
+
 BOOL InitializeApplication();
 void InstallSigintHandler();
 void ParseCommandLine(int argc, char *argv[],
-	int* pnPort, BOOL* pbDiagnosticMode);
+    int* pnPort, BOOL* pbDiagnosticMode);
 void PrintSoftwareTitleAndCopyright();
 void ServerCleanupHandler(int signum);
 void SetUpServerOnPort(int nPort);

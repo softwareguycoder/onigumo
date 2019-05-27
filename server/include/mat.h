@@ -7,8 +7,6 @@
 #ifndef __MAT_H__
 #define __MAT_H__
 
-extern HMUTEX g_hShellCodeListMutex;
-
 extern BOOL g_bShouldTerminateMasterThread;
 
 /* This is the 'big daddy' thread that accepts all new client connections

@@ -304,12 +304,6 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
   }
   UnlockMutex(GetClientListMutex());
 
-  LockMutex(GetShellCodeListMutex());
-  {
-    ClearList(&g_pShellCodeLines, ReleaseShellCodeBlock);
-  }
-  UnlockMutex(GetShellCodeListMutex());
-
   return TRUE;
 }
 
@@ -332,9 +326,6 @@ LPCLIENTSTRUCT GetSendingClientInfo(void* pvClientThreadUserState) {
   return (LPCLIENTSTRUCT) pvClientThreadUserState;
 }
 
-HMUTEX GetShellCodeListMutex() {
-  return g_hShellCodeListMutex;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // HandleProtocolCommand function - Deals with things we receive which appear

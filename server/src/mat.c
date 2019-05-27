@@ -18,8 +18,6 @@
 #include "mat_functions.h"
 #include "server_functions.h"
 
-HMUTEX g_hShellCodeListMutex = INVALID_HANDLE_VALUE;
-
 BOOL g_bShouldTerminateMasterThread = FALSE;
 
 ///////////////////////////////////////////////////////////////////////////////

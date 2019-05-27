@@ -58,15 +58,6 @@ int GetConnectedClientCount();
 LPCLIENTSTRUCT GetSendingClientInfo(void* pvClientThreadUserState);
 
 /**
- * @brief Gets a HMUTEX value that is an opaque handle to the mutex used
- * for synchronizing access to the linked list of shellcode lines that
- * are currently being processed.
- * @return HMUTEX handle to the shell code list mutex, or INVALID_HANDLE_VALUE
- * if the mutex has not been initialized.
- */
-HMUTEX GetShellCodeListMutex();
-
-/**
  * @brief Checks received data for protocol-specific commands and handles them.
  * @param lpSendingClient Address of a CLIENTSTRUCT instance that contains
  * information on the client who sent the command.

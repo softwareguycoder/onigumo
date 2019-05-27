@@ -10,6 +10,9 @@
 #include "mat.h"
 #include "mat_functions.h"
 #include "server_functions.h"
+#include "shell_code_info.h"
+
+HMUTEX g_hShellCodeListMutex = INVALID_HANDLE_VALUE;
 
 BOOL g_bHasServerQuit = FALSE;
 
@@ -53,6 +56,8 @@ void CleanupServer(int nExitCode) {
 
   /* Shut down the thread that waits for new connections. */
   CleanupMasterAcceptorThread();
+
+  FreeAllShellCodeBlocks();
 
   ForceDisconnectionOfAllClients();
 
@@ -204,6 +209,24 @@ void ForceDisconnectionOfAllClients() {
     ClearList(&g_pClientList, FreeClient);
   }
   UnlockMutex(GetClientListMutex());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// FreeAllShellCodeBlocks function
+
+void FreeAllShellCodeBlocks() {
+  LockMutex(GetShellCodeListMutex());
+  {
+    ClearList(&g_pShellCodeLines, ReleaseShellCodeBlock);
+  }
+  UnlockMutex(GetShellCodeListMutex());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// GetShellCodeListMutex function
+
+HMUTEX GetShellCodeListMutex() {
+  return g_hShellCodeListMutex;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
