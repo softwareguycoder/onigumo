@@ -587,6 +587,9 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
     return;
   }
 
+  lpSendingClient->nBytesSent +=
+      ReplyToClient(lpSendingClient, RECD_SHELLCODE_SUCCESSFULLY);
+
   FreeStringArray(&ppszStrings, nStringCount);
 }
 
