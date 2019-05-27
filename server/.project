@@ -14,6 +14,7 @@
 		<project>console_core</project>
 		<project>api_core</project>
 		<project>file_core</project>
+		<project>naraku</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

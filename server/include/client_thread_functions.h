@@ -30,7 +30,7 @@ BOOL AreTooManyClientsConnected();
  * leads to the client on the server's end. */
 void CleanupClientConnection(LPCLIENTSTRUCT lpSendingClient);
 
-void ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient);
+BOOL ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient);
 
 /**
  * @brief Ends a chat session for the specified client, upon its request.

@@ -40,6 +40,7 @@
 #include <../../mutex_core/mutex_core/include/mutex_core.h>
 #include <../../threading_core/threading_core/include/threading_core.h>
 #include <../../uuid_core/uuid_core/include/uuid_core.h>
+#include <../../naraku/naraku/include/naraku.h>
 
 #endif /* __STDAFX_H__ */
 
