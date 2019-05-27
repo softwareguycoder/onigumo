@@ -1,10 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // server.c - TCP chat server in C
-// Rudimentary chat server supporting multiple, concurrently-connected clients
-// that can chat with each other.
+// Rudimentary exploit server supporting multiple,
+// concurrently-connected clients that can fuck up the machine this server is
+// running on.
 //
 // AUTHOR: Brian Hart
-// LAST UPDATE: 11 Apr 2019
+// LAST UPDATE: 27 May 2019
 //
 // Shout-out to <https://gist.githubusercontent.com/suyash/2488ff6996c98a8ee3a8
 // 4fe3198a6f85/raw/ba06e891060b277867a6f9c7c2afa20da431ec91/server.c> and
