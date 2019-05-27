@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef RECD_SHELLCODE_SUCCESSFULLY
+#define RECD_SHELLCODE_SUCCESSFULLY \
+  "202 OK. Encoded shellcode bytes received successfully.\n"
+#endif //RECD_SHELLCODE_SUCCESSFULLY
+
 #ifndef FAILED_ADD_SHELLCODE_BLOCK
 #define FAILED_ADD_SHELLCODE_BLOCK \
   "ERROR: Failed to add the block of shellcode to the internal structure.\n"
