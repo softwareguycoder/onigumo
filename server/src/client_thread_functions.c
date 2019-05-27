@@ -401,13 +401,13 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
    * non-connected client can even send. Otherwise, do not accept any further
    * protocol commands until a client has said HELO ("Hello!") to us. */
   if (lpSendingClient->bConnected == FALSE) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_MUST_SAY_HELLO_FIRST);
     return FALSE;
   }
 
   if (Equals(pszBuffer, MSG_TERMINATOR)) {
-    /* Signal for end of multi-line input received.  However, we
-     * do not define this for the chat server (chat messages can only be one
-     * line). */
+    /* Signal for end of multi-line input received. */
     return FALSE;
   }
 

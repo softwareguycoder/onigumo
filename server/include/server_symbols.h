@@ -144,6 +144,11 @@
   "550 Failed. Unknown server or OS error.\n"
 #endif //ERROR_GENERAL_SERVER_FAILURE
 
+#ifndef ERROR_MUST_SAY_HELLO_FIRST
+#define ERROR_MUST_SAY_HELLO_FIRST \
+  "504 Failed. Must issue HELO command to begin client session.\n"
+#endif //ERROR_MUST_SAY_HELLO_FIRST
+
 /**
  * @brief Protocol response sent when too many clients are already connected.
  * @remarks Error reply to a HELO command from a client when more than the
