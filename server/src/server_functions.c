@@ -67,6 +67,8 @@ void CleanupServer(int nExitCode) {
 
   DestroyClientListMutex();
 
+  DestroyShellCodeLinesMutex();
+
   DestroyLoggingMutex();
 
   DestroyInterlock();
@@ -176,6 +178,17 @@ struct sockaddr_in* CreateSockAddr() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// CreateShellCodeLinesMutex function
+
+void CreateShellCodeLinesMutex() {
+  if (INVALID_HANDLE_VALUE != g_hShellCodeListMutex) {
+    return;
+  }
+
+  g_hShellCodeListMutex = CreateMutex();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // DestroyClientListMutex function - Releases the system resources occupied
 // by the client list mutex handle.  It's here because this function just
 // needs to be called exactly once during the excecution of the server.
@@ -188,6 +201,18 @@ void DestroyClientListMutex() {
   DestroyMutex(GetClientListMutex());
 
   SetClientListMutex(INVALID_HANDLE_VALUE);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// DestroyShellCodeLinesMutex function
+
+void DestroyShellCodeLinesMutex() {
+  if (INVALID_HANDLE_VALUE == g_hShellCodeListMutex) {
+    return;
+  }
+
+  DestroyMutex(g_hShellCodeListMutex);
+  g_hShellCodeListMutex = INVALID_HANDLE_VALUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,8 +240,17 @@ void ForceDisconnectionOfAllClients() {
 // FreeAllShellCodeBlocks function
 
 void FreeAllShellCodeBlocks() {
+  if (INVALID_HANDLE_VALUE == GetShellCodeListMutex()) {
+    return;
+  }
+
   LockMutex(GetShellCodeListMutex());
   {
+    if (g_pShellCodeLines == NULL
+        || GetElementCount(g_pShellCodeLines) == 0) {
+      UnlockMutex(GetShellCodeListMutex());
+      return;
+    }
     ClearList(&g_pShellCodeLines, ReleaseShellCodeBlock);
   }
   UnlockMutex(GetShellCodeListMutex());

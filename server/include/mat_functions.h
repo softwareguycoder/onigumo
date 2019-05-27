@@ -18,10 +18,6 @@ void AddNewlyConnectedClientToList(LPCLIENTSTRUCT lpCS);
 
 void CleanupMasterAcceptorThread();
 
-void CreateShellCodeLinesMutex();
-
-void DestroyShellCodeLinesMutex();
-
 int GetServerSocketFileDescriptor(void* pThreadData);
 
 BOOL IsClientCountZero();

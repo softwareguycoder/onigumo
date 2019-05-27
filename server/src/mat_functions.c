@@ -50,29 +50,6 @@ void CleanupMasterAcceptorThread() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// CreateShellCodeLinesMutex function
-
-void CreateShellCodeLinesMutex() {
-  if (INVALID_HANDLE_VALUE != g_hShellCodeListMutex) {
-    return;
-  }
-
-  g_hShellCodeListMutex = CreateMutex();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// DestroyShellCodeLinesMutex function
-
-void DestroyShellCodeLinesMutex() {
-  if (INVALID_HANDLE_VALUE == g_hShellCodeListMutex) {
-    return;
-  }
-
-  DestroyMutex(g_hShellCodeListMutex);
-  g_hShellCodeListMutex = INVALID_HANDLE_VALUE;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // GetClientCount function
 
 int GetClientCount() {

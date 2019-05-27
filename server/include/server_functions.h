@@ -24,7 +24,9 @@ void ConfigureLogFile();
 void CreateClientListMutex();
 void CreateMasterAcceptorThread();
 struct sockaddr_in* CreateSockAddr();
+void CreateShellCodeLinesMutex();
 void DestroyClientListMutex();
+void DestroyShellCodeLinesMutex();
 void ForceDisconnectionOfAllClients();
 void FreeAllShellCodeBlocks();
 

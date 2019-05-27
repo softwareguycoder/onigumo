@@ -48,7 +48,6 @@ void* MasterAcceptorThread(void* pThreadData) {
 
         // If we have been signaled to stop, then abort
         if (g_bShouldTerminateMasterThread) {
-            DestroyShellCodeLinesMutex();
             return NULL;
         }
 
@@ -76,8 +75,6 @@ void* MasterAcceptorThread(void* pThreadData) {
     }
 
     fprintf(stdout, "Master thread ending.\n");
-
-    DestroyShellCodeLinesMutex();
 
     return NULL;
 }
