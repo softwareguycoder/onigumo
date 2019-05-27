@@ -751,40 +751,14 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
 // ProcessPurgCommand
 
 void ProcessPurgCommand(LPCLIENTSTRUCT lpSendingClient) {
-  if (NULL == lpSendingClient) {
-    return;
-  }
-
-  if (!IsUUIDValid(&(lpSendingClient->clientID))) {
+  if (!ClearClientShellCodeLines(lpSendingClient)) {
     lpSendingClient->nBytesSent +=
-            ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
-
-  if (INVALID_HANDLE_VALUE == GetShellCodeListMutex()) {
-    lpSendingClient->nBytesSent +=
-            ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
-    return;
-  }
-
-  LockMutex(GetShellCodeListMutex());
-  {
-    if (g_pShellCodeLines == NULL
-        || GetElementCount(g_pShellCodeLines) == 0) {
-      UnlockMutex(GetShellCodeListMutex());
-      lpSendingClient->nBytesSent +=
-                  ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
-      return;
-    }
-
-    RemoveElementWhere(&g_pShellCodeLines,
-        &(lpSendingClient->clientID), FindShellCodeBlockForClient,
-        ReleaseShellCodeBlock);
-  }
-  UnlockMutex(GetShellCodeListMutex());
-
   lpSendingClient->nBytesSent +=
-              ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
+                    ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
