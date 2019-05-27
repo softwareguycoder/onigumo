@@ -58,7 +58,7 @@ void GatherShellCodeLine(void* pvSendingClient,
   }
 
   LPCLIENTSTRUCT lpSendingClient =
-      (LPCLIENTSTRUCT)pvSendingClient;
+      (LPCLIENTSTRUCT) pvSendingClient;
   if (lpSendingClient == NULL) {
     return; // Cast not successful?
   }
@@ -75,7 +75,7 @@ void GatherShellCodeLine(void* pvSendingClient,
     if (!IsShellCodeInfoValid(lpShellCodeInfo)) {
       UnlockMutex(GetShellCodeListMutex());
       fprintf(stderr,
-          FAILED_ADD_SHELLCODE_BLOCK);
+      FAILED_ADD_SHELLCODE_BLOCK);
       exit(EXIT_FAILURE);
       return; // Operation failed
     }
@@ -265,6 +265,38 @@ void CleanupClientConnection(LPCLIENTSTRUCT lpSendingClient) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// ClearClientShellCodeLines function
+
+void ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (!IsUUIDValid(&(lpSendingClient->clientID))) {
+    return;
+  }
+
+  if (g_pShellCodeLines == NULL
+      || GetElementCount(g_pShellCodeLines) == 0) {
+    return;
+  }
+
+  /* cycle through the linked list of shellcode lines, where
+   * each entry is tagged with the client ID of the client who sent
+   * that shellcode, and clear that client's shellcode lines from the
+   * list.
+   */
+
+  LockMutex(GetShellCodeListMutex());
+  {
+    RemoveElementWhere(&g_pShellCodeLines,
+        &(lpSendingClient->clientID), FindShellCodeBlockForClient,
+        ReleaseShellCodeBlock);
+  }
+  UnlockMutex(GetShellCodeListMutex());
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // EndClientSession function
 
 BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
@@ -293,16 +325,9 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
 
   ReportClientSessionStats(lpSendingClient);
 
-  LockMutex(GetClientListMutex());
-  {
-    LPPOSITION pos = FindElement(g_pClientList,
-        &(lpSendingClient->clientID), FindClientByID);
-    if (pos != NULL) {
-      g_pClientList = pos;
-      RemoveElement(&g_pClientList, FreeClient);
-    }
-  }
-  UnlockMutex(GetClientListMutex());
+  RemoveClientEntryFromList(lpSendingClient);
+
+  ClearClientShellCodeLines(lpSendingClient);
 
   return TRUE;
 }
@@ -325,7 +350,6 @@ LPCLIENTSTRUCT GetSendingClientInfo(void* pvClientThreadUserState) {
 
   return (LPCLIENTSTRUCT) pvClientThreadUserState;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // HandleProtocolCommand function - Deals with things we receive which appear
@@ -570,7 +594,7 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
       &(lpSendingClient->clientID),
       FindShellCodeBlockForClient);
 
-  if (total == -1 || total != (int)lShellcodeBytes) {
+  if (total == -1 || total != (int) lShellcodeBytes) {
     // Unknown error during computation of total bytes received.
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
@@ -615,7 +639,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
   int nDecodedBytes = GetBase64DecodedDataSize(pszEncodedShellCode);
 
   unsigned char szDecodedBytes[nDecodedBytes];
-  memset(szDecodedBytes, 0,  nDecodedBytes);
+  memset(szDecodedBytes, 0, nDecodedBytes);
 
   Base64Decode(pszEncodedShellCode, szDecodedBytes, nDecodedBytes);
 
@@ -626,7 +650,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
   RemoveElementWhere(&g_pShellCodeLines, &(lpSendingClient->clientID),
       FindShellCodeBlockForClient, ReleaseShellCodeBlock);
 
-  FreeBuffer((void**)&pszEncodedShellCode);
+  FreeBuffer((void**) &pszEncodedShellCode);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -783,7 +807,20 @@ void ReportClientSessionStats(LPCLIENTSTRUCT lpSendingClient) {
         lpSendingClient->nBytesSent);
   }
 
-  FreeBuffer((void**)&pszClientID);
+  FreeBuffer((void**) &pszClientID);
+}
+
+void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient) {
+  LockMutex(GetClientListMutex());
+  {
+    LPPOSITION pos = FindElement(g_pClientList,
+        &(lpSendingClient->clientID), FindClientByID);
+    if (pos != NULL) {
+      g_pClientList = pos;
+      RemoveElement(&g_pClientList, FreeClient);
+    }
+  }
+  UnlockMutex(GetClientListMutex());
 }
 
 int SendToClient(LPCLIENTSTRUCT lpCurrentClient, const char* pszMessage) {

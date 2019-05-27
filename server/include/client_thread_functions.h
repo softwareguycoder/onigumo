@@ -30,6 +30,8 @@ BOOL AreTooManyClientsConnected();
  * leads to the client on the server's end. */
 void CleanupClientConnection(LPCLIENTSTRUCT lpSendingClient);
 
+void ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient);
+
 /**
  * @brief Ends a chat session for the specified client, upon its request.
  * @returns TRUE if the session was ended successfully; FALSE otherwise.
@@ -169,6 +171,8 @@ int ReceiveFromClient(void* pvSendingClient, char** ppszReplyBuffer);
  * the client whose session just ended.  Required.
  */
 void ReportClientSessionStats(LPCLIENTSTRUCT lpSendingClient);
+
+void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient);
 
 /**
  * @brief Sends the data in pszMessage to the client designated.
