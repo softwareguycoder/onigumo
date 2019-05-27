@@ -287,8 +287,8 @@ BOOL ClearClientShellCodeLines(LPCLIENTSTRUCT lpSendingClient) {
     if (g_pShellCodeLines == NULL
         || GetElementCount(g_pShellCodeLines) == 0) {
       UnlockMutex(GetShellCodeListMutex());
-      return TRUE;  /* TRUE because zero lines of shellcode in the list for
-                        the current client is what we want. */
+      return TRUE; /* TRUE because zero lines of shellcode in the list for
+       the current client is what we want. */
     }
 
     /* Scan the linked list for lines of shell code that are tagged
@@ -315,27 +315,18 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
   char szReplyBuffer[BUFLEN];
   memset(szReplyBuffer, 0, BUFLEN);
 
-  //char* pszID = UUIDToString(lpSendingClient->clientID);
-
-  //fprintf(stdout, "Ending chat session with client '{%s}'...\n", pszID);
-
   /* Tell the client who told us they want to quit,
    * "Good bye sucka!" */
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-  OK_GOODBYE);
+      OK_GOODBYE);
 
-  //fprintf(stdout, "Marking client as not connected...\n");
-
-  // Mark this client as no longer being connected.
-  lpSendingClient->bConnected = FALSE;
+  ClearClientShellCodeLines(lpSendingClient);
 
   CleanupClientConnection(lpSendingClient);
 
   ReportClientSessionStats(lpSendingClient);
 
   RemoveClientEntryFromList(lpSendingClient);
-
-  ClearClientShellCodeLines(lpSendingClient);
 
   return TRUE;
 }
@@ -410,8 +401,8 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
   if (lpSendingClient->bConnected == FALSE) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_MUST_SAY_HELLO_FIRST);
-    return TRUE;  /* command or thing handled by telling client they
-                    need to say HELO first */
+    return TRUE; /* command or thing handled by telling client they
+     need to say HELO first */
   }
 
   if (Equals(pszBuffer, MSG_TERMINATOR)) {
@@ -631,7 +622,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
 
   if (!IsUUIDValid(&(lpSendingClient->clientID))) {
     lpSendingClient->nBytesSent +=
-                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return; // Required parameter
   }
 
@@ -645,20 +636,20 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
       &pszEncodedShellCode, &nTotalEncodedShellCodeBytes);
   if (nTotalEncodedShellCodeBytes <= 0) {
     lpSendingClient->nBytesSent +=
-                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
   if (IsNullOrWhiteSpace(pszEncodedShellCode)) {
     lpSendingClient->nBytesSent +=
-                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
   int nDecodedBytes = GetBase64DecodedDataSize(pszEncodedShellCode);
   if (nDecodedBytes <= 0) {
     lpSendingClient->nBytesSent +=
-                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
@@ -753,11 +744,11 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
 void ProcessPurgCommand(LPCLIENTSTRUCT lpSendingClient) {
   if (!ClearClientShellCodeLines(lpSendingClient)) {
     lpSendingClient->nBytesSent +=
-                ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
   lpSendingClient->nBytesSent +=
-                    ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
+      ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
 
 }
 
