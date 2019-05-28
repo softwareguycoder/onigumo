@@ -152,6 +152,15 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient);
 void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient);
 
 /**
+ * @brief Processes the server's behavior when the INFO command is received.
+ * @param lpSendingClient Pointer to an instance of CLIENTSTRUCT that refers
+ * to the client who sent the command.
+ * @remarks Causes the server to send the contents of /proc/cpuinfo to the
+ * client.
+ */
+void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient);
+
+/**
  * @brief Processes the server's behavior upon receiveing the LIST comamnd.
  * @param lpSendingClient Pointer to an instance of CLIENTSTRUCT that refers
  * to the client who sent the command.

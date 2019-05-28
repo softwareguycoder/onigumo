@@ -5,6 +5,21 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES
+#define ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES \
+  "507 Failed. The CODE command argument is number of Base64-encoded " \
+  "shellcode bytes.\n"
+#endif //ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES
+
+#ifndef PROTOCOL_INFO_COMMAND
+#define PROTOCOL_INFO_COMMAND \
+    "INFO\n"
+#endif //PROTOCOL_INFO_COMMAND
+
+#ifndef CPUINFO_FILE
+#define CPUINFO_FILE "/proc/cpuinfo"
+#endif //CPUINFO_FILE
+
 #ifndef PROTOCOL_PURG_COMMAND
 #define PROTOCOL_PURG_COMMAND "PURG\n"
 #endif //PROTOCOL_PURG_COMMAND
@@ -241,8 +256,13 @@
  */
 #ifndef HOST_PROC_LIST_ACCESS_DENIED
 #define HOST_PROC_LIST_ACCESS_DENIED \
-  "505 Host operating system denied us access to the list of processes.\n"
+  "505 Failed. Host operating system denied us access to the list of processes.\n"
 #endif //HOST_PROC_LIST_ACCESS_DENIED
+
+#ifndef HOST_OSINFO_ACCESS_DENIED
+#define HOST_OSINFO_ACCESS_DENIED \
+  "506 Failed. Host operating system denied us access to the CPU info.\n"
+#endif //HOST_OSINFO_ACCESS_DENIED
 
 /**
  * @brief Error message that is displayed when a function is given a NULL
@@ -374,8 +394,13 @@
  * server that their user is done chatting.
  */
 #ifndef OK_GOODBYE
-#define OK_GOODBYE					"205 Goodbye.\n"
+#define OK_GOODBYE					"206 Goodbye.\n"
 #endif //OK_GOODBYE
+
+#ifndef OK_CPU_INFO_FOLLOWS
+#define OK_CPU_INFO_FOLLOWS \
+  "205 OK. Following lines contain host machine CPU info.  Terminated by .\n"
+#endif //OK_CPU_INFO_FOLLOWS
 
 /**
  * @brief Response from the server in the case where a LIST command is issued
@@ -385,10 +410,10 @@
  * after this response, one nickname per line, and then a dot on a line by
  * itself follows, indicating the end of the response.
  */
-#ifndef OK_LIST_FOLLOWS
-#define OK_LIST_FOLLOWS \
+#ifndef OK_PROC_LIST_FOLLOWS
+#define OK_PROC_LIST_FOLLOWS \
 	"204 OK. List of processes running on this machine follows.\n"
-#endif //OK_LIST_FOLLOWS
+#endif //OK_PROC_LIST_FOLLOWS
 
 #ifndef OK_SEND_SHELLCODE
 #define OK_SEND_SHELLCODE \

