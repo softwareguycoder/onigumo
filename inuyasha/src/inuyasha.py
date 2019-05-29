@@ -1,19 +1,12 @@
 #!/usr/bin/python3
 
-from connect_menu import ConnectMenu
-from machine_info import MachineInfo
+from menus.connect_menu import ConnectMenu
 
 
 def showConnectMenu():
     theMenu = ConnectMenu()
     theMenu.show()
     pass
-
-
-def testMachineInfo():
-    machineInfo = MachineInfo("localhost", 9000)
-    print(machineInfo)
-    pass    
 
 
 def main():
