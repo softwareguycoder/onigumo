@@ -107,6 +107,63 @@ int GetCurrentShellCodeInfoBytes(void* pvShellCodeInfo) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// GetShellCodeBytesArgument function
+
+long GetShellCodeBytesArgument(LPCLIENTSTRUCT lpSendingClient,
+    const char *pszBuffer) {
+  int nStringCount = 0;
+  char **ppszStrings = NULL;
+
+  if (lpSendingClient == NULL) {
+    return 0L;
+  }
+
+  if (IsNullOrWhiteSpace(pszBuffer)) {
+    return 0L;
+  }
+
+  char szCommand[256];
+  memset(szCommand, 0, 256);
+
+  strcpy(szCommand, pszBuffer);
+
+  Split(szCommand, " ", &ppszStrings, &nStringCount);
+
+  if (ppszStrings == NULL || nStringCount <= 1) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
+
+    FreeStringArray(&ppszStrings, nStringCount);
+    return 0L;
+  }
+
+  /* We expect ppszStrings[1] to hold the ASCII representation of a
+   * positive, 32-bit integer. Convert it to a long, just in case
+   * the string is a really big number */
+  long lResult = 0L;
+  if (0 > StringToLong(ppszStrings[1], &lResult)) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
+
+    FreeStringArray(&ppszStrings, nStringCount);
+    return 0L;
+  }
+
+  if (lResult <= 0) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient,
+        ERROR_QTY_MUST_BE_POS_32BIT_INT);
+
+    FreeStringArray(&ppszStrings, nStringCount);
+    return 0L;
+  }
+
+  FreeStringArray(&ppszStrings, nStringCount);
+
+  return lResult;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // IsMultilineResponseTerminator function
 
 BOOL IsMultilineResponseTerminator(void* pvUserState /* not used */,
@@ -202,7 +259,47 @@ void SendMultilineDataTerminator(LPCLIENTSTRUCT lpSendingClient) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// VerifyShellcodeBytesReceived function
+
+void VerifyShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
+    long lShellcodeBytes) {
+  if (lpSendingClient == NULL) {
+    lpSendingClient->nBytesSent +=
+            ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    return;
+  }
+
+  if (lShellcodeBytes <= 0) {
+    lpSendingClient->nBytesSent +=
+            ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    return;
+  }
+
+  int nTotalShellCodeBytesReceived = 0;
+  nTotalShellCodeBytesReceived =
+      SumElementsWhere(g_pShellCodeLines,
+          GetCurrentShellCodeInfoBytes,
+          &(lpSendingClient->clientID),
+          FindShellCodeBlockForClient);
+
+  if (nTotalShellCodeBytesReceived == -1
+      || nTotalShellCodeBytesReceived != (int) lShellcodeBytes) {
+    // Unknown error during computation of total bytes received.
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES);
+    ClearClientShellCodeLines(lpSendingClient);
+    return;
+  }
+
+  lpSendingClient->nBytesSent +=
+      ReplyToClient(lpSendingClient, OK_RECD_SHELLCODE_SUCCESSFULLY);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Publicly-exposed functions
+
+///////////////////////////////////////////////////////////////////////////////
+// AreTooManyClientsConnected function
 
 BOOL AreTooManyClientsConnected() {
   return GetConnectedClientCount() > MAX_ALLOWED_CONNECTIONS;
@@ -529,12 +626,6 @@ void LogClientID(LPCLIENTSTRUCT lpCS) {
 
 void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
     const char* pszBuffer) {
-  int nStringCount = 0;
-  char **ppszStrings = NULL;
-
-  char szCommand[256];
-  memset(szCommand, 0, 256);
-
   if (lpSendingClient == NULL) {
     return;
   }
@@ -554,39 +645,8 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
   /* We expect the CODE command to be of the format
    * CODE <integer> where <integer> is a positive 32-bit value.
    */
-
-  strcpy(szCommand, pszBuffer);
-
-  Split(szCommand, " ", &ppszStrings, &nStringCount);
-
-  if (ppszStrings == NULL || nStringCount <= 1) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
-
-    FreeStringArray(&ppszStrings, nStringCount);
-    return;
-  }
-
-  /* We expect ppszStrings[1] to hold the ASCII representation of a
-   * positive, 32-bit integer. Convert it to a long, just in case
-   * the string is a really big number */
-  long lShellcodeBytes = 0L;
-  if (0 > StringToLong(ppszStrings[1], &lShellcodeBytes)) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
-
-    FreeStringArray(&ppszStrings, nStringCount);
-    return;
-  }
-
-  if (lShellcodeBytes <= 0) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient,
-        ERROR_QTY_MUST_BE_POS_32BIT_INT);
-
-    FreeStringArray(&ppszStrings, nStringCount);
-    return;
-  }
+  long lShellcodeBytes = GetShellCodeBytesArgument(lpSendingClient,
+      pszBuffer);
 
   lpSendingClient->nBytesSent +=
       ReplyToClient(lpSendingClient, OK_SEND_SHELLCODE);
@@ -599,25 +659,8 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
       GatherShellCodeLine,
       IsMultilineResponseTerminator);
 
-  int nTotalShellCodeBytesReceived =
-      SumElementsWhere(g_pShellCodeLines,
-          GetCurrentShellCodeInfoBytes,
-          &(lpSendingClient->clientID),
-          FindShellCodeBlockForClient);
-
-  if (nTotalShellCodeBytesReceived == -1
-      || nTotalShellCodeBytesReceived != (int) lShellcodeBytes) {
-    // Unknown error during computation of total bytes received.
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES);
-    ClearClientShellCodeLines(lpSendingClient);
-    return;
-  }
-
-  lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, OK_RECD_SHELLCODE_SUCCESSFULLY);
-
-  FreeStringArray(&ppszStrings, nStringCount);
+  VerifyShellcodeBytesReceived(lpSendingClient,
+      lShellcodeBytes);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
