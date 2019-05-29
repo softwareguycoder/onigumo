@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 from menu import Menu
-from consolemenu import *
-from consolemenu.items import *
+#from consolemenu import *
+from consolemenu.items import MenuItem
 
 class ConnectMenu(Menu):
 	def __init__(self):
