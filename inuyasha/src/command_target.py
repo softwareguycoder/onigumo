@@ -1,4 +1,5 @@
 from managers.connection_manager import ConnectionManager
+from inuyasha_symbols import *  # @UnusedWildImport
 
 
 class CommandTarget(object):
@@ -10,5 +11,12 @@ class CommandTarget(object):
         
     @staticmethod
     def ConnectRemoteMachine():
-        return ConnectionManager.GetRemoteMachineInfo()
-    
+        print(APP_TITLE)
+        print(APP_SUBTITLE)
+        print()
+        print(IDM_CONNECT_REMOTE_MACHINE)
+        print()
+
+        mgr = ConnectionManager()
+        mgr.ConnectRemote()
+            
