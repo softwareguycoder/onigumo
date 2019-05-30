@@ -4,6 +4,7 @@ from sockets.socket_wrapper import SocketWrapper
 
 
 class ConnectionManager(object):
+    get_Socket = None
 
     def GetRemoteMachineInfo(self):
         return MachineInfoFactory.Make()
@@ -13,8 +14,7 @@ class ConnectionManager(object):
         while(not MachineInfoValidator.IsValid(mi, True)):
             mi = self.GetRemoteMachineInfo()
             
-        self.__clientSocket = SocketWrapper(mi)
-        
-        
+        ConnectionManager.get_Socket = 
+            = SocketWrapper(mi)
         pass
     

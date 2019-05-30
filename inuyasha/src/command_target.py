@@ -1,6 +1,6 @@
 from managers.connection_manager import ConnectionManager
 from inuyasha_symbols import *  # @UnusedWildImport
-from menus.connect_menu import ConnectMenu
+from menus.main_menu import MainMenu
 
 
 class CommandTarget(object):
@@ -24,7 +24,7 @@ class CommandTarget(object):
 
     
     @staticmethod
-    def ListProcesses():
+    def ListProcessesOnRemoteMachine():
         print(APP_TITLE)
         print(APP_SUBTITLE)
         print()
@@ -33,6 +33,8 @@ class CommandTarget(object):
     
     @staticmethod
     def ShowMainMenu():
+        if (ConnectionManager.get_Socket != None):
+            ConnectionManager.get_Socket.Close()
         theMenu = MainMenu()
         theMenu.show()
         pass

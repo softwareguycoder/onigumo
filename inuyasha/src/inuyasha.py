@@ -1,13 +1,9 @@
 #!/usr/bin/python3
-
-from menus.connect_menu import ConnectMenu
-
-
-
+from command_target import CommandTarget
 
 
 def main():
-    showConnectMenu()
+    CommandTarget.ShowMainMenu()
     pass
 
 

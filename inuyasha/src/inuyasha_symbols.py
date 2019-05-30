@@ -6,6 +6,7 @@ ERROR_HOST_NAME_REQUIRED = \
 ERROR_PORT_NUMBER_OUT_OF_RANGE = \
     "ERROR: The port number is not valid. Must be in the range 1024-49150."
 
+IDM_BACK = "<< Back"
 IDM_CONNECT_REMOTE_MACHINE = "Connect to Remote Machine"
 IDM_SERVER_LIST_PROCESSES = "List Processes"
 
