@@ -1,5 +1,5 @@
 class StringUtils:
-    
+       
     @staticmethod
     def IsNullOrWhiteSpace(pszTest):
         result = True
@@ -9,3 +9,14 @@ class StringUtils:
             return result
         return False
     
+    @staticmethod
+    def GetLineCharCount(pszTest):
+        result = 0
+        if (StringUtils.IsNullOrWhiteSpace(pszTest)):
+            return result
+        if pszTest[len(pszTest)-1] == '\n':
+            for i in range(len(pszTest)):
+                if (pszTest[i] != '\n'):
+                    result++
+        return result
+                
