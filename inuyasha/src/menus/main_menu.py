@@ -8,7 +8,7 @@ from menus.menu_base import MenuBase
 from command_target import CommandTarget
 
 
-class ConnectMenu(MenuBase):
+class MainMenu(MenuBase):
 	
 	def init_menu(self):
 		connect_item = FunctionItem(IDM_CONNECT_REMOTE_MACHINE,

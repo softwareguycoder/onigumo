@@ -1,5 +1,6 @@
 from managers.connection_manager import ConnectionManager
 from inuyasha_symbols import *  # @UnusedWildImport
+from menus.connect_menu import ConnectMenu
 
 
 class CommandTarget(object):
@@ -19,4 +20,22 @@ class CommandTarget(object):
 
         mgr = ConnectionManager()
         mgr.ConnectRemote()
+        pass
+
+    
+    @staticmethod
+    def ListProcesses():
+        print(APP_TITLE)
+        print(APP_SUBTITLE)
+        print()
+        print()
+        pass
+    
+    @staticmethod
+    def ShowMainMenu():
+        theMenu = MainMenu()
+        theMenu.show()
+        pass
+    
+    
             

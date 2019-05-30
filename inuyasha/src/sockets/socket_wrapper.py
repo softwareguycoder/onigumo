@@ -1,7 +1,6 @@
-from socket import *  # @UnusedWildImport
+from socket import socket
 from validators.machine_info_validator import MachineInfoValidator
 from inuyasha_symbols import MULTILINE_DATA_TERMINATOR, LF
-from common.string_utils import StringUtils
 
 class SocketWrapper:
 
@@ -13,7 +12,7 @@ class SocketWrapper:
             result = len(pszMessage)
         return result
         
-    def __ReceiveLine(self):
+    def ReceiveLine(self):
         result = ''
         while True:
             c = self.__theSocket.recv(1)
@@ -23,7 +22,7 @@ class SocketWrapper:
 
         return result
 
-    def __ReceiveAllLines(self):
+    def ReceiveAllLines(self):
         result = []
         curline = self.__ReceiveLine()
         

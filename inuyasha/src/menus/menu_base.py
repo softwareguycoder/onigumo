@@ -7,8 +7,8 @@ class MenuBase:
 	def init_menu(self):
 		pass
 
-	def loadMenu(self, title, subtitle):
-		self.menu = ConsoleMenu(title, subtitle, show_exit_option=True)
+	def loadMenu(self, title, subtitle, bShowExit=True):
+		self.menu = ConsoleMenu(title, subtitle, show_exit_option=bShowExit)
 
 	def show(self):
 		self.menu.show()

@@ -7,9 +7,11 @@ ERROR_PORT_NUMBER_OUT_OF_RANGE = \
     "ERROR: The port number is not valid. Must be in the range 1024-49150."
 
 IDM_CONNECT_REMOTE_MACHINE = "Connect to Remote Machine"
+IDM_SERVER_LIST_PROCESSES = "List Processes"
 
 IDS_HOSTNAME_PROMPT = "> Type the hostname of the remote machine: > "
 IDS_PORT_PROMPT = "> Type the port number of the remote machine: > "
+IDS_SERVER_OPTIONS = "Server Options"
 
 LF = '\n'
 

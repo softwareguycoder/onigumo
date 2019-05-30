@@ -3,10 +3,7 @@
 from menus.connect_menu import ConnectMenu
 
 
-def showConnectMenu():
-    theMenu = ConnectMenu()
-    theMenu.show()
-    pass
+
 
 
 def main():
