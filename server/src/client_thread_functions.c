@@ -823,7 +823,7 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
   int nLineCount = 0;
   char** ppszOutputLines = NULL;
 
-  GetSystemCommandOutput("ps -a", &ppszOutputLines, &nLineCount);
+  GetSystemCommandOutput(PS_SHELL_COMMAND, &ppszOutputLines, &nLineCount);
 
   if (ppszOutputLines == NULL || nLineCount <= 0) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,

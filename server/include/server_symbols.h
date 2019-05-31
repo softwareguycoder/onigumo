@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef PS_SHELL_COMMAND
+#define PS_SHELL_COMMAND \
+  "ps -ef"
+#endif //PS_SHELL_COMMAND
+
 #ifndef ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES
 #define ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES \
   "507 Failed. The CODE command argument is number of Base64-encoded " \

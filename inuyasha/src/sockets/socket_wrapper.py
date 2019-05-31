@@ -67,11 +67,11 @@ class SocketWrapper:
         result = []
         if (self.__theSocket._closed):
             return result
-        curline = self.__ReceiveLine()
+        curline = self.ReceiveLine()
         
         while (curline != MULTILINE_DATA_TERMINATOR):
                 result.append(curline)
-                curline = self.__ReceiveLine()
+                curline = self.ReceiveLine()
                 
         return result
     
