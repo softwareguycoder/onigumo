@@ -1,117 +1,121 @@
+from common.shippo_symbols import ERROR_FAILED_CONNECT_TO_SERVER_FORMAT, \
+    EXIT_FAILURE, ASCII_ENCODING, ERROR_FAILED_SEND_MESSAGE_FORMAT, \
+    LF, MULTILINE_DATA_TERMINATOR
 import socket
-from validators.machine_info_validator import MachineInfoValidator
-from inuyasha_symbols import MULTILINE_DATA_TERMINATOR, LF,\
-    ERROR_FAILED_CREATE_SOCKET, EXIT_FAILURE
 
 
-class SocketWrapper:
-      
-    def Close(self):
-        try:
-            if (not self.__theSocket._closed):
-                self.__theSocket.close()
-                self.connected = False
-        except:
-            pass
+class SocketWrapper(object):
+    '''
+    This class wraps the commonly-used functionality of a socket.
+    A context manager is also used so this object can be used in a 
+    with statement.
+    '''
 
-    def Send(self, pszMessage):
-        print("In SocketWrapper.Send")
-        print("SocketWrapper.Send: pszMessage = '{}'".format(pszMessage.strip()))
-        bytesSent = 0
-        print("SocketWrapper.Send: bytesSent = {}".format(bytesSent))
-        print("SocketWrapper.Send: Checking whether the socket is closed...")
-        if (self.__theSocket._closed):
-            print("ERROR: Socket is closed.")
-            exit(EXIT_FAILURE)
-            return bytesSent
-        print("SocketWrapper.Send: Checking whether the message is blank...")
-        if (len(pszMessage) == 0):
-            print("ERROR: Message is blank.")
-            exit(EXIT_FAILURE)
-            return bytesSent
-        print("SocketWrapper.Send: Trying to send the message...")
-        try:
-            print("SocketWrapper.Send: Calling sendall...")
-            self.__theSocket.sendall(pszMessage.encode())
-            bytesSent = len(pszMessage)
-            print("SocketWrapper.Send: {} bytes sent.".format(bytesSent))
-        except Exception as e:
-            print("SocketWrapper.Send: {}".format(e))
-            bytesSent = 0
-        print("SocketWrapper.Send: Done.")
-        return bytesSent
-        
-    def ReceiveLine(self):
-        print("In SocketWrapper.ReceiveLine")
-        result = ''
-        print("SocketWrapper.ReceiveLine: Checking whether the socket is closed...") 
-        if (self.__theSocket._closed):
-            print("SocketWrapper.ReceiveLine: ERROR: The socket is closed.")
-            return result
-        print("SocketWrapper.ReceiveLine: The socket is not closed.")
+    def __DoReceive(self):
+        strReply = ''
+        if not self.__clientSocket:
+            return strReply
         while True:
             c = ''
             try:
-                print("SocketWrapper.ReceiveLine: trying to receive a char...")
-                c = self.__theSocket.recv(1)
-                result += c
+                c = self.__clientSocket.recv(1).decode(ASCII_ENCODING)
+                strReply += c
             except:
                 pass
             if c == LF or c == '':
                 break
             
-        print("SocketWrapper.ReceiveLine: result '{}'".format(result.strip()))
-        return result
-
-    def ReceiveAllLines(self):
-        result = []
-        if (self.__theSocket._closed):
+        return strReply.strip()
+       
+    def __DoSend(self, bytesToSend):
+        result = 0  # bytes sent
+        if (len(bytesToSend) == 0):
             return result
-        curline = self.ReceiveLine()
-        
-        while (curline != MULTILINE_DATA_TERMINATOR):
-                result.append(curline)
-                curline = self.ReceiveLine()
-                
+        if self.__clientSocket is None:
+            return result
+        try:
+            self.__clientSocket.sendall(bytesToSend)
+            result = len(bytesToSend)
+        except:
+            result = 0
+    
+        return result
+
+    def __DoConnect(self, hostname, port):
+        result = False
+        if self.__clientSocket is None:
+            return result
+        try:
+            self.__clientSocket.connect((hostname, port))
+        except Exception as e:
+            print(ERROR_FAILED_CONNECT_TO_SERVER_FORMAT.format(
+                hostname, port, e))
+            result = False
+        else:
+            result = True
+            
         return result
     
-    def __Connect(self):
-        self.connected = False
-        if (not MachineInfoValidator.IsValid(self.__machineInfo,
-            show_errors=False)):
-            return
-        if (self.__theSocket is None):
-            return
-                     
-        try:
-            self.__theSocket.connect((self.__machineInfo.szHostName,
-                self.__machineInfo.nPort))
-            self.connected = True
-        except:
-            print("ERROR: Failed to connect to server '{}' on port {}."\
-                  .format(self.__machineInfo.szHostName,
-                          self.__machineInfo.nPort))
-            self.connected = False
-            self.Close()           
-        pass
+    def ReceiveAllLines(self):
+        reecivedLines = []
+        if not self.__clientSocket:
+            return reecivedLines
+        strCurLine = self.__DoReceive()
+        while len(strCurLine) > 0 \
+            and strCurLine != MULTILINE_DATA_TERMINATOR:
+                reecivedLines.append(strCurLine)
+                strCurLine = self.__DoReceive()
+                
+        return reecivedLines
     
-    def __CreateSocket(self):
-        try:
-            self.__theSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except:
-            print(ERROR_FAILED_CREATE_SOCKET)
-            self.__theSocket = None
-        pass
+    def Receive(self):
+        strReply = self.__DoReceive()
+        if len(strReply.strip()) == 0:
+            self.Close()
+            exit(EXIT_FAILURE)
+            
+        return strReply
     
-    def __init__(self, machineInfo):
-        if (not MachineInfoValidator.IsValid(machineInfo, show_errors=False)):
+    def Send(self, strMessage):
+        bytesSent = 0
+        if len(strMessage.strip()) == 0:
+            return bytesSent
+        bytesSent = self.__DoSend(strMessage.encode(ASCII_ENCODING))
+        if bytesSent <= 0:
+            self.Close()
+            print(ERROR_FAILED_SEND_MESSAGE_FORMAT.
+                  format(strMessage.strip()))
+            exit(EXIT_FAILURE)
+            
+        return bytesSent
+    
+    def Close(self):
+        if self.__clientSocket is None:
             return
-        
-        self.__machineInfo = machineInfo
-        self.__CreateSocket()
-        self.__Connect()
+        self.__clientSocket.close()
+        self.__clientSocket = None
         pass
 
-    def __del__(self):
-        self.Close()
+    def Connect(self, hostname, port):
+        result = self.__DoConnect(hostname, port)
+        if not result:
+            self.Close()
+            exit(EXIT_FAILURE)
         pass
+
+    def __init__(self, hostname, port):
+        self.__hostname = hostname
+        self.__port = port
+        self.__clientSocket = \
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+    def __enter__(self):
+        self.Connect(self.__hostname, self.__port)
+        return self
+    
+    def __exit__(self, exc_type, exc_value, tb):
+        self.__exc_type = exc_type
+        self.__exc_value = exc_value
+        self.__tb = tb
+        self.Close()
+        return True
