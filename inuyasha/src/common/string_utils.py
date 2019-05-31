@@ -14,9 +14,9 @@ class StringUtils:
         result = 0
         if (StringUtils.IsNullOrWhiteSpace(pszTest)):
             return result
-        if pszTest[len(pszTest)-1] == '\n':
+        if pszTest[-1] == '\n':
             for i in range(len(pszTest)):
                 if (pszTest[i] != '\n'):
-                    result++
+                    result += 1
         return result
                 
