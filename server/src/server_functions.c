@@ -406,7 +406,19 @@ void SetUpServerOnPort(int nPort) {
     CleanupServer(EXIT_FAILURE);
   }
 
-  fprintf(stdout, SERVER_LISTENING_ON_PORT, nPort);
+  TellUserServerIsListening(nPort);
 
   FreeBuffer((void**) &pSockAddr);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// TellUserServerIsListening function
+
+void TellUserServerIsListening(int nPort) {
+  if (!IsUserPortNumberValid(nPort)) {
+    fprintf(stderr, PORT_NUMBER_NOT_VALID);
+
+    CleanupServer(EXIT_FAILURE);
+  }
+  fprintf(stdout, SERVER_LISTENING_ON_PORT, nPort);
 }

@@ -46,5 +46,6 @@ void ParseCommandLine(int argc, char *argv[],
 void PrintSoftwareTitleAndCopyright();
 void ServerCleanupHandler(int signum);
 void SetUpServerOnPort(int nPort);
+void TellUserServerIsListening(int nPort);
 
 #endif /* __SERVER_FUNCTIONS_H__ */
