@@ -22,6 +22,11 @@ extern LPPOSITION g_pClientList;
  */
 extern LPPOSITION g_pShellCodeLines;
 
+/**
+ * @brief Value of the port number that the server is listening on.
+ */
+extern int g_nServerPort;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Getter and setter accessors for file-scoped globals
 

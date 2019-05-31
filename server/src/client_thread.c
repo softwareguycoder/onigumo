@@ -86,6 +86,8 @@ void *ClientThread(void* pData) {
 
 	fprintf(stdout, CLIENT_THREAD_ENDING);
 
+	TellUserServerIsListening(g_nServerPort);
+
 	// done
 	return NULL;
 }
