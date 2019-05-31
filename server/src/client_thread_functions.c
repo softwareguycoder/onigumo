@@ -751,7 +751,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
    * connected or some such. */
   if (!AreTooManyClientsConnected()) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-    OK_WELCOME);
+        OK_WELCOME);
   } else {
     TellClientTooManyPeopleConnected(lpSendingClient);
 

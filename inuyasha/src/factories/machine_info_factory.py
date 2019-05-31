@@ -1,6 +1,5 @@
 from data.machine_info import MachineInfo
-from inuyasha_symbols import *  # @UnusedWildImport
-
+from inuyasha_symbols import IDS_HOSTNAME_PROMPT, IDS_PORT_PROMPT
 
 class MachineInfoFactory():
 

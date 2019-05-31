@@ -59,7 +59,10 @@ void ForciblyDisconnectClient(LPCLIENTSTRUCT lpCS) {
 
 int ReplyToClient(LPCLIENTSTRUCT lpCS, const char* pszBuffer) {
 	int nBytesSent = SendToClient(lpCS, pszBuffer);
-	if (nBytesSent <= 0) {
+	if (nBytesSent < 0) {
+	  fprintf(stderr, "ERROR: Send has failed.\n");
+	  perror("server[ReplyToClient]");
+
 		FreeSocketMutex();
 
 		CleanupServer(ERROR);
