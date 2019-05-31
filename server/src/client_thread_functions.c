@@ -265,13 +265,13 @@ void VerifyShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
     long lShellcodeBytes) {
   if (lpSendingClient == NULL) {
     lpSendingClient->nBytesSent +=
-            ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
   if (lShellcodeBytes <= 0) {
     lpSendingClient->nBytesSent +=
-            ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
@@ -751,7 +751,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
    * connected or some such. */
   if (!AreTooManyClientsConnected()) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-        OK_WELCOME);
+    OK_WELCOME);
   } else {
     TellClientTooManyPeopleConnected(lpSendingClient);
 
@@ -834,12 +834,7 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
   OK_PROC_LIST_FOLLOWS);
 
-  for (int i = 0; i < nLineCount; i++) {
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-        ppszOutputLines[i]);
-  }
-
-  SendMultilineDataTerminator(lpSendingClient);
+  SendMultilineData(lpSendingClient, ppszOutputLines, nLineCount);
 
   /* release the memory occupied by the output */
   FreeStringArray(&ppszOutputLines, nLineCount);
@@ -970,6 +965,28 @@ void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient) {
         FreeClient);
   }
   UnlockMutex(GetClientListMutex());
+}
+
+void SendMultilineData(LPCLIENTSTRUCT lpSendingClient,
+    char** ppszOutputLines, int nLineCount) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (ppszOutputLines == NULL) {
+    return;
+  }
+
+  if (nLineCount <= 0) {
+    return;
+  }
+
+  for (int i = 0; i < nLineCount; i++) {
+    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+        ppszOutputLines[i]);
+  }
+
+  SendMultilineDataTerminator(lpSendingClient);
 }
 
 int SendToClient(LPCLIENTSTRUCT lpCurrentClient, const char* pszMessage) {
