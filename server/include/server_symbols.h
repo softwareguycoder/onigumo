@@ -7,7 +7,7 @@
 
 #ifndef PS_SHELL_COMMAND
 #define PS_SHELL_COMMAND \
-  "ps -ef"
+  "ps -a"
 #endif //PS_SHELL_COMMAND
 
 #ifndef ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES
