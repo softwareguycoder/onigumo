@@ -1,40 +1,44 @@
-from common.inuyasha_symbols import TCP_IP, TCP_PORT, EXIT_FAILURE,\
+from common.inuyasha_symbols import TCP_IP, TCP_PORT, EXIT_FAILURE, \
     APP_SUBTITLE, APP_TITLE, \
-    IDM_SERVER_LIST_PROCESSES, EXIT_SUCCESS
+    IDM_SERVER_LIST_PROCESSES, EXIT_SUCCESS, IDS_PICK_PROCESS_TO_KILL
 from managers.session_manager import SessionManager
 from consolemenu.console_menu import ConsoleMenu
 from consolemenu.items.function_item import FunctionItem
+from factories.process_info_factory import ProcessInfoFactory
 from translators.ps_exec_output_line_to_function_item_translator \
     import PsExecOutputLineToFunctionItemTranslator
+
 
 class CommandTarget(object):
     session = None
 
     @staticmethod
     def __CreateProcessPickerMenu():
-        menu = ConsoleMenu(APP_TITLE, "Pick a process to kill", 
+        menu = ConsoleMenu(APP_TITLE, IDS_PICK_PROCESS_TO_KILL,
             show_exit_option=True)
-        if len(CommandTarget.session.GetResponseLines()) > 0:
-            for line in CommandTarget.session.GetResponseLines()[1:].strip():
-                new_menu_item = \
-                    PsExecOutputLineToFunctionItemTranslator \
-                        .ToFunctionItem(line)
-                if new_menu_item is None:
-                    continue
-                menu.append_item(new_menu_item)
+        response_lines = CommandTarget.session.GetResponseLines()[1:]
+        if len(response_lines) == 0:
+            return
+        
+        for line in response_lines:
+            new_menu_item = \
+                PsExecOutputLineToFunctionItemTranslator \
+                    .ToFunctionItem(CommandTarget.OnKillProcess,
+                        ProcessInfoFactory.Make(line))
+            if new_menu_item is None:
+                continue
+            menu.append_item(new_menu_item)
         menu.show()
         pass
-
     
     @staticmethod
     def __CreateServerFunctionsMenu():
         menu = ConsoleMenu(APP_TITLE, APP_SUBTITLE, show_exit_option=True)
         menu.append_item(FunctionItem(IDM_SERVER_LIST_PROCESSES,
             CommandTarget.OnListProcessesOnRemoteMachine))
-        menu.append_item(FunctionItem("End Session", 
+        menu.append_item(FunctionItem("End Session",
             CommandTarget.OnEndSession))
         menu.show()
-
 
     @staticmethod
     def OnConnectRemoteMachine():
@@ -57,9 +61,5 @@ class CommandTarget(object):
             exit(EXIT_FAILURE)
         CommandTarget.session.ListRemoteProcesses()
         CommandTarget.__CreateProcessPickerMenu()
-        pass
-    
-    @staticmethod
-    def DoNothing():
         pass
     

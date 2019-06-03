@@ -11,7 +11,7 @@ CLIENT_DATA_FORMAT = "C: {} ({} B sent)"
 ERROR_FAILED_CONNECT_TO_SERVER_FORMAT = \
     "ERROR: Failed to connect to server {} on port {}.\n{}"
 ERROR_FAILED_RECEIVE_FROM_SERVER_FORMAT = \
-    "ERROR: Failed to receive data from the server.\n{}"
+    "ERROR: Failed to receive entities from the server.\n{}"
 ERROR_FAILED_SEND_MESSAGE_FORMAT = \
     "ERROR: Failed to send message to server.\nMessage: '{}'"
 EXIT_FAILURE = -1
@@ -21,6 +21,7 @@ IDM_BACK = "<< Back"
 IDM_CONNECT_REMOTE_MACHINE = "Connect to Remote Machine"
 IDM_SERVER_LIST_PROCESSES = "List Processes"
 
+IDS_PICK_PROCESS_TO_KILL = "Pick a process to kill"
 IDS_PRESS_ENTER_TO_CONTINUE = \
 "Press ENTER to continue..."
 IDS_SERVER_OPTIONS = "Server Options"
