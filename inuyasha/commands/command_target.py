@@ -22,16 +22,15 @@ class CommandTarget(object):
             show_exit_option=True)
         response_lines = CommandTarget.session.GetResponseLines()[1:]
         if len(response_lines) == 0:
-            print(ERROR_NO_RESPONSE_LINES)
-            input(IDS_PRESS_ENTER_TO_CONTINUE)
-            exit(EXIT_FAILURE)
+            ErrorHandler.ShowErrorThenExit(
+                ERROR_NO_RESPONSE_LINES)
                 
         try:
             for line in response_lines:
+                procInfo = ProcessInfoFactory.Make(line)
                 new_menu_item = \
                     PsExecOutputLineToFunctionItemTranslator \
-                        .ToFunctionItem(CommandTarget.OnKillProcess,
-                            ProcessInfoFactory.Make(line))
+                        .ToFunctionItem(CommandTarget.OnKillProcess, procInfo)
                 if new_menu_item is None:
                     continue
                 menu.append_item(new_menu_item)

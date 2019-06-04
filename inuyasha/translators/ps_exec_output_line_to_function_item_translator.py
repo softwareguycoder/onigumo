@@ -14,6 +14,6 @@ class PsExecOutputLineToFunctionItemTranslator(object):
             # Make a FunctionItem that is named by the command string
             # of the process the user wants to kill, and that passes the
             # procInfo created from the information about that process
-            result = FunctionItemFactory.Make(procInfo.get_CMD(),
+            result = FunctionItemFactory.MakeWithArgs(procInfo.get_CMD(),
                 itemHandler, procInfo)
             return result
