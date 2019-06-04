@@ -66,6 +66,8 @@ class CommandTarget(object):
     def OnKillProcess(procInfo):
         if not ProcessInfoValidator.IsValid(procInfo):
             ErrorHandler.ShowErrorThenExit(ERROR_PROCESS_INFO_NOT_VALID)
+        print("Killing process", procInfo.get_CMD(), "...")
+        input(IDS_PRESS_ENTER_TO_CONTINUE)
         # TODO: Add lines here to compile shellcode and send to the server
         # in order to kill the specified process
         pass    
