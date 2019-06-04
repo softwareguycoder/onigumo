@@ -6,13 +6,13 @@ from common.inuyasha_symbols import PROTOCOL_HELO_COMMAND, PROTOCOL_QUIT_COMMAND
 class SessionManager(object):
                 
     def Close(self):
-        if not self.__session:
+        if self.__session is None:
             return False
         self.__session.Send(PROTOCOL_QUIT_COMMAND)
-        response = self.__session.Receive()
-        result = response.startswith("206 OK.")
+        #response = self.__session.Receive()
+        #result = response.startswith("206 OK.")
         self.__session.Close()
-        return result
+        return True
 
     def Connect(self):
         self.__session.__enter__()

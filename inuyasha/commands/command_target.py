@@ -59,8 +59,12 @@ class CommandTarget(object):
     
     @staticmethod
     def OnEndSession():
-        CommandTarget.session.Close()
-        exit(EXIT_SUCCESS)
+        try:
+            if CommandTarget.session is None:
+                return
+            CommandTarget.session.Close()
+        except:
+            pass  # at this point, ignore exceptions
         
     @staticmethod
     def OnKillProcess(procInfo):
