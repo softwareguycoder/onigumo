@@ -107,9 +107,9 @@ int GetCurrentShellCodeInfoBytes(void* pvShellCodeInfo) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// GetShellCodeBytesArgument function
+// GetCommandIntegerArgument function
 
-long GetShellCodeBytesArgument(LPCLIENTSTRUCT lpSendingClient,
+long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
     const char *pszBuffer) {
   int nStringCount = 0;
   char **ppszStrings = NULL;
@@ -521,8 +521,8 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     return TRUE; /* command successfully handled */
   }
 
-  if (Equals(pszBuffer, PROTOCOL_EXEC_COMMAND)) {
-    ProcessExecCommand(lpSendingClient);
+  if (StartsWith(pszBuffer, PROTOCOL_EXEC_COMMAND)) {
+    ProcessExecCommand(lpSendingClient, pszBuffer);
 
     return TRUE; /* command successfully handled */
   }
@@ -638,14 +638,14 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
     return;
   }
 
-  if (!StartsWith(pszBuffer, "CODE ")) {
+  if (!StartsWith(pszBuffer, PROTOCOL_CODE_COMMAND)) {
     return;
   }
 
   /* We expect the CODE command to be of the format
    * CODE <integer> where <integer> is a positive 32-bit value.
    */
-  long lShellcodeBytes = GetShellCodeBytesArgument(lpSendingClient,
+  long lShellcodeBytes = GetCommandIntegerArgument(lpSendingClient,
       pszBuffer);
 
   lpSendingClient->nBytesSent +=
@@ -666,9 +666,22 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
 ///////////////////////////////////////////////////////////////////////////////
 // ProcessExecCommand function
 
-void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
+void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
+    const char* pszBuffer) {
   if (lpSendingClient == NULL) {
-    return; // Required parameter
+    return;
+  }
+
+  if (lpSendingClient->bConnected == FALSE) {
+    return;
+  }
+
+  if (IsNullOrWhiteSpace(pszBuffer)) {
+    return;
+  }
+
+  if (!StartsWith(pszBuffer, PROTOCOL_EXEC_COMMAND)) {
+    return;
   }
 
   if (!IsUUIDValid(&(lpSendingClient->clientID))) {
@@ -711,14 +724,51 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
 
   void *pShellCodeBytes = NULL;
 
+  /* Get the argument passed to the EXEC command. This argument
+   * will be passed to the shellcode. The GetCommandLineIntegerArgument
+   * generically returns a long (since it wants to use as much space in
+   * memory to represent a nice range of values) but we will cast its
+   * return value to an int since that is what shellcode typically reserves
+   * room for in memory. */
+  int nShellCodeArgument =
+      (int) GetCommandIntegerArgument(lpSendingClient, pszBuffer);
+
+  LPSHELLCODEUSERSTATE lpUserState = NULL;
+
   HTHREAD hShellCodeThread =
-      ExecShellCode1Async(szDecodedBytes, nDecodedBytes, &pShellCodeBytes);
+      ExecShellCode2Async(szDecodedBytes, nDecodedBytes, nShellCodeArgument,
+          &pShellCodeBytes);
   if (INVALID_HANDLE_VALUE == hShellCodeThread) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    return;
   }
 
-  WaitThread(hShellCodeThread);
+  WaitThreadEx(hShellCodeThread, (void**)&lpUserState);
+  if (!IsShellCodeUserStateValid(lpUserState)) {
+    fprintf(stderr, ERROR_FAILED_RETRIEVE_SHELLCODE_EXECUTION_STATE);
+    exit(EXIT_FAILURE);
+  }
+
+  // Bring the return value of the shellcode function executed back
+  // across the thread boundary utilizing a demarshal operation.  This
+  // Also frees the block pointed to by the pResult member of the
+  // SHELLCODEUSERSTATE structure.
+  int* pnResult = (int*)GetResult(lpUserState);
+
+  int nResult = DeMarshalInt(pnResult);
+
+  /* Normally, it's unnecessary to set a block of memory that is
+   * about to be freed to zero.  However, if any of the pointers
+   * in the struct refer to memory blocks, those memory blocks are
+   * also freed.  To avoid double-calling free on those blocks, assume
+   * they've all been freed and wipe the whole block of memory that the
+   * SHELLCODEUSERINFO struct instance occupies with zeroes,
+   * so that the action of freeing THIS block does not double-call free()
+   * on any of the struct's pointer members. */
+  memset(lpUserState, 0, sizeof(SHELLCODEUSERSTATE));
+
+  FreeShellCodeUserState(&lpUserState);
 
   RemoveShellCodeFromMemory(pShellCodeBytes, nDecodedBytes);
 
@@ -726,13 +776,17 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient) {
    * linked list. This prevents this command from being re-issued
    * successfully without more code being sent. */
 
-  RemoveElementWhere(&g_pShellCodeLines, &(lpSendingClient->clientID),
-      FindShellCodeBlockForClient, ReleaseShellCodeBlock);
+  ClearClientShellCodeLines(lpSendingClient);
 
   FreeBuffer((void**) &pszEncodedShellCode);
 
+  char szReplyBuffer[MAX_LINE_LENGTH + 1];
+  memset(szReplyBuffer, 0, MAX_LINE_LENGTH + 1);
+  sprintf(szReplyBuffer, "207 OK. Shellcode executed.  Return value: %d.\n",
+      nResult);
+
   lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, "207 OK. Shellcode executed.\n");
+      ReplyToClient(lpSendingClient, szReplyBuffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

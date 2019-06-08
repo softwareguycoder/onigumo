@@ -40,7 +40,8 @@ void FreeAllShellCodeBlocks();
 HMUTEX GetShellCodeListMutex();
 
 BOOL InitializeApplication();
-void InstallSigintHandler();
+void InstallSignalHandler(int nSignal,
+    LPSIGNALHANDLER lpfnSignalHandler);
 void ParseCommandLine(int argc, char *argv[],
     int* pnPort, BOOL* pbDiagnosticMode);
 void PrintSoftwareTitleAndCopyright();

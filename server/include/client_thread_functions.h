@@ -132,6 +132,8 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
  * @brief Processes the server's behavior upon receiving the EXEC command.
  * @param lpSendingClient Pointer to an instance of CLIENTSTRUCT that refers
  * to the client who sent the command.
+ * @param pszBuffer Address of a string buffer containing the data sent by
+ * the client (for parsing).
  * @remarks This function instructs the server to obtain shellcode blocks
  * already previously transmitted with the CODE command, "marry" them
  * together, and then decode and execute the shellcode on the host
@@ -140,7 +142,8 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
  * machine (depending on what the shellcode instructs the host machine to
  * do.)
  */
-void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient);
+void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
+    const char* pszBuffer);
 
 /**
  * @brief Processes the server's behavior upon receiveing the HELO comamnd.

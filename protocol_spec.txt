@@ -95,9 +95,11 @@ LIST OF COMMANDS
 
 		i.	HELO
 		ii.	CODE
-		iii.EXEC
-		iv.	QUIT
-		v. 	USRS
+		iii.	EXEC
+			LIST
+			PURG
+		iv.	INFO
+		v. 	QUIT
 
 	Documentation of each command follows.
 

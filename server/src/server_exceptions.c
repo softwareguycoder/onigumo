@@ -9,12 +9,3 @@
 #include "server_exceptions.h"
 #include "server_functions.h"
 
-void ThrowNullReferenceException() {
-    LogError(ERROR_INVALID_PTR_ARG);
-
-    if (GetErrorLogFileHandle() != stderr) {
-        fprintf(stderr, ERROR_INVALID_PTR_ARG);
-    }
-
-    CleanupServer(ERROR);
-}

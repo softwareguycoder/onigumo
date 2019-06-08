@@ -5,6 +5,16 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef ERROR_FAILED_RETRIEVE_SHELLCODE_EXECUTION_STATE
+#define ERROR_FAILED_RETRIEVE_SHELLCODE_EXECUTION_STATE \
+    "ERROR: Failed to retrieve shellcode-execution user state.\n"
+#endif //ERROR_FAILED_RETRIEVE_SHELLCODE_EXECUTION_STATE
+
+#ifndef UNABLE_INSTALL_HANDLER_FOR_SIGNAL
+#define UNABLE_INSTALL_HANDLER_FOR_SIGNAL \
+  "server: Unable to install handler for signal %d.\n"
+#endif //UNABLE_INSTALL_HANDLER_FOR_SIGNAL
+
 #ifndef PS_SHELL_COMMAND
 #define PS_SHELL_COMMAND \
   "ps -a"
@@ -280,16 +290,6 @@
 #endif //INVALID_LIST_DATA
 
 /**
- * @brief Error message that is displayed when a fucntion is passed a pointer
- * that should not be NULL.
- */
-#ifndef INVALID_PTR_ARG
-#define ERROR_INVALID_PTR_ARG \
-    "ERROR: A NULL pointer was passed to a function that " \
-    "wasn't expecting it.\n"
-#endif //INVALID_PTR_ARG
-
-/**
  * @brief Maximum length of a string containing a valid IPv4 IP address.
  */
 #ifndef IPADDRLEN
@@ -441,7 +441,7 @@
 #endif //PROTOCOL_CODE_COMMAND
 
 #ifndef PROTOCOL_EXEC_COMMAND
-#define PROTOCOL_EXEC_COMMAND "EXEC\n"
+#define PROTOCOL_EXEC_COMMAND "EXEC "
 #endif //PROTOCOL_EXEC_COMMAND
 
 // Protocol command that gets this client marked as a member of the chat room

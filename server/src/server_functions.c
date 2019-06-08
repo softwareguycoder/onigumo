@@ -274,8 +274,13 @@ BOOL InitializeApplication() {
   // Since the usual way to exit this program is for the user to
   // press CTRL+C to forcibly terminate it, install a Linux SIGINT
   // handler here so that when the user does this, we may still
-  // get a chance to run the proper cleanup code.
-  InstallSigintHandler();
+  // get a chance to run the proper cleanup code.  Also, install the
+  // same function as the handler for the SIGTERM signal (as this
+  // allows us to cleanup gracefully in the event that a debugger tries
+  // to kill this process).
+  InstallSignalHandler(SIGINT, ServerCleanupHandler);
+
+  InstallSignalHandler(SIGTERM, ServerCleanupHandler);
 
   InitializeInterlock();
 
@@ -291,17 +296,20 @@ BOOL InitializeApplication() {
 // InstallSigintHandler function - Registers a function to be called when the
 // user presses CTRL+C, in order to perform an orderly shutdown
 
-void InstallSigintHandler() {
-  struct sigaction sigIntHandler;
+void InstallSignalHandler(int nSignal,
+    LPSIGNALHANDLER lpfnSignalHandler) {
+  if (nSignal <= 0) {
+    return;
+  }
 
-  sigIntHandler.sa_handler = ServerCleanupHandler;
-  sigemptyset(&sigIntHandler.sa_mask);
-  sigIntHandler.sa_flags = 0;
+  if (lpfnSignalHandler == NULL) {
+    return;
+  }
 
-  if (OK != sigaction(SIGINT, &sigIntHandler, NULL)) {
-    fprintf(stderr, "server: Unable to install CTRL+C handler.");
+  if (FALSE == RegisterEventEx(nSignal, lpfnSignalHandler)) {
+    fprintf(stderr, UNABLE_INSTALL_HANDLER_FOR_SIGNAL, nSignal);
 
-    perror("server[sigaction]");
+    perror("server[InstallSignalHandler]");
 
     FreeSocketMutex();
 

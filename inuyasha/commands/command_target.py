@@ -1,6 +1,6 @@
 from common.inuyasha_symbols import TCP_IP, TCP_PORT, EXIT_FAILURE, \
     APP_SUBTITLE, APP_TITLE, \
-    IDM_SERVER_LIST_PROCESSES, EXIT_SUCCESS, IDS_PICK_PROCESS_TO_KILL, \
+    IDM_SERVER_LIST_PROCESSES, IDS_PICK_PROCESS_TO_KILL, \
     IDS_PRESS_ENTER_TO_CONTINUE, ERROR_NO_RESPONSE_LINES,\
     ERROR_PROCESS_INFO_NOT_VALID, ERROR_FAILED_CONNECT_TO_SERVER
 from managers.session_manager import SessionManager
@@ -14,13 +14,14 @@ from translators.ps_exec_output_line_to_function_item_translator \
 
 
 class CommandTarget(object):
-    session = None
+    __session = None
+    __serverFunctionsMenu = None
 
     @staticmethod
     def __CreateProcessPickerMenu():
         menu = ConsoleMenu(APP_TITLE, IDS_PICK_PROCESS_TO_KILL,
             show_exit_option=True)
-        response_lines = CommandTarget.session.GetResponseLines()[1:]
+        response_lines = CommandTarget.__session.GetResponseLines()[1:]
         if len(response_lines) == 0:
             ErrorHandler.ShowErrorThenExit(
                 ERROR_NO_RESPONSE_LINES)
@@ -41,18 +42,21 @@ class CommandTarget(object):
     
     @staticmethod
     def __CreateServerFunctionsMenu():
-        menu = ConsoleMenu(APP_TITLE, APP_SUBTITLE, show_exit_option=True)
-        menu.append_item(FunctionItem(IDM_SERVER_LIST_PROCESSES,
+        CommandTarget.__serverFunctionsMenu = ConsoleMenu(APP_TITLE, 
+            APP_SUBTITLE,  show_exit_option=True)
+        CommandTarget.__serverFunctionsMenu.append_item(FunctionItem(
+            IDM_SERVER_LIST_PROCESSES,
             CommandTarget.OnListProcessesOnRemoteMachine))
-        menu.append_item(FunctionItem("End Session",
+        CommandTarget.__serverFunctionsMenu.append_item(FunctionItem(
+            "End Session",
             CommandTarget.OnEndSession))
-        menu.show()
+        CommandTarget.__serverFunctionsMenu.show()
 
     @staticmethod
     def OnConnectRemoteMachine():
-        CommandTarget.session = SessionManager(TCP_IP, TCP_PORT)
-        CommandTarget.session.Connect()
-        if not CommandTarget.session.Open():
+        CommandTarget.__session = SessionManager(TCP_IP, TCP_PORT)
+        CommandTarget.__session.Connect()
+        if not CommandTarget.__session.Open():
             ErrorHandler.ShowErrorThenExit(ERROR_FAILED_CONNECT_TO_SERVER)           
         CommandTarget.__CreateServerFunctionsMenu()
         pass
@@ -60,9 +64,9 @@ class CommandTarget(object):
     @staticmethod
     def OnEndSession():
         try:
-            if CommandTarget.session is None:
+            if CommandTarget.__session is None:
                 return
-            CommandTarget.session.Close()
+            CommandTarget.__session.Close()
         except:
             pass  # at this point, ignore exceptions
         
@@ -78,9 +82,9 @@ class CommandTarget(object):
     
     @staticmethod
     def OnListProcessesOnRemoteMachine():
-        if not CommandTarget.session:
+        if not CommandTarget.__session:
             exit(EXIT_FAILURE)
-        if not CommandTarget.session.ListRemoteProcesses():
+        if not CommandTarget.__session.ListRemoteProcesses():
             exit(EXIT_FAILURE)
         CommandTarget.__CreateProcessPickerMenu()
         pass
