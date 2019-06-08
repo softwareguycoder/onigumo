@@ -590,7 +590,7 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
   if (StartsWith(pszBuffer, PROTOCOL_LDIR_COMMAND)) {
     ProcessLDirCommand(lpSendingClient, pszBuffer);
 
-    return TRUE;  /* command successfully handled */
+    return TRUE; /* command successfully handled */
   }
 
   if (Equals(pszBuffer, PROTOCOL_PURG_COMMAND)) {
@@ -991,23 +991,28 @@ void ProcessLDirCommand(LPCLIENTSTRUCT lpSendingClient,
   if (ppszOutputLines == NULL || nLineCount <= 0) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient,
-            ERROR_FAILED_TO_PARSE_STRING);
+        ERROR_FAILED_TO_PARSE_STRING);
     if (bShouldDeallocateDirectoryPathBuffer)
-      FreeBuffer((void**)&pszDirectoryPath);
-    FreeStringArray(&ppszOutputLines, nLineCount);
+      FreeBuffer((void**) &pszDirectoryPath);
+    if (ppszOutputLines != NULL) {
+      FreeStringArray(&ppszOutputLines, nLineCount);
+      ppszOutputLines = NULL;
+    }
     return;
   }
 
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-      OK_DIR_LIST_FOLLOWS);
+  OK_DIR_LIST_FOLLOWS);
 
   SendMultilineData(lpSendingClient, ppszOutputLines, nLineCount);
 
   /* release the memory occupied by the output */
   if (bShouldDeallocateDirectoryPathBuffer)
-    FreeBuffer((void**)&pszDirectoryPath);
-  FreeStringArray(&ppszOutputLines, nLineCount);
-  ppszOutputLines = NULL;
+    FreeBuffer((void**) &pszDirectoryPath);
+  if (ppszOutputLines != NULL) {
+    FreeStringArray(&ppszOutputLines, nLineCount);
+    ppszOutputLines = NULL;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1030,6 +1035,11 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
   if (ppszOutputLines == NULL || nLineCount <= 0) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
     HOST_PROC_LIST_ACCESS_DENIED);
+    if (ppszOutputLines != NULL) {
+      /* release the memory occupied by the output */
+      FreeStringArray(&ppszOutputLines, nLineCount);
+      ppszOutputLines = NULL;
+    }
     return;
   }
 
