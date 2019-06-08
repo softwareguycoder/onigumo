@@ -20,6 +20,7 @@
 #include "client_list_manager.h"
 #include "client_thread.h"
 #include "client_thread_functions.h"
+#include "directory_lister.h"
 #include "server_functions.h"
 
 #include "shell_code_info.h"
@@ -122,8 +123,8 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
     return 0L;
   }
 
-  char szCommand[256];
-  memset(szCommand, 0, 256);
+  char szCommand[MAX_LINE_LENGTH + 1];
+  memset(szCommand, 0, MAX_LINE_LENGTH + 1);
 
   strcpy(szCommand, pszBuffer);
 
@@ -161,6 +162,65 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
   FreeStringArray(&ppszStrings, nStringCount);
 
   return lResult;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// GetCommandStringArgument function
+
+void GetCommandStringArgument(LPCLIENTSTRUCT lpSendingClient,
+    const char *pszBuffer, char** ppszOutputBuffer) {
+  int nStringCount = 0;
+  char **ppszStrings = NULL;
+
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (IsNullOrWhiteSpace(pszBuffer)) {
+    return;
+  }
+
+  if (ppszOutputBuffer == NULL) {
+    return;
+  }
+
+  char szCommand[MAX_LINE_LENGTH + 1];
+  memset(szCommand, 0, MAX_LINE_LENGTH + 1);
+
+  strcpy(szCommand, pszBuffer);
+
+  Split(szCommand, " ", &ppszStrings, &nStringCount);
+
+  if (ppszStrings == NULL || nStringCount <= 1) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_STRING);
+
+    FreeStringArray(&ppszStrings, nStringCount);
+    return;
+  }
+
+  *ppszStrings = "";  // Set the first element to the empty string
+
+  /* We exepct the 1th through the (N-1)th (where N is the number of
+   * elements) elements to, collectively, hold the directory path (
+   * delimited by forward slashes of course) */
+  int nDirectoryPathLength = 0;
+  char* pszOutputBuffer = NULL;
+
+  JoinStrings(ppszStrings, nStringCount, &pszOutputBuffer,
+      &nDirectoryPathLength);
+
+  if (IsNullOrWhiteSpace(pszOutputBuffer)) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_STRING);
+
+    FreeStringArray(&ppszStrings, nStringCount);
+    return;
+  }
+
+  *ppszOutputBuffer = pszOutputBuffer;
+
+  FreeStringArray(&ppszStrings, nStringCount);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -527,6 +587,12 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     return TRUE; /* command successfully handled */
   }
 
+  if (StartsWith(pszBuffer, PROTOCOL_LDIR_COMMAND)) {
+    ProcessLDirCommand(lpSendingClient, pszBuffer);
+
+    return TRUE;  /* command successfully handled */
+  }
+
   if (Equals(pszBuffer, PROTOCOL_PURG_COMMAND)) {
     ProcessPurgCommand(lpSendingClient);
 
@@ -744,7 +810,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
     return;
   }
 
-  WaitThreadEx(hShellCodeThread, (void**)&lpUserState);
+  WaitThreadEx(hShellCodeThread, (void**) &lpUserState);
   if (!IsShellCodeUserStateValid(lpUserState)) {
     fprintf(stderr, ERROR_FAILED_RETRIEVE_SHELLCODE_EXECUTION_STATE);
     exit(EXIT_FAILURE);
@@ -754,7 +820,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   // across the thread boundary utilizing a demarshal operation.  This
   // Also frees the block pointed to by the pResult member of the
   // SHELLCODEUSERSTATE structure.
-  int* pnResult = (int*)GetResult(lpUserState);
+  int* pnResult = (int*) GetResult(lpUserState);
 
   int nResult = DeMarshalInt(pnResult);
 
@@ -793,7 +859,11 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
 // ProcessHeloCommand function
 
 void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
-  if (NULL == lpSendingClient) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (lpSendingClient->bConnected == TRUE) {
     return;
   }
 
@@ -827,7 +897,11 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
 // ProcessInfoCommand function
 
 void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
-  if (NULL == lpSendingClient) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (lpSendingClient->bConnected == FALSE) {
     return;
   }
 
@@ -867,10 +941,84 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// ProcessLDirCommand function
+
+void ProcessLDirCommand(LPCLIENTSTRUCT lpSendingClient,
+    const char* pszBuffer) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (lpSendingClient->bConnected == FALSE) {
+    return;
+  }
+
+  if (IsNullOrWhiteSpace(pszBuffer)) {
+    return;
+  }
+
+  if (!StartsWith(pszBuffer, PROTOCOL_LDIR_COMMAND)) {
+    return;
+  }
+
+  int nLineCount = 0;
+  BOOL bShouldDeallocateDirectoryPathBuffer = FALSE;
+  char* pszDirectoryPath = NULL;
+  char** ppszOutputLines = NULL;
+
+  char szCommandWithNoArgs[MAX_LINE_LENGTH + 1];
+  memset(szCommandWithNoArgs, 0, MAX_LINE_LENGTH + 1);
+  sprintf(szCommandWithNoArgs, "%s\n", PROTOCOL_LDIR_COMMAND);
+
+  if (!Equals(pszBuffer, szCommandWithNoArgs)) {
+    GetCommandStringArgument(lpSendingClient,
+        pszBuffer, &pszDirectoryPath);
+    bShouldDeallocateDirectoryPathBuffer = TRUE;
+  } else {
+    /* If just LDIR<LF> was transmitted by the client,
+     * then the home directory of the user that is executing
+     * this process should be listed, as the default. */
+    GetHomeDirectoryPath(&pszDirectoryPath);
+    bShouldDeallocateDirectoryPathBuffer = FALSE;
+  }
+
+  char szTrimmedDirectoryName[PATH_MAX + 1];
+  memset(szTrimmedDirectoryName, 0, PATH_MAX + 1);
+  Trim(szTrimmedDirectoryName, PATH_MAX + 1, pszDirectoryPath);
+
+  ListDirectory(szTrimmedDirectoryName, &ppszOutputLines, &nLineCount);
+
+  if (ppszOutputLines == NULL || nLineCount <= 0) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient,
+            ERROR_FAILED_TO_PARSE_STRING);
+    if (bShouldDeallocateDirectoryPathBuffer)
+      FreeBuffer((void**)&pszDirectoryPath);
+    FreeStringArray(&ppszOutputLines, nLineCount);
+    return;
+  }
+
+  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+      OK_DIR_LIST_FOLLOWS);
+
+  SendMultilineData(lpSendingClient, ppszOutputLines, nLineCount);
+
+  /* release the memory occupied by the output */
+  if (bShouldDeallocateDirectoryPathBuffer)
+    FreeBuffer((void**)&pszDirectoryPath);
+  FreeStringArray(&ppszOutputLines, nLineCount);
+  ppszOutputLines = NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // ProcessListCommand function
 
 void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
-  if (NULL == lpSendingClient) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (lpSendingClient->bConnected == FALSE) {
     return;
   }
 
@@ -899,6 +1047,14 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
 // ProcessPurgCommand
 
 void ProcessPurgCommand(LPCLIENTSTRUCT lpSendingClient) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  if (lpSendingClient->bConnected == FALSE) {
+    return;
+  }
+
   if (!ClearClientShellCodeLines(lpSendingClient)) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);

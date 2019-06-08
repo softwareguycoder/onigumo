@@ -41,6 +41,7 @@
 #include <../../threading_core/threading_core/include/threading_core.h>
 #include <../../uuid_core/uuid_core/include/uuid_core.h>
 #include <../../naraku/naraku/include/naraku.h>
+#include <../../exceptions_core/exceptions_core/include/exceptions_core.h>
 
 #endif /* __STDAFX_H__ */
 

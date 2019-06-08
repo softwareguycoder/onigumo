@@ -5,6 +5,16 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED
+#define ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED \
+  "508 Failed. Input string or command is limited to 255 characters including <LF>.\n"
+#endif //ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED
+
+#ifndef LINUX_DIRECTORY_LIST_COMMAND
+#define LINUX_DIRECTORY_LIST_COMMAND \
+  "ls -al"
+#endif //LINUX_DIRECTORY_LIST_COMMAND
+
 #ifndef ERROR_FAILED_RETRIEVE_SHELLCODE_EXECUTION_STATE
 #define ERROR_FAILED_RETRIEVE_SHELLCODE_EXECUTION_STATE \
     "ERROR: Failed to retrieve shellcode-execution user state.\n"
@@ -17,7 +27,7 @@
 
 #ifndef PS_SHELL_COMMAND
 #define PS_SHELL_COMMAND \
-  "ps -a"
+  "ps -ef"
 #endif //PS_SHELL_COMMAND
 
 #ifndef ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES
@@ -205,8 +215,13 @@
 
 #ifndef ERROR_FAILED_TO_PARSE_INT
 #define ERROR_FAILED_TO_PARSE_INT \
-    "501 Failed.  Cannot parse input as integer.\n"
+    "401 Failed.  Cannot parse input as integer.\n"
 #endif //ERROR_FAILED_TO_PARSE_INT
+
+#ifndef ERROR_FAILED_TO_PARSE_STRING
+#define ERROR_FAILED_TO_PARSE_STRING \
+    "401 Failed.  Cannot parse input as string argument.\n"
+#endif //ERROR_FAILED_TO_PARSE_STRING
 
 #ifndef ERROR_TOO_MANY_CLIENTS
 #define ERROR_TOO_MANY_CLIENTS \
@@ -420,6 +435,11 @@
 	"204 OK. List of processes running on this machine follows.\n"
 #endif //OK_PROC_LIST_FOLLOWS
 
+#ifndef OK_DIR_LIST_FOLLOWS
+#define OK_DIR_LIST_FOLLOWS \
+  "204 OK. Directory listing follows.\n"
+#endif //OK_DIR_LIST_FOLLOWS
+
 #ifndef OK_SEND_SHELLCODE
 #define OK_SEND_SHELLCODE \
   "201 OK. Send your shellcode.  Terminate with a '.' on a line by itself.\n"
@@ -448,6 +468,10 @@
 #ifndef PROTOCOL_HELO_COMMAND
 #define PROTOCOL_HELO_COMMAND	"HELO\n"
 #endif //PROTOCOL_HELO_COMMAND
+
+#ifndef PROTOCOL_LDIR_COMMAND
+#define PROTOCOL_LDIR_COMMAND "LDIR"
+#endif //PROTOCOL_LDIR_COMMAND
 
 #ifndef PROTOCOL_LIST_COMMAND
 #define PROTOCOL_LIST_COMMAND	"LIST\n"

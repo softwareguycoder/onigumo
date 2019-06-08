@@ -15,6 +15,7 @@
 		<project>api_core</project>
 		<project>file_core</project>
 		<project>naraku</project>
+		<project>exceptions_core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

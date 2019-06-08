@@ -5,8 +5,7 @@
 #ifndef __DIRECTORY_LISTER_H__
 #define __DIRECTORY_LISTER_H__
 
-typedef struct _tagDIRECTORYCONTENTS {
-
-};
+void ListDirectory(const char* pszDirectoryPath, char*** pppszOutputLines,
+    int* pnOutputLines);
 
 #endif //__DIRECTORY_LISTER_H__

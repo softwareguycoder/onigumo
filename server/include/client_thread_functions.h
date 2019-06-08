@@ -163,6 +163,9 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient);
  */
 void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient);
 
+void ProcessLDirCommand(LPCLIENTSTRUCT lpSendingClient,
+    const char* pszBuffer);
+
 /**
  * @brief Processes the server's behavior upon receiveing the LIST comamnd.
  * @param lpSendingClient Pointer to an instance of CLIENTSTRUCT that refers
