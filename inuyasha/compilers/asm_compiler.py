@@ -26,17 +26,11 @@ class AsmCompiler(object):
         filename_only = PathUtilities.GetFileNameWithoutExtension(expandedPath)
         args = NASM_SHELL_COMMAND_FORMAT.format(filename_only,
             filename_only).split()
-        tmpdir = PathUtilities.GetDirectoryName(expandedPath)
-        if StringUtilities.IsNullOrWhiteSpace(tmpdir):
+        code_dir = PathUtilities.GetDirectoryName(expandedPath)
+        if StringUtilities.IsNullOrWhiteSpace(code_dir):
             ErrorHandler.ShowErrorThenExit(
                 ERROR_FAILED_DETERMINE_TEMP_DIR_PATH)       
-        if not DirectoryUtilities.RemoveDirectory(tmpdir):
-            ErrorHandler.ShowErrorThenExit(
-                ERROR_FAILED_REMOVE_TEMP_DIR)
-        if not DirectoryUtilities.CreateDirectory(tmpdir):
-            ErrorHandler.ShowErrorThenExit(
-                ERROR_FAILED_CREATE_DIRECTORY_FORMAT.format(tmpdir))
-        DirectoryUtilities.SetCurrentDirectory(tmpdir)
+        DirectoryUtilities.SetCurrentDirectory(code_dir)
         completedProc = subprocess.run(args)
         return OK == completedProc.returncode
     

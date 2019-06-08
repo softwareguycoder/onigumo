@@ -98,8 +98,8 @@ class SocketWrapper(object):
         self.__clientSocket = None
         pass
 
-    def Connect(self, hostname, port):
-        result = self.__DoConnect(hostname, port)
+    def Connect(self):
+        result = self.__DoConnect(self.__hostname, self.__port)
         if not result:
             self.Close()
             exit(EXIT_FAILURE)

@@ -7,6 +7,8 @@ BUFFER_SIZE = 1024
 BYTES_SENT_FORMAT = "C: {} B sent."
 
 CLIENT_DATA_FORMAT = "C: {} ({} B sent)"
+CODE_DIR = "/home/bhart/code"
+CODE_PATH = "~/code/pidkiller.asm"
 
 EMPTY_BYTES = b''
 EMPTY_STRING = ''
@@ -54,12 +56,17 @@ LF = '\n'
 
 MULTILINE_DATA_TERMINATOR = '.'
 
-NASM_SHELL_COMMAND_FORMAT = "nasm -f elf -F dwarf -g {}.asm -l {}.lst"
+NASM_SHELL_COMMAND_FORMAT = "nasm -f elf64 -F dwarf -g {}.asm -l {}.lst"
 
+OBJECT_CODE_PATH = '/home/bhart/code/pidkiller.o'
 OBJDUMP_SYSTEM_COMMAND = "objdump -d {} -M intel | grep '^ ' | cut -f2"
 OK = 0
 
 PROTOCOL_HELO_COMMAND = "HELO\n"
+PROTOCOL_CODE_COMMAND_FORMAT = "CODE {}\n"
+PROTOCOL_EXEC_COMMAND_FORMAT = "EXEC {}\n"
+PROTOCOL_INFO_COMMAND = "INFO\n"
+PROTOCOL_LDIR_COMMAND = "LDIR"
 PROTOCOL_LIST_COMMAND = "LIST\n"
 PROTOCOL_QUIT_COMMAND = "QUIT\n"
 
@@ -69,3 +76,6 @@ TEMP_ASM_FILENAME = '~/tmp/asmcode/asmcode.asm'
 
 SERVER_DATA_FORMAT = \
     "S: {} ({} B received)"
+    
+SOCKET = None
+CONNECTED = False
