@@ -47,13 +47,13 @@ typedef struct _tagCLIENTSTRUCT {
 	 * @brief Set this member to the total number of bytes received from the
 	 * client.
 	 */
-	long nBytesReceived;
+	long long nBytesReceived;
 
 	/**
 	 * @name nBytesSent
 	 * @brief Set this member to the total number of bytes sent to the client.
 	 */
-	long nBytesSent;
+	long long nBytesSent;
 
 	/**
 	 * @name bConnected

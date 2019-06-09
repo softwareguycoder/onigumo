@@ -5,6 +5,16 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED
+#define ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED \
+  "407 Failed. Shellcode syscall executed.  Return value: %d, errno: %d.\n"
+#endif //ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED
+
+#ifndef OK_SHELLCODE_SYSCALL_EXECUTED_FORMAT
+#define OK_SHELLCODE_SYSCALL_EXECUTED_FORMAT \
+  "207 OK. Shellcode executed.  Return value: %d.\n"
+#endif //OK_SHELLCODE_SYSCALL_EXECUTED_FORMAT
+
 #ifndef ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED
 #define ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED \
   "508 Failed. Input string or command is limited to 255 characters including <LF>.\n"
@@ -126,7 +136,7 @@
 
 #ifndef CLIENT_SESSION_STATS
 #define CLIENT_SESSION_STATS \
-	"Client '{%s}': %ld B received, %ld B sent.\n"
+	"Client '{%s}': %lld B received, %lld B sent.\n"
 #endif //CLIENT_SESSION_STATS
 
 #ifndef CLIENT_THREAD_ENDING

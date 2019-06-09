@@ -25,6 +25,8 @@
 
 #include "shell_code_info.h"
 
+#define RESULTS_BLOCK_SIZE  2
+
 ///////////////////////////////////////////////////////////////////////////////
 // Global variables
 
@@ -816,13 +818,13 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
     exit(EXIT_FAILURE);
   }
 
-  // Bring the return value of the shellcode function executed back
-  // across the thread boundary utilizing a demarshal operation.  This
-  // Also frees the block pointed to by the pResult member of the
-  // SHELLCODEUSERSTATE structure.
-  int* pnResult = (int*) GetResult(lpUserState);
+  void* pvResult = GetShellCodeUserStateResultPointer(lpUserState);
 
-  int nResult = DeMarshalInt(pnResult);
+  SHELLCODERESULTS shellCodeResults = {0};
+
+  DeMarshalBlockFromThread(&shellCodeResults, pvResult,
+      sizeof(SHELLCODERESULTS));
+  pvResult = NULL;
 
   /* Normally, it's unnecessary to set a block of memory that is
    * about to be freed to zero.  However, if any of the pointers
@@ -848,8 +850,15 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
 
   char szReplyBuffer[MAX_LINE_LENGTH + 1];
   memset(szReplyBuffer, 0, MAX_LINE_LENGTH + 1);
-  sprintf(szReplyBuffer, "207 OK. Shellcode executed.  Return value: %d.\n",
-      nResult);
+
+  if (shellCodeResults.nSyscallReturnValue != OK) {
+    sprintf(szReplyBuffer, ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED,
+        shellCodeResults.nSyscallReturnValue,
+          shellCodeResults.nErrnoValue);
+  } else {
+    sprintf(szReplyBuffer, OK_SHELLCODE_SYSCALL_EXECUTED_FORMAT,
+        shellCodeResults.nSyscallReturnValue);
+  }
 
   lpSendingClient->nBytesSent +=
       ReplyToClient(lpSendingClient, szReplyBuffer);

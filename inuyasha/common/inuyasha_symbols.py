@@ -8,7 +8,7 @@ BYTES_SENT_FORMAT = "C: {} B sent."
 
 CLIENT_DATA_FORMAT = "C: {} ({} B sent)"
 CODE_DIR = "/home/bhart/code"
-CODE_PATH = "~/code/pidkiller.asm"
+ASM_CODE_PATH = "~/code/pidkiller.asm"
 
 EMPTY_BYTES = b''
 EMPTY_STRING = ''

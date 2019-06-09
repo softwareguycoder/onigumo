@@ -1,16 +1,17 @@
 #!/usr/bin/python3
 from os import system, name
 from sockets.socket_wrapper import SocketWrapper
-from common.inuyasha_symbols import EXIT_FAILURE, IDS_PRESS_ENTER_TO_CONTINUE,\
-    EXIT_SUCCESS, PROTOCOL_HELO_COMMAND, PROTOCOL_QUIT_COMMAND, CONNECTED,\
-    SOCKET, PROTOCOL_INFO_COMMAND, PROTOCOL_LDIR_COMMAND, PROTOCOL_LIST_COMMAND,\
-    CODE_PATH, OBJECT_CODE_PATH, PROTOCOL_CODE_COMMAND_FORMAT,\
-    PROTOCOL_EXEC_COMMAND_FORMAT
+from common.inuyasha_symbols import EXIT_FAILURE, IDS_PRESS_ENTER_TO_CONTINUE, \
+    PROTOCOL_HELO_COMMAND, PROTOCOL_QUIT_COMMAND, \
+    PROTOCOL_INFO_COMMAND, PROTOCOL_LDIR_COMMAND, PROTOCOL_LIST_COMMAND, \
+    OBJECT_CODE_PATH, PROTOCOL_CODE_COMMAND_FORMAT, \
+    PROTOCOL_EXEC_COMMAND_FORMAT, EXIT_SUCCESS, ASM_CODE_PATH
 from pkg_resources._vendor.pyparsing import line
-from commands.command_target import CommandTarget
 from compilers.asm_compiler import AsmCompiler
 from parsers.object_code_parser import ObjectCodeParser
 from translators.bytes_to_base64_translator import BytesToBase64Translator
+import os
+
 
 # define our clear function 
 def clear(): 
@@ -32,8 +33,15 @@ def prompt_user_for_server_and_connect():
     print()
     print("             ***   Welcome to the Inuyasha Client!   ***")
     print()
-    hostname = input("> Server address: > ")
-    port = int(input("> Server port: > "))
+    hostname = input("> Server address [localhost]: > ")
+    if len(hostname.strip()) <= 0:
+        hostname = 'localhost'
+    portString = input("> Server port [9000]: > ")
+    port = 0
+    if len(portString.strip()) == 0:
+        port = 9000
+    else:
+        port = int(portString)
     global SOCKET
     SOCKET = SocketWrapper(hostname, port)
     if SOCKET is None:
@@ -104,9 +112,9 @@ def get_dir_listing():
     print()
     print("                   ***   List Server Directory   ***")
     print()
-    dir = input("> Server directory path [ENTER for home]: > ")
-    if not dir.strip():
-        dir = "~"
+    dirChosen = input("> Server directory path [ENTER for home]: > ")
+    if not dirChosen.strip():
+        dirChosen = "~"
     print()
     clear()
     print("*************************************************************************")
@@ -115,9 +123,9 @@ def get_dir_listing():
     print()
     print("                   ***   List Server Directory   ***")
     print()
-    print("Listing of " + dir + ": ")
+    print("Listing of " + dirChosen.strip() + ": ")
     print()
-    SOCKET.Send(PROTOCOL_LDIR_COMMAND + " " + dir + "\n")
+    SOCKET.Send(PROTOCOL_LDIR_COMMAND + " " + dirChosen.strip() + "\n")
     status = SOCKET.Receive()
     if status.startswith('2'):
         lines = SOCKET.ReceiveAllLines()
@@ -184,6 +192,29 @@ def end_session(exit_code):
     print("*************************************************************************")
     exit(exit_code)
 
+
+def get_exec_return_code(strStatusReply):
+    if not len(strStatusReply.strip()) \
+        or not strStatusReply.strip().startswith('2'):
+        return -32767  # return some nonsense value
+    partsOfStatus = list(strStatusReply.strip().split())
+    retcode = int((''.join(partsOfStatus[-1]))\
+                  .replace(',',''))
+    return retcode
+
+
+def get_exec_return_code_and_errno(strStatusReply):
+    if not len(strStatusReply.strip()) \
+        or not strStatusReply.strip().startswith('2') \
+        and not strStatusReply.strip().startswith('4'):
+        return -32767  # return some nonsense value
+    partsOfStatus = list(strStatusReply.strip().split())
+    retcode = int((''.join(partsOfStatus[-3]))\
+                  .replace(',',''))
+    errno = int((''.join(partsOfStatus[-1]))\
+                .replace('.',''))
+    return (retcode, errno)
+
         
 def send_shellcode_and_kill_proc(pid):
     clear()
@@ -195,12 +226,23 @@ def send_shellcode_and_kill_proc(pid):
     print()
     if pid == -1:
         end_session(EXIT_FAILURE)
-    print("Compiling file", CODE_PATH, "...")
-    if not AsmCompiler.CompileWitNasm(CODE_PATH):
+    strCodePath = input("> Path to assembly code to send as " \
+                        "shellcode [{}]: > ".format(ASM_CODE_PATH))
+    if len(strCodePath.strip()) == 0:
+        strCodePath = ASM_CODE_PATH     # use default
+    strCodePath = os.path.expanduser(strCodePath.strip())
+    if not os.path.exists(strCodePath):
+        print("Failed to find any shellcode source at '{}'."\
+              .format(strCodePath))
+        input(IDS_PRESS_ENTER_TO_CONTINUE)
         end_session(EXIT_FAILURE)
-    print("Extracting shellcode bytes from", OBJECT_CODE_PATH, "...")
+    print("Compiling file '{}'...".format(strCodePath))
+    if not AsmCompiler.CompileWitNasm(strCodePath):
+        end_session(EXIT_FAILURE)
+    strObjectCodePath = strCodePath.replace('.asm', '.o')
+    print("Extracting shellcode bytes from", strObjectCodePath, "...")
     shellcode = \
-        ObjectCodeParser.ObjectCodeToShellCode(OBJECT_CODE_PATH)
+        ObjectCodeParser.ObjectCodeToShellCode(strObjectCodePath)
     if shellcode is None or shellcode[1] <= 0:
         end_session(EXIT_FAILURE)
     print("Sending shellcode to server...")
@@ -224,10 +266,32 @@ def send_shellcode_and_kill_proc(pid):
             else:
                 SOCKET.Send(PROTOCOL_EXEC_COMMAND_FORMAT.format(pid))
                 status = SOCKET.Receive()
-            if not status.startswith('2'):
+            if not status.startswith('2') and not status.startswith('4'):
                 print(">>> ERROR: Could not send shellcode!")
                 input(IDS_PRESS_ENTER_TO_CONTINUE)
                 end_session(EXIT_FAILURE)
+            else:
+                nReturnCode = nErrno = 0
+                if status.startswith('4'):
+                    nReturnCode, nErrno = get_exec_return_code_and_errno(status)
+                elif status.startswith('2'): 
+                    nReturnCode = get_exec_return_code(status)
+                    if nReturnCode == 0:
+                        print("The execution of the shellcode succeeded.")
+                    else:
+                        print(">>> ERROR: Shellcode execution failed.")
+                
+                if status.startswith('4'):
+                    if nReturnCode == 0:
+                        print("The execution of the shellcode succeeded.")
+                    elif nErrno == 1:
+                        print("Access to kill the specified process " \
+				"was denied by host machine's OS.")  
+                    elif nErrno == 3:
+                        print("The process or process group does not exist, " \
+                              "or is a zombie..")
+                elif not status.startswith('2'):
+                    print("Shellcode execution failed for an unknown reason.")
     print()
     print("*************************************************************************")
     input("Press ENTER to go back to Main Menu")
@@ -257,22 +321,13 @@ def main():
             send_shellcode_and_kill_proc(pid)
             if pid == -1:
                 end_session(EXIT_FAILURE)
-            print("Compiling file", CODE_PATH, "...")
-            if not AsmCompiler.CompileWitNasm(CODE_PATH):
-                end_session(EXIT_FAILURE)
-            print("Extracting shellcode bytes from", OBJECT_CODE_PATH, "...")
-            shellcode = \
-                ObjectCodeParser.ObjectCodeToShellCode(OBJECT_CODE_PATH)
-            if shellcode is None:
-                end_session(EXIT_FAILURE)
-            print("Sending shellcode to server...")
-            
             continue
         
         if choice == 4:
             end_session(EXIT_SUCCESS)
                 
     pass
+
 
 if __name__ == "__main__":
     main()
