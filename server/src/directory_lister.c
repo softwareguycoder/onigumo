@@ -22,7 +22,8 @@ void ListDirectory(const char* pszDirectoryPath, char*** pppszOutputLines,
   ShellExpand(pszDirectoryPath, szExpandedPathName, MAX_PATH + 1);
 
   if (!DirectoryExists(szExpandedPathName)) {
-    ThrowDirectoryNotFoundException(szExpandedPathName, NULL);
+    ThrowDirectoryNotFoundException("ListDirectory",
+        szExpandedPathName, NULL);
   }
 
   if (pppszOutputLines == NULL) {
