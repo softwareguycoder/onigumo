@@ -1,36 +1,24 @@
 #!/usr/bin/python3
-from os import system, name
 from sockets.socket_wrapper import SocketWrapper
 from common.inuyasha_symbols import EXIT_FAILURE, IDS_PRESS_ENTER_TO_CONTINUE, \
     PROTOCOL_HELO_COMMAND, PROTOCOL_QUIT_COMMAND, \
     PROTOCOL_INFO_COMMAND, PROTOCOL_LDIR_COMMAND, PROTOCOL_LIST_COMMAND, \
     PROTOCOL_CODE_COMMAND_FORMAT, \
-    PROTOCOL_EXEC_COMMAND_FORMAT, EXIT_SUCCESS, ASM_CODE_PATH,\
-    ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER_FORMAT,\
+    PROTOCOL_EXEC_COMMAND_FORMAT, EXIT_SUCCESS, ASM_CODE_PATH, \
+    ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER_FORMAT, \
     DEFAULT_PORT, DEFAULT_HOSTNAME
 from pkg_resources._vendor.pyparsing import line
 from compilers.asm_compiler import AsmCompiler
 from parsers.object_code_parser import ObjectCodeParser
 from translators.bytes_to_base64_translator import BytesToBase64Translator
 import os
-
-
-# define our clear function 
-def clear(): 
-  
-    # for windows 
-    if name == 'nt': 
-        _ = system('cls') 
-  
-    # for mac and linux(here, os.name is 'posix') 
-    else: 
-        _ = system('clear') 
+from console.console_class import Console
         
         
 def prompt_user_for_server_and_connect():
     global CONNECTED
     global SOCKET
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -74,7 +62,7 @@ def prompt_user_for_server_and_connect():
 
 
 def print_menu():
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -94,7 +82,7 @@ def print_menu():
     
     
 def get_cpu_info():
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -118,7 +106,7 @@ def get_cpu_info():
 
 
 def get_dir_listing():
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -129,7 +117,7 @@ def get_dir_listing():
     if not dirChosen.strip():
         dirChosen = "~"
     print()
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -155,7 +143,7 @@ def get_dir_listing():
 
 
 def pick_proc_to_kill():
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -163,7 +151,7 @@ def pick_proc_to_kill():
     print("         *** Run Some Shellcode that Will Kill A Process ***")
     print()
     input("> Press ENTER when ready to pick a process to kill >")
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -195,7 +183,7 @@ def end_session(exit_code):
     SOCKET.Send(PROTOCOL_QUIT_COMMAND)
     _ = SOCKET.Receive()
     CONNECTED = False
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -212,7 +200,7 @@ def get_exec_return_code(strStatusReply):
         return -32767  # return some nonsense value
     partsOfStatus = list(strStatusReply.strip().split())
     retcode = int((''.join(partsOfStatus[-1]))\
-                  .replace(',',''))
+                  .replace(',', ''))
     return retcode
 
 
@@ -223,14 +211,14 @@ def get_exec_return_code_and_errno(strStatusReply):
         return -32767  # return some nonsense value
     partsOfStatus = list(strStatusReply.strip().split())
     retcode = int((''.join(partsOfStatus[-3]))\
-                  .replace(',',''))
+                  .replace(',', ''))
     errno = int((''.join(partsOfStatus[-1]))\
-                .replace('.',''))
+                .replace('.', ''))
     return (retcode, errno)
 
         
 def send_shellcode_and_kill_proc(pid):
-    clear()
+    Console.Clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
     print("*************************************************************************")
@@ -242,7 +230,7 @@ def send_shellcode_and_kill_proc(pid):
     strCodePath = input("> Path to assembly code to send as " \
                         "shellcode [{}]: > ".format(ASM_CODE_PATH))
     if len(strCodePath.strip()) == 0:
-        strCodePath = ASM_CODE_PATH     # use default
+        strCodePath = ASM_CODE_PATH  # use default
     strCodePath = os.path.expanduser(strCodePath.strip())
     if not os.path.exists(strCodePath):
         print("Failed to find any shellcode source at '{}'."\
