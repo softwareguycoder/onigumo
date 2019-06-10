@@ -7,6 +7,7 @@ import os
 from common.file_utilities import FileUtilities
 from compilers.asm_compiler import AsmCompiler
 from parsers.object_code_parser import ObjectCodeParser
+from announcers.announcer import Announcer
 
 
 class ShellcodeExtractor(object):
@@ -24,6 +25,7 @@ class ShellcodeExtractor(object):
 
     @staticmethod
     def __DoCompileSourceCode(strCodePath):
+        Announcer.AnnounceAttemptingCompileShellcode()
         if not len(strCodePath.strip()):
             return False
         if not FileUtilities.Exists(strCodePath):
@@ -61,6 +63,8 @@ class ShellcodeExtractor(object):
     
     @staticmethod
     def Extract():
+        Announcer.AnnounceAttemptingExtractShellcodeBytes()
+        
         strCodePath = ShellcodeExtractor.__DoGetAsmCodePath()
         
         if not ShellcodeExtractor.__DoCheckSourceCodeExists(strCodePath):

@@ -1,20 +1,40 @@
 from common.inuyasha_symbols import IDS_SERVER_CPU_INFO_HEADER, \
     IDS_NOW_CONNECTED_TO_SERVER, IDS_LIST_SERVER_DIR_HEADER, \
     IDS_SERVER_DIR_LIST_HEADER, IDS_PICK_PROCESS_TO_KILL_HEADER, \
-    IDS_REMOTE_PROCESS_LIST_HEADER, IDS_TRYING_TO_KILL_PROC_WITH_PID_HEADER,\
-    ERROR_FAILED_SERIALIZE_SHELLCODE, ERROR_FAILED_SEND_SHELLCODE,\
-    ERROR_FAILED_KILL_REMOTE_PROCESS, SHELLCODE_EXECUTION_SUCCEEDED,\
-    ERROR_REMOTE_PROCESS_ACCESS_DENIED, ERROR_REMOTE_PROCESS_NOT_EXISTS,\
-    ERROR_FAILED_EXECUTE_SHELLCODE
+    IDS_REMOTE_PROCESS_LIST_HEADER, IDS_TRYING_TO_KILL_PROC_WITH_PID_HEADER, \
+    ERROR_FAILED_SERIALIZE_SHELLCODE, ERROR_FAILED_SEND_SHELLCODE, \
+    ERROR_FAILED_KILL_REMOTE_PROCESS, SHELLCODE_EXECUTION_SUCCEEDED, \
+    ERROR_REMOTE_PROCESS_ACCESS_DENIED, ERROR_REMOTE_PROCESS_NOT_EXISTS, \
+    ERROR_FAILED_EXECUTE_SHELLCODE, IDS_ATTEMPTING_SERIALIZE_SHELLCODE, \
+    IDS_ATTEMPTING_EXTRACT_SHELLCODE_BYTES, IDS_ATTEMPTING_COMPILE_SHELLCODE
 
 
 class Announcer(object):
 
     @staticmethod
+    def AnnounceAttemptingCompileShellcode(strCodePath):
+        print(IDS_ATTEMPTING_COMPILE_SHELLCODE\
+              .format(strCodePath.strip()))
+        print()
+
+    @staticmethod
+    def AnnounceAttemptingExtractShellcodeBytes():
+        print(IDS_ATTEMPTING_EXTRACT_SHELLCODE_BYTES)
+        print()
+        pass
+
+    @staticmethod
+    def AnnounceAttemptingToSerializeShellcode():
+        print(IDS_ATTEMPTING_SERIALIZE_SHELLCODE)
+        print()
+        pass
+
+    @staticmethod
     def AnnounceShellcodeExecutionFailed():
         print(ERROR_FAILED_EXECUTE_SHELLCODE)
         print()
-
+        pass
+    
     @staticmethod
     def AnnounceRemoteProcessNotFound():
         print(ERROR_REMOTE_PROCESS_NOT_EXISTS)
@@ -85,7 +105,6 @@ class Announcer(object):
         print(ERROR_FAILED_SERIALIZE_SHELLCODE)
         print()
         pass
-    
     
     @staticmethod
     def AnnounceFailedSendShellcode():

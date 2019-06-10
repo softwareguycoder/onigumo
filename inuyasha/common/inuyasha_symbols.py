@@ -85,6 +85,12 @@ IDM_SERVER_LIST_PROCESSES = "List Processes"
 
 IDS_ASSEMBLY_CODE_PATH_PROMPT_FORMAT = \
     "> Path to assembly code to send as shellcode [{}]: > "
+IDS_ATTEMPTING_COMPILE_SHELLCODE = \
+    "Compiling shellcode source file '{}'..."
+IDS_ATTEMPTING_EXTRACT_SHELLCODE_BYTES = \
+    "Extracting opcodes from compiled shellcode source file..."
+IDS_ATTEMPTING_SERIALIZE_SHELLCODE = \
+    "Attempting to serialize shellcode bytes into Base64..."
 IDS_COMPILING_FILE_FORMAT = \
     "Compiling file '{}'..."
 IDS_FOOTER = \
