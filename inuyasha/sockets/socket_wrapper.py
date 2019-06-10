@@ -1,6 +1,7 @@
 from common.inuyasha_symbols import ERROR_FAILED_CONNECT_TO_SERVER_FORMAT, \
     EXIT_FAILURE, ASCII_ENCODING, ERROR_FAILED_SEND_MESSAGE_FORMAT, \
-    LF, MULTILINE_DATA_TERMINATOR
+    LF, MULTILINE_DATA_TERMINATOR,\
+    ERROR_PORT_INVALID_VALUE
 import socket
 
 
@@ -98,16 +99,21 @@ class SocketWrapper(object):
         self.__clientSocket = None
         pass
 
-    def Connect(self):
+    def Connect(self, hostname, port):
+        self.__hostname = hostname
+        self.__port = port
+        if not len(self.__hostname.strip()):
+            return False
+        if self.__port < 1024 or self.__port > 49151:
+            print(ERROR_PORT_INVALID_VALUE)
+            return False
         result = self.__DoConnect(self.__hostname, self.__port)
         if not result:
             self.Close()
             exit(EXIT_FAILURE)
         return result
 
-    def __init__(self, hostname, port):
-        self.__hostname = hostname
-        self.__port = port
+    def __init__(self):
         self.__clientSocket = \
             socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         

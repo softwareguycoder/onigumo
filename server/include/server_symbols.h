@@ -452,7 +452,7 @@
 
 #ifndef OK_SEND_SHELLCODE
 #define OK_SEND_SHELLCODE \
-  "201 OK. Send your shellcode.  Terminate with a '.' on a line by itself.\n"
+  "301 OK. Send your shellcode.  Terminate with a '.' on a line by itself.\n"
 #endif //OK_SEND_SHELLCODE
 
 #ifndef OUT_OF_MEMORY
