@@ -4,8 +4,10 @@ from sockets.socket_wrapper import SocketWrapper
 from common.inuyasha_symbols import EXIT_FAILURE, IDS_PRESS_ENTER_TO_CONTINUE, \
     PROTOCOL_HELO_COMMAND, PROTOCOL_QUIT_COMMAND, \
     PROTOCOL_INFO_COMMAND, PROTOCOL_LDIR_COMMAND, PROTOCOL_LIST_COMMAND, \
-    OBJECT_CODE_PATH, PROTOCOL_CODE_COMMAND_FORMAT, \
-    PROTOCOL_EXEC_COMMAND_FORMAT, EXIT_SUCCESS, ASM_CODE_PATH
+    PROTOCOL_CODE_COMMAND_FORMAT, \
+    PROTOCOL_EXEC_COMMAND_FORMAT, EXIT_SUCCESS, ASM_CODE_PATH,\
+    ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER_FORMAT,\
+    DEFAULT_PORT, DEFAULT_HOSTNAME
 from pkg_resources._vendor.pyparsing import line
 from compilers.asm_compiler import AsmCompiler
 from parsers.object_code_parser import ObjectCodeParser
@@ -26,6 +28,8 @@ def clear():
         
         
 def prompt_user_for_server_and_connect():
+    global CONNECTED
+    global SOCKET
     clear()
     print("*************************************************************************")
     print("***                         INUYASHA CLIENT                           ***")
@@ -33,25 +37,34 @@ def prompt_user_for_server_and_connect():
     print()
     print("             ***   Welcome to the Inuyasha Client!   ***")
     print()
-    hostname = input("> Server address [localhost]: > ")
+    hostname = input("> Server address [{}]: > ".format(DEFAULT_HOSTNAME))
     if len(hostname.strip()) <= 0:
-        hostname = 'localhost'
-    portString = input("> Server port [9000]: > ")
+        hostname = DEFAULT_HOSTNAME
+    portString = input("> Server port [{}]: > ".format(DEFAULT_PORT))
     port = 0
     if len(portString.strip()) == 0:
-        port = 9000
+        port = DEFAULT_PORT
     else:
         port = int(portString)
-    global SOCKET
+        
     SOCKET = SocketWrapper(hostname, port)
     if SOCKET is None:
-        print("ERROR: Failed to connect.")
+        print(ERROR_FAILED_CONNECT_TO_SERVER_FORMAT.format(hostname, port))
         exit(EXIT_FAILURE)
         
-    SOCKET.Connect()
-    SOCKET.Send(PROTOCOL_HELO_COMMAND)
-    _ = SOCKET.Receive()
-    global CONNECTED
+    if not SOCKET.Connect():
+        print(ERROR_FAILED_CONNECT_TO_SERVER_FORMAT.format(hostname, port))
+        exit(EXIT_FAILURE)
+        
+    if 0 == SOCKET.Send(PROTOCOL_HELO_COMMAND):
+        print(ERROR_FAILED_ESTABLISH_SESSION)
+        exit(EXIT_FAILURE)
+        
+    status = SOCKET.Receive()
+    if not status.startswith('2'):
+        print(ERROR_FAILED_ESTABLISH_SESSION)
+        exit(EXIT_FAILURE)
+
     CONNECTED = True
     print()
     print("               *** Now connected to the server!!! ***")

@@ -4,7 +4,6 @@ from common.string_utils import StringUtilities
 from common.file_utilities import FileUtilities
 from common.inuyasha_symbols import \
     NASM_SHELL_COMMAND_FORMAT, OK, ERROR_FAILED_DETERMINE_TEMP_DIR_PATH,\
-    ERROR_FAILED_REMOVE_TEMP_DIR, ERROR_FAILED_CREATE_DIRECTORY_FORMAT,\
     ERROR_FAILED_FIND_FILE_FORMAT
 import os
 from common.path_utilities import PathUtilities

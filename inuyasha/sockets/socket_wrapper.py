@@ -103,7 +103,7 @@ class SocketWrapper(object):
         if not result:
             self.Close()
             exit(EXIT_FAILURE)
-        pass
+        return result
 
     def __init__(self, hostname, port):
         self.__hostname = hostname

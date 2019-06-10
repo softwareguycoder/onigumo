@@ -10,31 +10,36 @@ CLIENT_DATA_FORMAT = "C: {} ({} B sent)"
 CODE_DIR = "/home/bhart/code"
 ASM_CODE_PATH = "~/code/pidkiller.asm"
 
+DEFAULT_HOSTNAME = "localhost"
+DEFAULT_PORT = 9000
+
 EMPTY_BYTES = b''
 EMPTY_STRING = ''
 
 ERROR_FAILED_CONNECT_TO_SERVER = \
-    "ERROR: Failed to connect to remote server."
+    ">>> ERROR:Failed to connect to remote server or server not running."
 ERROR_FAILED_CONNECT_TO_SERVER_FORMAT = \
-    "ERROR: Failed to connect to server {} on port {}.\n{}"
+    ">>> ERROR:Failed to connect to server {} on port {}.\n{}"
 ERROR_FAILED_CREATE_DIRECTORY_FORMAT = \
-    "ERROR: Failed to create the directory '{}'."
+    ">>> ERROR:Failed to create the directory '{}'."
 ERROR_FAILED_DETERMINE_TEMP_DIR_PATH = \
-    "ERROR: Failed to determine temp directory path from assembly file path."
+    ">>> ERROR:Failed to determine temp directory path from assembly file path."
+ERROR_FAILED_ESTABLISH_SESSION = \
+    ">>> ERROR: Failed to establish new session."
 ERROR_FAILED_EXTRACT_SHELLCODE = \
-    "ERROR: Unable to extract shellcode bytes from assembly code."
+    ">>> ERROR:Unable to extract shellcode bytes from assembly code."
 ERROR_FAILED_FIND_FILE_FORMAT = \
-    "ERROR: Failed to find the file '{}'."
+    ">>> ERROR:Failed to find the file '{}'."
 ERROR_FAILED_RECEIVE_FROM_SERVER_FORMAT = \
-    "ERROR: Failed to receive entities from the server.\n{}"
+    ">>> ERROR:Failed to receive entities from the server.\n{}"
 ERROR_FAILED_REMOVE_TEMP_DIR = \
-    "ERROR: Failed to remove the temporary directory."
+    ">>> ERROR:Failed to remove the temporary directory."
 ERROR_FAILED_SEND_MESSAGE_FORMAT = \
-    "ERROR: Failed to send message to server.\nMessage: '{}'"
+    ">>> ERROR:Failed to send message to server.\nMessage: '{}'"
 ERROR_NO_RESPONSE_LINES = \
-    "ERROR: No lines of response received from server."
+    ">>> ERROR:No lines of response received from server."
 ERROR_PROCESS_INFO_NOT_VALID = \
-    "ERROR: ProcessInfo object has not passed the validation criteria."
+    ">>> ERROR:ProcessInfo object has not passed the validation criteria."
 EXIT_FAILURE = -1
 EXIT_SUCCESS = 0
 
