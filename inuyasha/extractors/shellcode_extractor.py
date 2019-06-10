@@ -25,7 +25,7 @@ class ShellcodeExtractor(object):
 
     @staticmethod
     def __DoCompileSourceCode(strCodePath):
-        Announcer.AnnounceAttemptingCompileShellcode()
+        Announcer.AnnounceAttemptingCompileShellcode(strCodePath)
         if not len(strCodePath.strip()):
             return False
         if not FileUtilities.Exists(strCodePath):
