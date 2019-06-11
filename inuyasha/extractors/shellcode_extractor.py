@@ -1,6 +1,7 @@
 from common.inuyasha_symbols import IDS_ASSEMBLY_CODE_PATH_PROMPT_FORMAT, \
     ASM_CODE_PATH, ERROR_FAILED_FIND_SHELLCODE_SOURCE_FORMAT,\
-    IDS_COMPILING_FILE_FORMAT, ERROR_OBJECT_CODE_NOT_EXISTS_FORMAT
+    IDS_COMPILING_FILE_FORMAT, ERROR_OBJECT_CODE_NOT_EXISTS_FORMAT,\
+    ERROR_FAILED_COMPILE_FILE
 from common.gui_utilities import BlankLinePrinter, Footer,\
     PressEnterToReturnToMainMenu
 import os
@@ -73,6 +74,8 @@ class ShellcodeExtractor(object):
             return ()
         
         if not ShellcodeExtractor.__DoCompileSourceCode(strCodePath):
+            print(ERROR_FAILED_COMPILE_FILE.format(
+                strCodePath))
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()
             return ()

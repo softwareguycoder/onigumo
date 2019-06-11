@@ -40,9 +40,6 @@ class ShellcodeSender(object):
         shellcode = ShellcodeExtractor.Extract()
         
         if not ShellcodeTupleValidator.IsValid(shellcode):
-            Announcer.AnnounceFailedSerializeShellcode()
-            Footer.Print()
-            PressEnterToReturnToMainMenu.Print()
             return False
         
         shellcode_encoded = ShellcodeSerializer.Serialize(shellcode)

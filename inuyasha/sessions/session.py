@@ -9,7 +9,7 @@ from common.inuyasha_symbols import ERROR_FAILED_CONNECT_TO_SERVER_FORMAT, \
 from announcers.announcer import Announcer
 from info_getters.cpu_info_getter import CpuInfo
 from info_getters.dir_listing import DirListing
-from pickers.process_to_kill import ProcessToKill
+from pickers.process_to_kill_picker import ProcessToKillPicker
 from senders.shellcode_sender import ShellcodeSender
 from executers.shellcode_executer import ShellcodeExecuter
 
@@ -41,7 +41,7 @@ class Session(object):
         return self.__socket
     
     def KillSpecifiedProcess(self):
-        pid = ProcessToKill.PickAndKillProc(
+        pid = ProcessToKillPicker.PickAndKillProc(
             self.GetSocket(), self.IsConnected())
         if pid <= 0:
             Announcer.AnnounceFailedKillProcess()
@@ -52,9 +52,13 @@ class Session(object):
         Announcer.AnnounceTryingToKillProcWithPid(pid)
 
         if not ShellcodeSender.Send(self.GetSocket()):
+            Footer.Print()
+            PressEnterToReturnToMainMenu.Print()
             return
         
         if not ShellcodeExecuter.Execute(self.GetSocket(), pid):
+            Footer.Print()
+            PressEnterToReturnToMainMenu.Print()
             return
         
         Footer.Print()

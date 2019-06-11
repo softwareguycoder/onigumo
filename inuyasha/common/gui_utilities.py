@@ -44,7 +44,10 @@ class WaitForEnterToContinue(object):
 
     @staticmethod
     def Print():
-        input(IDS_PRESS_ENTER_TO_CONTINUE)
+        try:
+            input(IDS_PRESS_ENTER_TO_CONTINUE)
+        except KeyboardInterrupt as e:
+            raise e
         pass
 
 
@@ -52,7 +55,10 @@ class PressEnterToReturnToMainMenu(object):
 
     @staticmethod
     def Print():
-        input(IDS_PRESS_ENTER_TO_RETURN_TO_MAIN_MENU)
+        try:
+            input(IDS_PRESS_ENTER_TO_RETURN_TO_MAIN_MENU)
+        except KeyboardInterrupt as e:
+            raise e
         pass
     
 

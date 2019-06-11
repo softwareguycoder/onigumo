@@ -1,5 +1,7 @@
 from console.console_class import Console
 from common.gui_utilities import Banner
+from common.inuyasha_symbols import INVALID_CHOICE_VALUE,\
+    ERROR_INVALID_MAIN_MENU_CHOICE
 
 
 class MainMenu(object):
@@ -18,5 +20,17 @@ class MainMenu(object):
         print("   4) Exit")
         print()
         print("*************************************************************************")
-        value = int(input("Choice: >> "))
-        return value
+        nValue = INVALID_CHOICE_VALUE
+        while nValue == INVALID_CHOICE_VALUE:
+            try:
+                nValue = int(input("> Choice (1/2/3/4): > "))
+                if nValue < 1 or nValue > 4:
+                    nValue = INVALID_CHOICE_VALUE
+                    print(ERROR_INVALID_MAIN_MENU_CHOICE)
+                    continue
+            except KeyboardInterrupt as e:
+                raise e
+            except:
+                nValue = INVALID_CHOICE_VALUE
+                print(ERROR_INVALID_MAIN_MENU_CHOICE)
+        return nValue

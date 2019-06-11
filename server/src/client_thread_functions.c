@@ -995,19 +995,17 @@ void ProcessLDirCommand(LPCLIENTSTRUCT lpSendingClient,
   memset(szTrimmedDirectoryName, 0, PATH_MAX + 1);
   Trim(szTrimmedDirectoryName, PATH_MAX + 1, pszDirectoryPath);
 
-  ListDirectory(szTrimmedDirectoryName, &ppszOutputLines, &nLineCount);
+  if (!ListDirectory(szTrimmedDirectoryName, &ppszOutputLines, &nLineCount)) {
+    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+        ERROR_DIR_COULD_NOT_BE_LISTED);
+    goto cleanup;
+  }
 
   if (ppszOutputLines == NULL || nLineCount <= 0) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient,
         ERROR_FAILED_TO_PARSE_STRING);
-    if (bShouldDeallocateDirectoryPathBuffer)
-      FreeBuffer((void**) &pszDirectoryPath);
-    if (ppszOutputLines != NULL) {
-      FreeStringArray(&ppszOutputLines, nLineCount);
-      ppszOutputLines = NULL;
-    }
-    return;
+    goto cleanup;
   }
 
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
@@ -1015,6 +1013,7 @@ void ProcessLDirCommand(LPCLIENTSTRUCT lpSendingClient,
 
   SendMultilineData(lpSendingClient, ppszOutputLines, nLineCount);
 
+cleanup:
   /* release the memory occupied by the output */
   if (bShouldDeallocateDirectoryPathBuffer)
     FreeBuffer((void**) &pszDirectoryPath);

@@ -1,51 +1,69 @@
 from console.console_class import Console
 from common.gui_utilities import Banner, Footer, PressEnterToReturnToMainMenu
 from common.inuyasha_symbols import PROTOCOL_LDIR_COMMAND, \
-    IDS_SERVER_DIR_PATH_PROMPT, ERROR_FAILED_GET_DIR_LISTING, \
-    ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER
+    IDS_SERVER_DIR_PATH_PROMPT, \
+    ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER, LF,\
+    DEFAULT_PAGE_LINE_COUNT, ERROR_FAILED_GET_DIR_LISTING_FORMAT
 from announcers.announcer import Announcer
+from paginators.paginator import Paginator
 
 
 class DirListing(object):
+    
+    @staticmethod
+    def __OnShowNextPage(nPageNum, strDirChosen):  # @UnusedVariable
+        DirListing.__PrintDirListingHeader(strDirChosen)
+    
+    @staticmethod
+    def __PrintDirListingHeader(strDirChosen):
+        if not len(strDirChosen.strip()):
+            return
+        Console.Clear()
+        Banner.Print()
+        Announcer.AnnounceListServerDirectory()
+        Announcer.AnnounceServerDirListed(strDirChosen)
+    
 
     @staticmethod
     def GetServerDirectoryToList():
         Console.Clear()
         Banner.Print()
         Announcer.AnnounceListServerDirectory()
-        dirChosen = input(IDS_SERVER_DIR_PATH_PROMPT)
-        if not dirChosen.strip():
-            dirChosen = "~"
+        strDirChosen = input(IDS_SERVER_DIR_PATH_PROMPT)
+        if not strDirChosen.strip():
+            strDirChosen = "~"
         print()
-        return dirChosen
+        return strDirChosen
 
     @staticmethod
-    def PrintDirListing(theSocket):
+    def PrintDirListing(theSocket, strDirChosen):
         if not theSocket:
+            return
+        if not len(strDirChosen.strip()):
             return
         status = theSocket.Receive()
         if status.startswith('2'):
             lines = theSocket.ReceiveAllLines()
-            for line in lines:
-                if not line.strip():
-                    continue
-                print(line.strip())
+            Paginator.Paginate(iter(lines),
+                promptCallable=DirListing.__OnShowNextPage,
+                userState=strDirChosen, nLineCount=DEFAULT_PAGE_LINE_COUNT - 1)
+#             for line in lines:
+#                 if not line.strip():
+#                     continue
+#                 print(line.strip())
             print()
         else:
-            print(ERROR_FAILED_GET_DIR_LISTING)
+            print(ERROR_FAILED_GET_DIR_LISTING_FORMAT.format(strDirChosen))
         pass
 
     @staticmethod
-    def RequestServerDirectoryListing(theSocket, dirChosen):
-        if not len(dirChosen.strip()):
+    def RequestServerDirectoryListing(theSocket, strDirChosen):
+        if not len(strDirChosen.strip()):
             return
         if not theSocket:
             return
-        Console.Clear()
-        Banner.Print()
-        Announcer.AnnounceListServerDirectory()
-        Announcer.AnnounceServerDirListed(dirChosen)
-        theSocket.Send(PROTOCOL_LDIR_COMMAND + " " + dirChosen.strip() + "\n")
+        DirListing.__PrintDirListingHeader(strDirChosen)
+        theSocket.Send(PROTOCOL_LDIR_COMMAND + " " + strDirChosen.strip() + LF)
 
     @staticmethod
     def Get(theSocket, isConnected):
@@ -63,9 +81,9 @@ class DirListing(object):
             PressEnterToReturnToMainMenu.Print()          
             return
 
-        dirChosen = DirListing.GetServerDirectoryToList()
-        DirListing.RequestServerDirectoryListing(theSocket, dirChosen)
-        DirListing.PrintDirListing(theSocket)
+        strDirChosen = DirListing.GetServerDirectoryToList()
+        DirListing.RequestServerDirectoryListing(theSocket, strDirChosen)
+        DirListing.PrintDirListing(theSocket, strDirChosen)
         Footer.Print()
         PressEnterToReturnToMainMenu.Print()
         

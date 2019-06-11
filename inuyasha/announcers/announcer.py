@@ -82,7 +82,7 @@ class Announcer(object):
         pass
     
     @staticmethod
-    def AnnouncePickProcessToKill():
+    def AnnouncePickProcessToKillPicker():
         print(IDS_PICK_PROCESS_TO_KILL_HEADER)
         print()
         pass

@@ -10,10 +10,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // ListDirectory function
 
-void ListDirectory(const char* pszDirectoryPath, char*** pppszOutputLines,
+BOOL ListDirectory(const char* pszDirectoryPath, char*** pppszOutputLines,
     int* pnOutputLines) {
   if (IsNullOrWhiteSpace(pszDirectoryPath)) {
-    return; // Required parameter
+    return FALSE; // Required parameter
   }
 
   /* Be sure to expand the path name string just like Bash would */
@@ -22,20 +22,26 @@ void ListDirectory(const char* pszDirectoryPath, char*** pppszOutputLines,
   ShellExpand(pszDirectoryPath, szExpandedPathName, MAX_PATH + 1);
 
   if (!DirectoryExists(szExpandedPathName)) {
-    ThrowDirectoryNotFoundException("ListDirectory",
-        szExpandedPathName, NULL);
+    fprintf(stderr,
+        "server: Directory '%s' does not exist, or is not a folder.\n",
+        szExpandedPathName);
+    return FALSE;
   }
 
   if (pppszOutputLines == NULL) {
-    return; // Required parameter
+    return FALSE; // Required parameter
   }
 
   if (pnOutputLines == NULL) {
-    return; // Required parameter
+    return FALSE; // Required parameter
   }
 
-  SetCurrentWorkingDirectory(szExpandedPathName);
+  if (!SetCurrentWorkingDirectory(szExpandedPathName)) {
+    return FALSE;
+  }
 
   GetSystemCommandOutput(LINUX_DIRECTORY_LIST_COMMAND,
       pppszOutputLines, pnOutputLines);
+
+  return TRUE;
 }

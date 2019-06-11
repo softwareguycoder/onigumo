@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef ERROR_DIR_COULD_NOT_BE_LISTED
+#define ERROR_DIR_COULD_NOT_BE_LISTED \
+  "509 Failed. Directory not found or is not a folder.\n"
+#endif //ERROR_DIR_COULD_NOT_BE_LISTED
+
 #ifndef ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED
 #define ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED \
   "407 Failed. Shellcode syscall executed.  Return value: %d, errno: %d.\n"

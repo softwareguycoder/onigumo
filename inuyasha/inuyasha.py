@@ -3,43 +3,72 @@
 from factories.session_factory import SessionFactory
 from common.inuyasha_symbols import EXIT_FAILURE, \
     ERROR_FAILED_START_USER_SESSION, ERROR_FAILED_CONNECT_TO_SERVER, \
-    EXIT_SUCCESS
+    EXIT_SUCCESS, CHOICE_GET_CPU_INFO, CHOICE_LIST_DIR, CHOICE_KILL_PROC, \
+    CHOICE_EXIT, INVALID_CHOICE_VALUE, ERROR_INVALID_MAIN_MENU_CHOICE
 from menus.main_menu import MainMenu
+from console.console_class import Console
+from common.gui_utilities import Banner, ThankYouMessagePrinter, Footer
 
 
 class InuyashaApp(object):
 
-    def prompt_user_for_server_and_connect(self):
-        self.__session = SessionFactory.Make()
+    def InitSession(self):
+        try:
+            self.__session = SessionFactory.Make()
+            if not self.__session:
+                print(ERROR_FAILED_START_USER_SESSION)
+                self.ExitInstance(EXIT_FAILURE, self.__session)
+            if not self.__session.IsConnected():
+                print(ERROR_FAILED_CONNECT_TO_SERVER)
+                self.ExitInstance(EXIT_FAILURE, self.__session)
+        except KeyboardInterrupt:
+            self.ExitInstance(EXIT_FAILURE, None)
         pass
+ 
+    def ExitInstance(self, nExitCode, sessionObject):
+        if sessionObject is not None:
+            sessionObject.End(nExitCode)
+            return
+        
+        Console.Clear()
+        Banner.Print()
+        ThankYouMessagePrinter.Print()
+        Footer.Print()
+        exit(nExitCode)
+   
+    def PickMainMenuChoice(self):
+        nChoice = INVALID_CHOICE_VALUE
+        while nChoice == INVALID_CHOICE_VALUE:
+            nChoice = MainMenu.Show()
+            if nChoice == INVALID_CHOICE_VALUE:
+                print(ERROR_INVALID_MAIN_MENU_CHOICE)
+                continue
+        return nChoice
         
     def main(self):
-        self.prompt_user_for_server_and_connect()
-        if not self.__session:
-            print(ERROR_FAILED_START_USER_SESSION)
-            exit(EXIT_FAILURE)
-        if not self.__session.IsConnected():
-            print(ERROR_FAILED_CONNECT_TO_SERVER)
-            exit(EXIT_FAILURE)
-            
-        while(True):
-            choice = MainMenu.Show()
-            print()
-            if choice == 1:
-                self.__session.GetCpuInfo()
-                continue
-            
-            if choice == 2:
-                self.__session.GetDirListing()
-                continue
-            
-            if choice == 3:
-                self.__session.KillSpecifiedProcess()
-                continue
-            
-            if choice == 4:
-                self.__session.End(EXIT_SUCCESS)
-                    
+        self.InitSession()
+        
+        try:
+            while(True):
+                nChoice = self.PickMainMenuChoice()
+                
+                print()
+                if nChoice == CHOICE_GET_CPU_INFO:
+                    self.__session.GetCpuInfo()
+                    continue
+                
+                if nChoice == CHOICE_LIST_DIR:
+                    self.__session.GetDirListing()
+                    continue
+                
+                if nChoice == CHOICE_KILL_PROC:
+                    self.__session.KillSpecifiedProcess()
+                    continue
+                
+                if nChoice == CHOICE_EXIT:
+                    self.__session.End(EXIT_SUCCESS)
+        except KeyboardInterrupt:
+            self.__session.End(EXIT_FAILURE)    
         pass
 
 

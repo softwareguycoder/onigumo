@@ -7,7 +7,7 @@ class ExecResponseParser(object):
             return -32767  # return some nonsense value
         partsOfStatus = list(status.strip().split())
         retcode = int((''.join(partsOfStatus[-1]))\
-                      .replace(',', ''))
+                      .replace('.', ''))
         return retcode
     
     @staticmethod
