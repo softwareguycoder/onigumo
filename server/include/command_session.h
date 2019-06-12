@@ -83,4 +83,16 @@ typedef struct _tagCOMMANDSESSION {
 void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
     LPCLIENTSTRUCT lpClient, const char *pszCommandString);
 
+/**
+ * @name SetCommandSessionCommand
+ * @brief Sets the szCommand member of the COMMANDSESSION struct to the
+ * specified value.
+ * @param pszCommandString Address of a buffer containing the characters
+ * transmitted by a client.  Only up to MAX_LINE_LENGTH characters will be
+ * stored in the COMMANDSESSION struct instance referred to by the
+ * lpCommandSession parameter.
+ */
+void SetCommandSessionCommand(LPCOMMANDSESSION lpCommandSession,
+    const char* pszCommandString);
+
 #endif //__COMMAND_SESSION_H__
