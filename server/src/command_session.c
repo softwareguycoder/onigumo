@@ -259,9 +259,14 @@ INVOCATIONSTATUS SetCommandSessionInvocationStatus(
     LPCOMMANDSESSION lpCommandSession, INVOCATIONSTATUS status) {
   INVOCATIONSTATUS previousStatus = INVOCATION_STATUS_UNKNOWN;
 
-  // TODO: Add implementation code here
+  if (lpCommandSession == NULL) {
+    return previousStatus;
+  }
+
+  lpCommandSession->invocationStatus = status;
 
   return previousStatus;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
