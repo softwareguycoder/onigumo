@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN
+#define COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN \
+  "S: Command invocation session '{%s}': Unknown status.\n"
+#endif //COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN
+
 #ifndef COMMAND_INVOCATION_SESSION_MULTILINE_END
 #define COMMAND_INVOCATION_SESSION_MULTILINE_END \
   "S: Command invocation session '{%s}': Multiline data transmission completed.\n"
