@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef COMMAND_INVOCATION_SESSION_WAITING
+#define COMMAND_INVOCATION_SESSION_WAITING \
+  "S: Command invocation session '{%s}': Waiting for further input.\n"
+#endif //"S: Command invocation session '{%s}': Waiting for further input.\n"
+
 #ifndef COMMAND_INVOCATION_SESSION_WARNING
 #define COMMAND_INVOCATION_SESSION_WARNING \
   "S: Command invocation session '{%s}': Warning issued.\n"
