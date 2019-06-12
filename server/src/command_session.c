@@ -28,7 +28,8 @@ void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
     return;
   }
 
-  fprintf(stdout, CLIENT_ID_FORMAT, pszCommandSessionID);
+  fprintf(stdout, BEGAN_COMMAND_INVOCATION_SESSION_FORMAT,
+      pszCommandSessionID);
 
   FreeBuffer((void**) &pszCommandSessionID);
 }
