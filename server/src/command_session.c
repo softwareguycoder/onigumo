@@ -42,7 +42,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONOPENED:
     fprintf(stdout,
-        "S: Command invocation session '{%s}': Opened.\n",
+        COMMAND_INVOCATION_SESSION_OPENED,
         pszCommandSessionID);
     break;
 
