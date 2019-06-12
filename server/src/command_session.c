@@ -256,8 +256,6 @@ void ReleaseCommandSession(void* pvCommandSession) {
     return; // Must have valid command session ID at least
   }
 
-  char *pszCommandSessionID = UUIDToString(GetCommandSessionID(lpCS));
-
   DisplayEndingCommandSessionMessage(lpCS);
 
   /* Free the contents of the  multiline data, if there */
@@ -271,8 +269,6 @@ void ReleaseCommandSession(void* pvCommandSession) {
   FreeBuffer((void**) &lpCS);
 
   DisplayEndedCommandSessionMessage(lpCS);
-
-  FreeBuffer((void**) &pszCommandSessionID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
