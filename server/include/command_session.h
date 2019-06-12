@@ -125,6 +125,19 @@ int GetCommandSessionMultilineDataLineCount(
 BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession);
 
 /**
+ * @name ReleaseCommandSession
+ * @brief Frees memory associated with the members of the COMMANDSESSION
+ * instance whose address is passed, and then releases the memory occupied
+ * by the instance.
+ * @param pvCommandSession Address of the COMMANDSESSION object to be
+ * released.
+ * @remarks Once this function returns, the address provided to this function
+ * will point to memory that is no longer usable by the caller.  The function
+ * prototype is as such so this function can work as a callback.
+ */
+void ReleaseCommandSession(void* pvCommandSession);
+
+/**
  * @name SetCommandSessionClient
  * @brief Sets the lpClient member of the COMMANDSESSION struct to the
  * address that lpClient is initialized to.
