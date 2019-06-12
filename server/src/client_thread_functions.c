@@ -895,6 +895,14 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
+  LPCOMMANDSESSION lpSession =
+      BeginCommandSession(lpSendingClient, PROTOCOL_HELO_COMMAND);
+  if (lpSession == NULL) {
+    fprintf(stderr, ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION);
+    CleanupServer(EXIT_FAILURE);
+    return;
+  }
+
   /* mark the current client as connected */
   lpSendingClient->bConnected = TRUE;
 
@@ -904,21 +912,26 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
   if (!AreTooManyClientsConnected()) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
     OK_WELCOME);
-  } else {
-    TellClientTooManyPeopleConnected(lpSendingClient);
 
-    /* In the case that too many poeple are connected, tell
-     * the latest client to connect so.  Then, unmark its connected
-     * flag.
-     */
-    lpSendingClient->bConnected = FALSE;
+    EndCommandSession(&lpSession);
 
-    /*
-     * Make sure to end the client's session and remove the session from
-     * the linked list.
-     */
-    EndClientSession(lpSendingClient);
+    return;
   }
+
+  TellClientTooManyPeopleConnected(lpSendingClient);
+
+  /* In the case that too many poeple are connected, tell
+   * the latest client to connect so.  Then, unmark its connected
+   * flag.
+   */
+  lpSendingClient->bConnected = FALSE;
+
+  EndCommandSession(&lpSession);
+  /*
+   * Make sure to end the client's session and remove the session from
+   * the linked list.
+   */
+  EndClientSession(lpSendingClient);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

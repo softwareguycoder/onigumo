@@ -273,6 +273,8 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
   SetCommandSessionCommand(*lppCommandSession, pszCommandString);
 
   SetCommandSessionClient(*lppCommandSession, lpClient);
+
+  SetCommandSessionInvocationStatus(*lppCommandSession, SESSIONOPENED);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
