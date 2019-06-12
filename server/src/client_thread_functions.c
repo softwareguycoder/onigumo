@@ -676,16 +676,25 @@ void LogClientID(LPCLIENTSTRUCT lpCS) {
   char* pszClientID = UUIDToString(&(lpCS->clientID));
   if (IsNullOrWhiteSpace(pszClientID)) {
     fprintf(stderr, "Client ID has not been initialized.\n");
+
+    FreeBuffer((void**)&pszClientID);
+
     CleanupServer(ERROR);
   }
 
   if (IsNullOrWhiteSpace(lpCS->szIPAddress)) {
     fprintf(stderr, "Client IP address is not intialized.\n");
+
+    FreeBuffer((void**)&pszClientID);
+
     CleanupServer(ERROR);
   }
 
   if (!IsSocketValid(lpCS->nSocket)) {
     fprintf(stderr, "Client socket file descriptor is not valid.\n");
+
+    FreeBuffer((void**)&pszClientID);
+
     CleanupServer(ERROR);
   }
 
@@ -696,8 +705,7 @@ void LogClientID(LPCLIENTSTRUCT lpCS) {
     CLIENT_ID_FORMAT, lpCS->szIPAddress, lpCS->nSocket, pszClientID);
   }
 
-  free(pszClientID);
-  pszClientID = NULL;
+  FreeBuffer((void**)&pszClientID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -831,7 +839,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
 
   void* pvResult = GetShellCodeUserStateResultPointer(lpUserState);
 
-  SHELLCODERESULTS shellCodeResults = {0};
+  SHELLCODERESULTS shellCodeResults = { 0 };
 
   DeMarshalBlockFromThread(&shellCodeResults, pvResult,
       sizeof(SHELLCODERESULTS));
@@ -865,7 +873,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   if (shellCodeResults.nSyscallReturnValue != OK) {
     sprintf(szReplyBuffer, ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED,
         shellCodeResults.nSyscallReturnValue,
-          shellCodeResults.nErrnoValue);
+        shellCodeResults.nErrnoValue);
   } else {
     sprintf(szReplyBuffer, OK_SHELLCODE_SYSCALL_EXECUTED_FORMAT,
         shellCodeResults.nSyscallReturnValue);
@@ -1008,7 +1016,7 @@ void ProcessLDirCommand(LPCLIENTSTRUCT lpSendingClient,
 
   if (!ListDirectory(szTrimmedDirectoryName, &ppszOutputLines, &nLineCount)) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-        ERROR_DIR_COULD_NOT_BE_LISTED);
+    ERROR_DIR_COULD_NOT_BE_LISTED);
     goto cleanup;
   }
 
@@ -1024,7 +1032,7 @@ void ProcessLDirCommand(LPCLIENTSTRUCT lpSendingClient,
 
   SendMultilineData(lpSendingClient, ppszOutputLines, nLineCount);
 
-cleanup:
+  cleanup:
   /* release the memory occupied by the output */
   if (bShouldDeallocateDirectoryPathBuffer)
     FreeBuffer((void**) &pszDirectoryPath);
