@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef COMMAND_INVOCATION_SESSION_MULTILINE_START
+#define COMMAND_INVOCATION_SESSION_MULTILINE_START \
+  "S: Command invocation session '{%s}': Starting multiline data transmission...\n"
+#endif //COMMAND_INVOCATION_SESSION_MULTILINE_START
+
 #ifndef COMMAND_INVOCATION_SESSION_WAITING
 #define COMMAND_INVOCATION_SESSION_WAITING \
   "S: Command invocation session '{%s}': Waiting for further input.\n"
