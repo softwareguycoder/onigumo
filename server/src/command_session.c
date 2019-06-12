@@ -63,8 +63,11 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
 // GetCommandSessionClient function
 
 LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession) {
-  // TODO: Add implementation code here
-  return NULL;
+  if (lpCommandSession == NULL) {
+    return NULL;
+  }
+
+  return lpCommandSession->lpClient;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
