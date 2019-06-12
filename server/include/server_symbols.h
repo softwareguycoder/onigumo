@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef COMMAND_INVOCATION_SESSION_CLOSED
+#define COMMAND_INVOCATION_SESSION_CLOSED \
+  "S: Command invocation session '{%s}': Closed.\n"
+#endif //COMMAND_INVOCATION_SESSION_CLOSED
+
 #ifndef FAILED_ALLOCATE_COMMAND_SESSION
 #define FAILED_ALLOCATE_COMMAND_SESSION \
   "Failed to allocate new instance of COMMANDSESSION.\n"
