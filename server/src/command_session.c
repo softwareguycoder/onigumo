@@ -482,6 +482,8 @@ INVOCATIONSTATUS SetCommandSessionInvocationStatus(
 
   lpCommandSession->invocationStatus = status;
 
+  DisplayCommandSessionInvocationStatus(lpCommandSession, status);
+
   return previousStatus;
 }
 
