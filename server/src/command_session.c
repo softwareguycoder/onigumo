@@ -12,6 +12,28 @@
 // Internal-use-only functions
 
 ///////////////////////////////////////////////////////////////////////////////
+// DisplayInvokedCommandSessionID function
+
+void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
+  if (!IsCommandSessionValid(lpCommandSession)) {
+    return;
+  }
+
+  char *pszCommandSessionID =
+      UUIDToString(GetCommandSessionID(lpCommandSession));
+  if (IsNullOrWhiteSpace(pszCommandSessionID)) {
+
+    FreeBuffer((void**)&pszCommandSessionID);   // just in case
+
+    return;
+  }
+
+  fprintf(stdout, CLIENT_ID_FORMAT, pszCommandSessionID);
+
+  FreeBuffer((void**)&pszCommandSessionID);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // GenerateNewCommandSessionID function
 
 /**
@@ -56,7 +78,6 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
   if (*lppCommandSession == NULL) {
     ThrowOutOfMemoryException(FAILED_ALLOCATE_COMMAND_SESSION);
   }
-
   memset(*lppCommandSession, 0, 1 * sizeof(COMMANDSESSION));
 
   GenerateNewCommandSessionID(*lppCommandSession);
