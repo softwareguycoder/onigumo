@@ -126,6 +126,18 @@ LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession);
 UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession);
 
 /**
+ * @name GetCommandSessionInvocationStatus
+ * @brief Gets the current invocation state of the COMMANDSESSION instance
+ * passed.
+ * @param lpCommandSession Address of an instance of COMMANDSESSION.
+ * @return Value of the invocationStatus member of the COMMANDSESSION
+ * instance whose address is passed; or INVOCATION_STATUS_UNKNOWN if the
+ * current invocation status cannot be determined.
+ */
+INVOCATIONSTATUS GetCommandSessionInvocationStatus(
+    LPCOMMANDSESSION lpCommandSession);
+
+/**
  * @name GetCommandSessionMultilineData
  * @brief Gets the address of the string array member, ppszMultilineData,
  * of the COMMANDSESSION instance passed.
