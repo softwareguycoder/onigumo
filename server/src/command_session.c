@@ -24,7 +24,61 @@ void DisplayCommandSessionInvocationStatus(
     return;
   }
 
-  // TODO: Add implementation code here
+  char* pszCommandSessionID =
+      UUIDToString(GetCommandSessionID(lpCommandSession));
+
+  switch (status) {
+  case INVOCATION_STATUS_UNKNOWN:
+    fprintf(stdout,
+        "S: Command invocation session '{%s}': Unknown status.\n",
+        pszCommandSessionID);
+    break;
+
+  case SESSIONCLOSED:
+    fprintf(stdout,
+        "S: Command invocation session '{%s}': Closed.\n",
+        pszCommandSessionID);
+    break;
+
+  case SESSIONOPENED:
+    fprintf(stdout,
+        "S: Command invocation session '{%s}': Opened.\n",
+        pszCommandSessionID);
+    break;
+
+  case SESSIONERROR:
+    fprintf(stdout,
+        "S: Command invocation session '{%s}': Error.\n",
+        pszCommandSessionID);
+    break;
+
+  case WARNING:
+    fprintf(stdout,
+        "S: Command invocation session '{%s}': Warning issued.\n",
+        pszCommandSessionID);
+    break;
+
+  case WAITING:
+    fprintf(stdout,
+        "S: Command invocation session '{%s}': Waiting for further input.\n",
+        pszCommandSessionID);
+    break;
+
+  case MULTILINE_START:
+    fprintf(stdout,
+        "S: Command invocation session '{%s}': Starting multiline data transmission...\n",
+        pszCommandSessionID);
+    break;
+
+  case MULITLINE_END:
+    fprintf(stdout,
+        "S: Command invocation session '{%s}': Multiline data transmission completed.\n",
+        pszCommandSessionID);
+    break;
+  }
+
+  FreeBuffer((void**) pszCommandSessionID);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,7 +134,6 @@ void DisplayEndingCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
 
   FreeBuffer((void**) &pszCommandSessionID);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // DisplayEndedCommandSessionMessage function
@@ -193,7 +246,7 @@ void EndCommandSession(LPPCOMMANDSESSION lppCommandSession) {
     return; // Could not determine the current session status
   }
 
-  ReleaseCommandSession((void*)(*lppCommandSession));
+  ReleaseCommandSession((void*) (*lppCommandSession));
   *lppCommandSession = NULL;
 }
 
@@ -228,7 +281,7 @@ UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 
 INVOCATIONSTATUS GetCommandSessionInvocationStatus(
     LPCOMMANDSESSION lpCommandSession) {
-  if (lpCommandSession == NULL){
+  if (lpCommandSession == NULL) {
     return INVOCATION_STATUS_UNKNOWN; // Required parameter
   }
 
