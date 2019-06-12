@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef FAILED_ALLOCATE_COMMAND_SESSION
+#define FAILED_ALLOCATE_COMMAND_SESSION \
+  "Failed to allocate new instance of COMMANDSESSION.\n"
+#endif //FAILED_ALLOCATE_COMMAND_SESSION
+
 #ifndef ERROR_DIR_COULD_NOT_BE_LISTED
 #define ERROR_DIR_COULD_NOT_BE_LISTED \
   "509 Failed. Directory not found or is not a folder.\n"
