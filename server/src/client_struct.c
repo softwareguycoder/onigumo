@@ -156,5 +156,8 @@ BOOL IsClientStructValid(void* pvClientStruct) {
 
 void SetCommandSession(LPCLIENTSTRUCT lpClientStruct,
     LPCOMMANDSESSION lpCommandSession) {
-  // TODO: Add implementation code here
+  if (lpClientStruct == NULL) {
+    return;  // Required parameter
+  }
+  lpClientStruct->lpCommandSession = lpCommandSession;
 }
