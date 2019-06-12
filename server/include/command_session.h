@@ -97,6 +97,16 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
     LPCLIENTSTRUCT lpClient, const char *pszCommandString);
 
 /**
+ * @name EndCommandSession
+ * @brief Ends the command session specified.
+ * @param lppCommandSession Address of a variable that points to the instance
+ * of COMMANDSESSION to be de-allocated.  This pointer's value is set to
+ * NULL once the operation completes.
+ * @remarks This function is a helpful alias for ReleaseCommandSession.
+ */
+void EndCommandSession(LPPCOMMANDSESSION lppCommandSession);
+
+/**
  * @name GetCommandSessionClient
  * @brief Gets the address of the CLIENTSTRUCT instance with which this
  * COMMANDSESSION instance is associated.
