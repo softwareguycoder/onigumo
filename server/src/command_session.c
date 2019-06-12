@@ -118,6 +118,15 @@ void GenerateNewCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 // Publicly-exposed functions
 
 ///////////////////////////////////////////////////////////////////////////////
+// BeginCommandSession function
+
+LPCOMMANDSESSION BeginCommandSession(LPCLIENTSTRUCT lpClient,
+    const char* pszCommandString) {
+  // TODO: Add implementation code here
+  return NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // CreateCommandSession function
 
 void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
