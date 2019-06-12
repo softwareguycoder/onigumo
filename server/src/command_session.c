@@ -60,6 +60,14 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// GetCommandSessionClient function
+
+LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession) {
+  // TODO: Add implementation code here
+  return NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // GetCommandSessionID function
 
 UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
