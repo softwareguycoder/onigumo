@@ -190,7 +190,7 @@
 
 #ifndef BEGAN_COMMAND_INVOCATION_SESSION_FORMAT
 #define BEGAN_COMMAND_INVOCATION_SESSION_FORMAT \
-  "S: Began command invocation session '{%s}'.\n"
+  "S: Began command invocation session '{%s} for command '{%s}'.\n"
 #endif //BEGAN_COMMAND_INVOCATION_SESSION_FORMAT
 
 #ifndef ENDING_COMMAND_INVOCATION_SESSION_FORMAT

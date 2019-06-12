@@ -121,17 +121,28 @@ void DisplayCommandSessionInvocationStatus(
     break;
   }
 
-  FreeBuffer((void**) pszCommandSessionID);
+  FreeBuffer((void**) &pszCommandSessionID);
 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // DisplayInvokedCommandSessionID function
 
-void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
+void DisplayBeganCommandSessionMessage(LPCOMMANDSESSION lpCommandSession,
+    const char* pszCommandString) {
   if (!IsCommandSessionValid(lpCommandSession)) {
     return;
   }
+
+  if (IsNullOrWhiteSpace(pszCommandString)) {
+    return;
+  }
+
+  const int COMMAND_STRING_SIZE = strlen(pszCommandString) + 1;
+
+  char szTrimmedCommandString[COMMAND_STRING_SIZE];
+  memset(szTrimmedCommandString, 0, COMMAND_STRING_SIZE);
+  Trim(szTrimmedCommandString, COMMAND_STRING_SIZE, pszCommandString);
 
   char *pszCommandSessionID =
       UUIDToString(GetCommandSessionID(lpCommandSession));
@@ -143,11 +154,12 @@ void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
   }
 
   if (GetLogFileHandle() != stdout) {
-    LogInfo(BEGAN_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
+    LogInfo(BEGAN_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID,
+        szTrimmedCommandString);
   }
   if (IsDiagnosticMode()) {
     fprintf(stdout, BEGAN_COMMAND_INVOCATION_SESSION_FORMAT,
-        pszCommandSessionID);
+        pszCommandSessionID, szTrimmedCommandString);
   }
 
   FreeBuffer((void**) &pszCommandSessionID);
@@ -267,6 +279,8 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
     ThrowOutOfMemoryException(FAILED_ALLOCATE_COMMAND_SESSION);
   }
   memset(*lppCommandSession, 0, 1 * sizeof(COMMANDSESSION));
+
+  DisplayBeganCommandSessionMessage(*lppCommandSession, pszCommandString);
 
   GenerateNewCommandSessionID(*lppCommandSession);
 
@@ -428,13 +442,14 @@ void ReleaseCommandSession(void* pvCommandSession) {
   FreeStringArray(GetCommandSessionMultilineData(lpCS),
       GetCommandSessionMultilineDataLineCount(lpCS));
 
+  DisplayEndedCommandSessionMessage(lpCS);
+
   /* set memory to zero to avoid double-free attempts */
   memset(lpCS, 0, 1 * sizeof(COMMANDSESSION));
 
   /* Release memory occupied by the structure */
   FreeBuffer((void**) &lpCS);
 
-  DisplayEndedCommandSessionMessage(lpCS);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
