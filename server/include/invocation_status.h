@@ -9,7 +9,7 @@ typedef enum {
   SESSIONWARNING, /* user supplied incorrect input, or other non-showstopper  */
   SESSIONWAITING, /* command engine waiting for new input from user/client */
   SESSION_MULTILINE_START,   /* starting a multiline reply */
-  MULITLINE_END,     /* ending a multiline reply */
+  SESSION_MULITLINE_END,     /* ending a multiline reply */
 }  INVOCATIONSTATUS, *LPINVOCATIONSTATUS;
 
 #endif //__INVOCATION_STATUS_H__
