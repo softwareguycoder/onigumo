@@ -68,10 +68,6 @@ void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
     return; // Required parameter
   }
 
-  if (!IsClientStructValid((void*)lpClient)) {
-    return; // Required parameter
-  }
-
   lpCommandSession->lpClient = lpClient;
 }
 
