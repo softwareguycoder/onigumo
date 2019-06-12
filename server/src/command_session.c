@@ -64,7 +64,7 @@ void DisplayCommandSessionInvocationStatus(
         pszCommandSessionID);
     break;
 
-  case MULTILINE_START:
+  case SESSION_MULTILINE_START:
     fprintf(stdout,
         "S: Command invocation session '{%s}': Starting multiline data transmission...\n",
         pszCommandSessionID);
