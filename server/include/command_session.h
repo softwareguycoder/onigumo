@@ -70,6 +70,20 @@ typedef struct _tagCOMMANDSESSION {
 } COMMANDSESSION, *LPCOMMANDSESSION, **LPPCOMMANDSESSION;
 
 /**
+ * @name BeginCommandSession
+ * @brief Begins a new command session and returns an address of an instance
+ * of COMMANDSESSION that is initialized for the new session.
+ * @param lpClient Address of a CLIENTSTRUCT instance identifying the source
+ * of the command transmission,
+ * @param pszCommandString Command string originally transmitted by the client.
+ * @return Address of an instance of COMMANDSESSION that has been initialized
+ * for the new session.
+ * @remarks This function is a helpful alias for CreateCommandSession.
+ */
+LPCOMMANDSESSION BeginCommandSession(LPCLIENTSTRUCT lpClient,
+    const char* pszCommandString);
+
+/**
  * @name CreateCommandSession
  * @brief Creates a new instance of COMMANDSESSION, initializes it, and then
  * returns the address of the newly-created and initialized instance.
