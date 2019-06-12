@@ -258,10 +258,7 @@ void ReleaseCommandSession(void* pvCommandSession) {
 
   char *pszCommandSessionID = UUIDToString(GetCommandSessionID(lpCS));
 
-  if (IsDiagnosticMode()) {
-    fprintf(stdout, ENDING_COMMAND_INVOCATION_SESSION_FORMAT,
-        pszCommandSessionID);
-  }
+  DisplayEndingCommandSessionMessage(lpCS);
 
   /* Free the contents of the  multiline data, if there */
   FreeStringArray(GetCommandSessionMultilineData(lpCS),
