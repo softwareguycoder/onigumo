@@ -16,6 +16,14 @@
 
 void DisplayCommandSessionInvocationStatus(
     LPCOMMANDSESSION lpCommandSession) {
+  if (!IsCommandSessionValid(lpCommandSession)) {
+    return;
+  }
+
+  if (!IsDiagnosticMode()) {
+    return;
+  }
+
   // TODO: Add implementation code here
 }
 
