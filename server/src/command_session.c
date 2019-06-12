@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "server.h"
 
+#include "client_struct.h"
 #include "command_session.h"
 
 ///////////////////////////////////////////////////////////////////////////////
