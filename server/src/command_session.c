@@ -54,7 +54,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONWARNING:
     fprintf(stdout,
-        "S: Command invocation session '{%s}': Warning issued.\n",
+        COMMAND_INVOCATION_SESSION_WARNING,
         pszCommandSessionID);
     break;
 
