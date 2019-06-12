@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef COMMAND_INVOCATION_SESSION_WARNING
+#define COMMAND_INVOCATION_SESSION_WARNING \
+  "S: Command invocation session '{%s}': Warning issued.\n"
+#endif //COMMAND_INVOCATION_SESSION_WARNING
+
 #ifndef COMMAND_INVOCATION_SESSION_ERROR
 #define COMMAND_INVOCATION_SESSION_ERROR \
   "S: Command invocation session '{%s}': Error.\n"
