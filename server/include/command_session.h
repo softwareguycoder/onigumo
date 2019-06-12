@@ -83,6 +83,16 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
     LPCLIENTSTRUCT lpClient, const char *pszCommandString);
 
 /**
+ * @name GetCommandSessionClient
+ * @brief Gets the address of the CLIENTSTRUCT instance with which this
+ * COMMANDSESSION instance is associated.
+ * @param lpCommandSession Address of an instance of COMMANDSESSION that refers
+ * to its associated client.
+ * @return Address of the associated CLIENTSTRUCT, or NULL if not found.
+ */
+LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession);
+
+/**
  * @name GetCommandSessionID
  * @brief Gets the value of the commandSessionID member.
  * @param lpCommandSession Address of an instance of COMMANDSESSION.
