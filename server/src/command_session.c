@@ -15,7 +15,7 @@
 // DisplayCommandSessionInvocationStatus function
 
 void DisplayCommandSessionInvocationStatus(
-    LPCOMMANDSESSION lpCommandSession) {
+    LPCOMMANDSESSION lpCommandSession, INVOCATIONSTATUS status) {
   if (!IsCommandSessionValid(lpCommandSession)) {
     return;
   }
