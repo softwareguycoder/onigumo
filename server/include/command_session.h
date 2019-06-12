@@ -67,7 +67,7 @@ typedef struct _tagCOMMANDSESSION {
    * multiline reply.
    */
   int nMultilineDataLineCount;
-} COMMANDSESSION, *LPCOMMANDESSION, **LPPCOMMANDSESSION;
+} COMMANDSESSION, *LPCOMMANDSESSION, **LPPCOMMANDSESSION;
 
 
 /**
