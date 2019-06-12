@@ -128,12 +128,7 @@ void DisplayCommandSessionInvocationStatus(
 ///////////////////////////////////////////////////////////////////////////////
 // DisplayInvokedCommandSessionID function
 
-void DisplayBeganCommandSessionMessage(LPCOMMANDSESSION lpCommandSession,
-    const char* pszCommandString) {
-  if (!IsCommandSessionValid(lpCommandSession)) {
-    return;
-  }
-
+void DisplayBeganCommandSessionMessage(const char* pszCommandString) {
   if (IsNullOrWhiteSpace(pszCommandString)) {
     return;
   }
@@ -144,25 +139,16 @@ void DisplayBeganCommandSessionMessage(LPCOMMANDSESSION lpCommandSession,
   memset(szTrimmedCommandString, 0, COMMAND_STRING_SIZE);
   Trim(szTrimmedCommandString, COMMAND_STRING_SIZE, pszCommandString);
 
-  char *pszCommandSessionID =
-      UUIDToString(GetCommandSessionID(lpCommandSession));
-  if (IsNullOrWhiteSpace(pszCommandSessionID)) {
-
-    FreeBuffer((void**) &pszCommandSessionID);   // just in case
-
-    return;
-  }
-
   if (GetLogFileHandle() != stdout) {
-    LogInfo(BEGAN_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID,
+    LogInfo(BEGAN_COMMAND_INVOCATION_SESSION_FORMAT,
         szTrimmedCommandString);
   }
   if (IsDiagnosticMode()) {
     fprintf(stdout, BEGAN_COMMAND_INVOCATION_SESSION_FORMAT,
-        pszCommandSessionID, szTrimmedCommandString);
+        szTrimmedCommandString);
   }
 
-  FreeBuffer((void**) &pszCommandSessionID);
+  memset(szTrimmedCommandString, 0, COMMAND_STRING_SIZE);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,29 +182,18 @@ void DisplayEndingCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
 ///////////////////////////////////////////////////////////////////////////////
 // DisplayEndedCommandSessionMessage function
 
-void DisplayEndedCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
-  if (!IsCommandSessionValid(lpCommandSession)) {
-    return;
-  }
-
-  char *pszCommandSessionID =
-      UUIDToString(GetCommandSessionID(lpCommandSession));
-  if (IsNullOrWhiteSpace(pszCommandSessionID)) {
-
-    FreeBuffer((void**) &pszCommandSessionID);   // just in case
-
+void DisplayEndedCommandSessionMessage(const char* pszCommandString) {
+  if (IsNullOrWhiteSpace(pszCommandString)) {
     return;
   }
 
   if (GetLogFileHandle() != stdout) {
-    LogInfo(ENDED_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
+    LogInfo(ENDED_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandString);
   }
   if (IsDiagnosticMode()) {
     fprintf(stdout, ENDED_COMMAND_INVOCATION_SESSION_FORMAT,
-        pszCommandSessionID);
+        pszCommandString);
   }
-
-  FreeBuffer((void**) &pszCommandSessionID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -248,11 +223,10 @@ void GenerateNewCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 ///////////////////////////////////////////////////////////////////////////////
 // BeginCommandSession function
 
-LPCOMMANDSESSION BeginCommandSession(LPCLIENTSTRUCT lpClient,
-    const char* pszCommandString) {
+LPCOMMANDSESSION BeginCommandSession(const char* pszCommandString) {
   LPCOMMANDSESSION lpResult = NULL;
 
-  CreateCommandSession(&lpResult, lpClient, pszCommandString);
+  CreateCommandSession(&lpResult, pszCommandString);
 
   return lpResult;
 }
@@ -261,12 +235,8 @@ LPCOMMANDSESSION BeginCommandSession(LPCLIENTSTRUCT lpClient,
 // CreateCommandSession function
 
 void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
-    LPCLIENTSTRUCT lpClient, const char *pszCommandString) {
+    const char *pszCommandString) {
   if (lppCommandSession == NULL) {
-    return; // Required parameter
-  }
-
-  if (lpClient == NULL || !IsUUIDValid(&(lpClient->clientID))) {
     return; // Required parameter
   }
 
@@ -280,13 +250,11 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
   }
   memset(*lppCommandSession, 0, 1 * sizeof(COMMANDSESSION));
 
-  DisplayBeganCommandSessionMessage(*lppCommandSession, pszCommandString);
+  DisplayBeganCommandSessionMessage(pszCommandString);
 
   GenerateNewCommandSessionID(*lppCommandSession);
 
   SetCommandSessionCommand(*lppCommandSession, pszCommandString);
-
-  SetCommandSessionClient(*lppCommandSession, lpClient);
 
   SetCommandSessionInvocationStatus(*lppCommandSession, SESSIONOPENED);
 }
@@ -300,7 +268,7 @@ void EndCommandSession(LPPCOMMANDSESSION lppCommandSession) {
   }
 
   if (*lppCommandSession == NULL) {
-    return;   // Required parameter; nothing to do.
+    return;   // Required parameter; nothing to do .
   }
 
   INVOCATIONSTATUS status =
@@ -311,17 +279,6 @@ void EndCommandSession(LPPCOMMANDSESSION lppCommandSession) {
 
   ReleaseCommandSession((void*) (*lppCommandSession));
   *lppCommandSession = NULL;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// GetCommandSessionClient function
-
-LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession) {
-  if (lpCommandSession == NULL) {
-    return NULL;
-  }
-
-  return lpCommandSession->lpClient;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -403,11 +360,6 @@ BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
     return FALSE; // Must have valid client session ID value
   }
 
-  if (!IsClientStructValid(
-      (void*) GetCommandSessionClient(lpCommandSession))) {
-    return FALSE; // Must be associated with a client
-  }
-
   if (GetCommandSessionMultilineDataLineCount(lpCommandSession) < 0) {
     return FALSE; // Count must always be zero or greater
   }
@@ -434,6 +386,11 @@ void ReleaseCommandSession(void* pvCommandSession) {
     return; // Must have valid command session ID at least
   }
 
+  const int COMMAND_STRING_SIZE = strlen(lpCS->szCommand) + 1;
+  char szTrimmedCommandString[COMMAND_STRING_SIZE];
+  memset(szTrimmedCommandString, 0, COMMAND_STRING_SIZE);
+  Trim(szTrimmedCommandString, COMMAND_STRING_SIZE, lpCS->szCommand);
+
   SetCommandSessionInvocationStatus(lpCS, SESSIONCLOSED);
 
   DisplayEndingCommandSessionMessage(lpCS);
@@ -442,27 +399,16 @@ void ReleaseCommandSession(void* pvCommandSession) {
   FreeStringArray(GetCommandSessionMultilineData(lpCS),
       GetCommandSessionMultilineDataLineCount(lpCS));
 
-  DisplayEndedCommandSessionMessage(lpCS);
-
   /* set memory to zero to avoid double-free attempts */
   memset(lpCS, 0, 1 * sizeof(COMMANDSESSION));
 
   /* Release memory occupied by the structure */
   FreeBuffer((void**) &lpCS);
 
+  DisplayEndedCommandSessionMessage(szTrimmedCommandString);
+
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// SetCommandSessionClient function
-
-void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
-    LPCLIENTSTRUCT lpClient) {
-  if (lpCommandSession == NULL) {
-    return; // Required parameter
-  }
-
-  lpCommandSession->lpClient = lpClient;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // SetCommandSessionCommand function

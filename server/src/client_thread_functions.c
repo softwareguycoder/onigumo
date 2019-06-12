@@ -897,7 +897,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
   }
 
   LPCOMMANDSESSION lpSession =
-      BeginCommandSession(lpSendingClient, PROTOCOL_HELO_COMMAND);
+      BeginCommandSession(PROTOCOL_HELO_COMMAND);
   if (lpSession == NULL) {
     fprintf(stderr, ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION);
     CleanupServer(EXIT_FAILURE);

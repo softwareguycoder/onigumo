@@ -27,13 +27,6 @@ typedef struct _tagCOMMANDSESSION {
   UUID commandSessionID;
 
   /**
-   * @name lpClient
-   * @brief Address of a CLIENTSTRUCT instance.  Identifies which client
-   * initiated this command session.
-   */
-  LPCLIENTSTRUCT lpClient;
-
-  /**
    * @name szCommand
    * @brief Character buffer holding the text of the command as originally
    * transmitted by the client.
@@ -73,14 +66,12 @@ typedef struct _tagCOMMANDSESSION {
  * @name BeginCommandSession
  * @brief Begins a new command session and returns an address of an instance
  * of COMMANDSESSION that is initialized for the new session.
- * @param lpClient Address of a CLIENTSTRUCT instance identifying the source
- * of the command transmission,
  * @param pszCommandString Command string originally transmitted by the client.
  * @return Address of an instance of COMMANDSESSION that has been initialized
  * for the new session.
  * @remarks This function is a helpful alias for CreateCommandSession.
  */
-LPCOMMANDSESSION BeginCommandSession(LPCLIENTSTRUCT lpClient,
+LPCOMMANDSESSION BeginCommandSession(
     const char* pszCommandString);
 
 /**
@@ -89,12 +80,14 @@ LPCOMMANDSESSION BeginCommandSession(LPCLIENTSTRUCT lpClient,
  * returns the address of the newly-created and initialized instance.
  * @param lppCommandSession Address of a pointer variable that will receive
  * the address of the newly-created command session struct.
- * @param lpClient Address of a CLIENTSTRUCT instance identifying the source
- * of the command transmission,
  * @param pszCommandString Command string originally transmitted by the client.
+ * @remarks This function dynamically allocates an instance of COMMANDSESSION
+ * on the heap and then initializes its key members.  Finally, the pointer
+ * referenced by lppCommandSession receives the address of the newly-
+ * allocated COMMANDSESSION instance.
  */
 void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
-    LPCLIENTSTRUCT lpClient, const char *pszCommandString);
+    const char *pszCommandString);
 
 /**
  * @name EndCommandSession
@@ -105,16 +98,6 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
  * @remarks This function is a helpful alias for ReleaseCommandSession.
  */
 void EndCommandSession(LPPCOMMANDSESSION lppCommandSession);
-
-/**
- * @name GetCommandSessionClient
- * @brief Gets the address of the CLIENTSTRUCT instance with which this
- * COMMANDSESSION instance is associated.
- * @param lpCommandSession Address of an instance of COMMANDSESSION that refers
- * to its associated client.
- * @return Address of the associated CLIENTSTRUCT, or NULL if not found.
- */
-LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession);
 
 /**
  * @name GetCommandSessionID
@@ -194,16 +177,6 @@ BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession);
  * prototype is as such so this function can work as a callback.
  */
 void ReleaseCommandSession(void* pvCommandSession);
-
-/**
- * @name SetCommandSessionClient
- * @brief Sets the lpClient member of the COMMANDSESSION struct to the
- * address that lpClient is initialized to.
- * @param lpClient Address of an instance of CLIENTSTRUCT that refers to the
- * client who sent the command.
- */
-void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
-    LPCLIENTSTRUCT lpClient);
 
 /**
  * @name SetCommandSessionCommand
