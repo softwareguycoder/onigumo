@@ -245,8 +245,7 @@ void ReleaseCommandSession(void* pvCommandSession) {
   /* Release memory occupied by the structure */
   FreeBuffer((void**) &lpCS);
 
-  fprintf(stdout, ENDED_COMMAND_INVOCATION_SESSION_FORMAT,
-      pszCommandSessionID);
+  DisplayEndedCommandSessionMessage(lpCS);
 
   FreeBuffer((void**) &pszCommandSessionID);
 }
