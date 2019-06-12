@@ -92,6 +92,18 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
 UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession);
 
 /**
+ * @name IsCommandSessionValid
+ * @brief Provides logic to tell whether a command session is valid or not.
+ * @param lpCommandSession Address of the COMMANDSESSION instance to be
+ * checked.
+ * @return TRUE if the information contained in the members of the
+ * COMMANDSESSION object is valid; FALSE otherwise.
+ * @remarks If the lpCommandSession pointer has a NULL value, this function
+ * returns FALSE.
+ */
+BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession);
+
+/**
  * @name SetCommandSessionClient
  * @brief Sets the lpClient member of the COMMANDSESSION struct to the
  * address that lpClient is initialized to.
