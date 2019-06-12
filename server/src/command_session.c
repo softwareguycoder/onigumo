@@ -97,6 +97,11 @@ BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
     return FALSE; // Must have valid client session ID value
   }
 
+  if (!IsClientStructValid(
+      (void*)GetCommandSessionClient(lpCommandSession))) {
+    return FALSE;
+  }
+
   // TODO: Add additional validation here
 
   return TRUE;
