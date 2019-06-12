@@ -80,6 +80,13 @@ void FreeClient(void* pvClientStruct) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// GetCommmandSession function
+
+LPCOMMANDSESSION GetCommandSession(LPCLIENTSTRUCT lpClientStruct) {
+  // TODO: Add implementation code here
+  return NULL;
+}
+///////////////////////////////////////////////////////////////////////////////
 // IsClientConnected function
 
 BOOL IsClientConnected(void* pvClientStruct) {
