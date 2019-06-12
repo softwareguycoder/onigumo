@@ -122,4 +122,17 @@ BOOL IsClientConnected(void* pvClientStruct);
  */
 BOOL IsClientStructValid(void* pvClientStruct);
 
+/**
+ * @name SetCommandSession
+ * @brief Sets the address of the COMMANDSESSION instance that is being used
+ * by the server to track the progress of its own handling of the protocol
+ * command that has just been issued by this client.
+ * @param lpClientStruct Address of the CLIENTSTRUCT instance whose member
+ * should be set to the value provided.
+ * @param lpCommandSession Address of the COMMANDSTRUCT instance to assign
+ * to the lpCommandSession member of CLIENTSTRUCT.
+ */
+void SetCommandSession(LPCLIENTSTRUCT lpClientStruct,
+    LPCOMMANDSESSION lpCommandSession);
+
 #endif /* __CLIENT_STRUCT_H__ */
