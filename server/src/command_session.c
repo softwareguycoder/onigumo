@@ -182,11 +182,29 @@ void ReleaseCommandSession(void* pvCommandSession) {
     return;  // Required parameter
   }
 
+  if (!IsUUIDValid(GetCommandSessionID(lpCS))) {
+    return; // Must have valid command session ID at least
+  }
+
+  char *pszCommandSessionID = UUIDToString(GetCommandSessionID(lpCS));
+
+  fprintf(stdout, ENDING_COMMAND_INVOCATION_SESSION_FORMAT,
+      pszCommandSessionID);
+
   /* Free the contents of the  multiline data, if there */
   FreeStringArray(GetCommandSessionMultilineData(lpCS),
       GetCommandSessionMultilineDataLineCount(lpCS));
 
-  // TODO: Add implementation code here
+  /* set memory to zero to avoid double-free attempts */
+  memset(lpCS, 0, 1 * sizeof(COMMANDSESSION));
+
+  /* Release memory occupied by the structure */
+  FreeBuffer((void**) &lpCS);
+
+  fprintf(stdout, ENDED_COMMAND_INVOCATION_SESSION_FORMAT,
+      pszCommandSessionID);
+
+  FreeBuffer((void**) &pszCommandSessionID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
