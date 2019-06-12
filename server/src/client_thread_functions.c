@@ -548,7 +548,7 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
 
   /* per protocol, client says bye bye server by sending the QUIT
    * command */
-  if (StartsWith(pszBuffer, PROTOCOL_QUIT_COMMAND)) {
+  if (Equals(pszBuffer, PROTOCOL_QUIT_COMMAND)) {
     return EndClientSession(lpSendingClient);
   }
 
