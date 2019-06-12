@@ -148,6 +148,16 @@
   "S: Began command invocation session '{%s}'.\n"
 #endif //BEGAN_COMMAND_INVOCATION_SESSION_FORMAT
 
+#ifndef ENDING_COMMAND_INVOCATION_SESSION_FORMAT
+#define ENDING_COMMAND_INVOCATION_SESSION_FORMAT \
+  "S: Ending command invocation session '{%s}'...\n"
+#endif //ENDING_COMMAND_INVOCATION_SESSION_FORMAT
+
+#ifndef ENDED_COMMAND_INVOCATION_SESSION_FORMAT
+#define ENDED_COMMAND_INVOCATION_SESSION_FORMAT \
+  "S: Ended command invocation session '{%s}'.\n"
+#endif //ENDED_COMMAND_INVOCATION_SESSION_FORMAT
+
 #ifndef CLIENT_IP_ADDR_UNK
 #define CLIENT_IP_ADDR_UNK		"server: Client IP address not known.\n"
 #endif //CLIENT_IP_ADDR_UNK
