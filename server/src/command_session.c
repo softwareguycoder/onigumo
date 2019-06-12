@@ -30,7 +30,7 @@ void DisplayCommandSessionInvocationStatus(
   switch (status) {
   case INVOCATION_STATUS_UNKNOWN:
     fprintf(stdout,
-        "S: Command invocation session '{%s}': Unknown status.\n",
+        COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN,
         pszCommandSessionID);
     break;
 
