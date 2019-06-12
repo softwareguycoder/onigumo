@@ -112,7 +112,11 @@ BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
 
   if (!IsClientStructValid(
       (void*)GetCommandSessionClient(lpCommandSession))) {
-    return FALSE;
+    return FALSE; // Must be associated with a client
+  }
+
+  if (GetCommandSessionMultilineDataLineCount(lpCommandSession) < 0) {
+    return FALSE; // Count must always be zero or greater
   }
 
   // TODO: Add additional validation here
