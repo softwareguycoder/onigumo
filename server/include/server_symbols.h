@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef COMMAND_INVOCATION_SESSION_OPENED
+#define COMMAND_INVOCATION_SESSION_OPENED \
+  "S: Command invocation session '{%s}': Opened.\n"
+#endif //COMMAND_INVOCATION_SESSION_OPENED
+
 #ifndef COMMAND_INVOCATION_SESSION_CLOSED
 #define COMMAND_INVOCATION_SESSION_CLOSED \
   "S: Command invocation session '{%s}': Closed.\n"
