@@ -195,6 +195,16 @@ UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// GetCommandSessionInvocationStatus function
+
+INVOCATIONSTATUS GetCommandSessionInvocationStatus(
+    LPCOMMANDSESSION lpCommandSession) {
+  // TODO: Add implementation code here
+
+  return INVOCATION_STATUS_UNKNOWN;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // GetCommandSessionMultilineData function
 
 char*** GetCommandSessionMultilineData(LPCOMMANDSESSION lpCommandSession) {
