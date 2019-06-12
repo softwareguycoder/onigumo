@@ -139,7 +139,8 @@
 #endif //CLIENT_DISCONNECTED
 
 #ifndef CLIENT_ID_FORMAT
-#define CLIENT_ID_FORMAT        "C[%s:%d]: Client ID is '{%s}'.\n"
+#define CLIENT_ID_FORMAT \
+  "C[%s:%d]: Client ID is '{%s}'.\n"
 #endif //CLIENT_ID_FORMAT
 
 #ifndef BEGAN_COMMAND_INVOCATION_SESSION_FORMAT
