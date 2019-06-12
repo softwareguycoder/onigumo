@@ -102,6 +102,17 @@ LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession);
 UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession);
 
 /**
+ * @name GetCommandSessionMultilineDataLineCount
+ * @brief Gets the value of the nMultilineDataLineCount member.
+ * @param lpCommandSession
+ * @param lpCommandSession Address of an instance of COMMANDSESSION.
+ * @return Value of the nMultilineDataLineCount member of the COMMANDSESSION
+ * instance specified by lpCommandSession, or INT_MIN if it cannot be found.
+ */
+int GetCommandSessionMultilineDataLineCount(
+    LPCOMMANDSESSION lpCommandSession);
+
+/**
  * @name IsCommandSessionValid
  * @brief Provides logic to tell whether a command session is valid or not.
  * @param lpCommandSession Address of the COMMANDSESSION instance to be
