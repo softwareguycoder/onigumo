@@ -125,10 +125,21 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
     return 0L;
   }
 
+  /*
+   * This function is responsible for parsing input argument(s)
+   * to a command that has a code word followed by whitespace and then
+   * followed by one or more arguments who are ASCII strings representing
+   * integer values.  We also want to start by performing a trim operation
+   * to strip whitespace from before and after the command itself.
+   * This will also serve to prevent malicious users of the software from,
+   * e.g., transmitting a command that has the code word, followed by
+   * whitespace.
+   */
+
   char szCommand[MAX_LINE_LENGTH + 1];
   memset(szCommand, 0, MAX_LINE_LENGTH + 1);
 
-  strcpy(szCommand, pszBuffer);
+  Trim(szCommand, MAX_LINE_LENGTH + 1, pszBuffer);
 
   Split(szCommand, " ", &ppszStrings, &nStringCount);
 
