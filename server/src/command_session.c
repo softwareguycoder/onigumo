@@ -51,6 +51,7 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
 
   memset(*lppCommandSession, 0, 1 * sizeof(COMMANDSESSION));
 
+  GenerateNewCommandSessionID(*lppCommandSession);
 
   strncpy((*lppCommandSession)->szCommand,
       pszCommandString, MAX_LINE_LENGTH);
