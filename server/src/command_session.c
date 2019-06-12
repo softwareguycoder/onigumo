@@ -48,7 +48,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONERROR:
     fprintf(stdout,
-        "S: Command invocation session '{%s}': Error.\n",
+        COMMAND_INVOCATION_SESSION_ERROR,
         pszCommandSessionID);
     break;
 
