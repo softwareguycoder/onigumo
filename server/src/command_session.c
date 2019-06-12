@@ -122,8 +122,11 @@ void GenerateNewCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 
 LPCOMMANDSESSION BeginCommandSession(LPCLIENTSTRUCT lpClient,
     const char* pszCommandString) {
-  // TODO: Add implementation code here
-  return NULL;
+  LPCOMMANDSESSION lpResult = NULL;
+
+  CreateCommandSession(&lpResult, lpClient, pszCommandString);
+
+  return lpResult;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
