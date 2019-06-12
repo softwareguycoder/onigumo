@@ -102,6 +102,18 @@ LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession);
 UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession);
 
 /**
+ * @name GetCommandSessionMultilineData
+ * @brief Gets the address of the string array member, ppszMultilineData,
+ * of the COMMANDSESSION instance passed.
+ * @param lpCommandSession Address of an instance of COMMANDSESSION from which
+ * to retrieve the multiline data.
+ * @return Address of the ppszMultilineData member of the COMMANDSESSION
+ * instance whose address is provided in the lpCommandSession parameter, or
+ * NULL if no data found.
+ */
+char*** GetCommandSessionMultilineData(LPCOMMANDSESSION lpCommandSession);
+
+/**
  * @name GetCommandSessionMultilineDataLineCount
  * @brief Gets the value of the nMultilineDataLineCount member.
  * @param lpCommandSession
