@@ -36,7 +36,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONCLOSED:
     fprintf(stdout,
-        "S: Command invocation session '{%s}': Closed.\n",
+        COMMAND_INVOCATION_SESSION_CLOSED,
         pszCommandSessionID);
     break;
 
