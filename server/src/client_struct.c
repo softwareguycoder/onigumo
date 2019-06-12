@@ -86,6 +86,7 @@ LPCOMMANDSESSION GetCommandSession(LPCLIENTSTRUCT lpClientStruct) {
   // TODO: Add implementation code here
   return NULL;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // IsClientConnected function
 
@@ -149,3 +150,9 @@ BOOL IsClientStructValid(void* pvClientStruct) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// SetCommandSession function
+
+void SetCommandSession(LPCLIENTSTRUCT lpClientStruct,
+    LPCOMMANDSESSION lpCommandSession) {
+  // TODO: Add implementation code here
+}
