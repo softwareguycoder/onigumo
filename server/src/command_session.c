@@ -19,6 +19,10 @@ void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
     return;
   }
 
+  if (!IsDiagnosticMode()) {
+    return;
+  }
+
   char *pszCommandSessionID =
       UUIDToString(GetCommandSessionID(lpCommandSession));
   if (IsNullOrWhiteSpace(pszCommandSessionID)) {
@@ -199,8 +203,10 @@ void ReleaseCommandSession(void* pvCommandSession) {
 
   char *pszCommandSessionID = UUIDToString(GetCommandSessionID(lpCS));
 
-  fprintf(stdout, ENDING_COMMAND_INVOCATION_SESSION_FORMAT,
-      pszCommandSessionID);
+  if (IsDiagnosticMode()) {
+    fprintf(stdout, ENDING_COMMAND_INVOCATION_SESSION_FORMAT,
+        pszCommandSessionID);
+  }
 
   /* Free the contents of the  multiline data, if there */
   FreeStringArray(GetCommandSessionMultilineData(lpCS),
