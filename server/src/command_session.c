@@ -57,9 +57,25 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
   SetCommandSessionCommand(*lppCommandSession, pszCommandString);
 
   SetCommandSessionClient(*lppCommandSession, lpClient);
+
 }
 
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// GetCommandSessionID function
+
+UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
+  if (lpCommandSession == NULL) {
+    return NULL;
+  }
+
+  if (!IsUUIDValid(&(lpCommandSession->commandSessionID))) {
+    return NULL;
+  }
+
+  return &(lpCommandSession->commandSessionID);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // SetCommandSessionClient function
 
 void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
