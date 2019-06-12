@@ -163,7 +163,9 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
 // EndCommandSession function
 
 void EndCommandSession(LPPCOMMANDSESSION lppCommandSession) {
-  // TODO: Add implementation code here
+  if (lppCommandSession == NULL) {
+    return;   // Required parameter; nothing to do.
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
