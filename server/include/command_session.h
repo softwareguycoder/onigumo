@@ -125,6 +125,16 @@ int GetCommandSessionMultilineDataLineCount(
     LPCOMMANDSESSION lpCommandSession);
 
 /**
+ * @name IsCommandSessionEnded
+ * @brief Gets a value indicating whether the current command session has
+ * ended.
+ * @param lpCommandSession Address of an instance of COMMANDSESSION that has
+ * the status value to be checked.
+ * @return TRUE if the command session is in the ended state; FALSE otherwise.
+ */
+BOOL IsCommandSessionEnded(LPCOMMANDSESSION lpCommandSession);
+
+/**
  * @name IsCommandSessionValid
  * @brief Provides logic to tell whether a command session is valid or not.
  * @param lpCommandSession Address of the COMMANDSESSION instance to be
