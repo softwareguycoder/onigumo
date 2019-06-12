@@ -60,7 +60,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONWAITING:
     fprintf(stdout,
-        "S: Command invocation session '{%s}': Waiting for further input.\n",
+        COMMAND_INVOCATION_SESSION_WAITING,
         pszCommandSessionID);
     break;
 
