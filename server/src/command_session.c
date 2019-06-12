@@ -64,7 +64,15 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
 
 void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
     LPCLIENTSTRUCT lpClient) {
-  // TODO: Add code here
+  if (lpCommandSession == NULL) {
+    return; // Required parameter
+  }
+
+  if (!IsClientStructValid((void*)lpClient)) {
+    return; // Required parameter
+  }
+
+  lpCommandSession->lpClient = lpClient;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
