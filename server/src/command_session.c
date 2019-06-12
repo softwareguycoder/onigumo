@@ -78,8 +78,17 @@ UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 // IsCommandSessionValid function
 
 BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
-  // TODO: Add implementation code here
-  return FALSE;
+  if (lpCommandSession == NULL) {
+    return FALSE; // Required parameter; obviously not valid
+  }
+
+  if (!IsUUIDValid(GetCommandSessionID(lpCommandSession))) {
+    return FALSE; // Must have valid client session ID value
+  }
+
+  // TODO: Add additional validation here
+
+  return TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
