@@ -75,6 +75,14 @@ UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// IsCommandSessionValid function
+
+BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
+  // TODO: Add implementation code here
+  return FALSE;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // SetCommandSessionClient function
 
 void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
