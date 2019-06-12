@@ -144,6 +144,15 @@ int GetCommandSessionMultilineDataLineCount(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// IsCommandSessionEnded function
+
+BOOL IsCommandSessionEnded(LPCOMMANDSESSION lpCommandSession) {
+  // TODO: Add implementation code here
+
+  return FALSE;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // IsCommandSessionValid function
 
 BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
