@@ -14,6 +14,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // GenerateNewCommandSessionID function
 
+/**
+ * @name GenerateNewCommandSessionID
+ * @brief Generates a new UUID value and populates the commandSessionID
+ * member of the COMMANDSESSION instance passed with the new value
+ * @param lpCommandSession Address of an instance of COMMANDSESSION whose
+ * commandSessionID member is to be populated with a newly-generated UUID.
+ */
 void GenerateNewCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
   if (lpCommandSession == NULL) {
     return; // Required parameter
