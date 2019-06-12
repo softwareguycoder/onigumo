@@ -12,6 +12,14 @@
 // Internal-use-only functions
 
 ///////////////////////////////////////////////////////////////////////////////
+// DisplayCommandSessionInvocationStatus function
+
+void DisplayCommandSessionInvocationStatus(
+    LPCOMMANDSESSION lpCommandSession) {
+  // TODO: Add implementation code here
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // DisplayInvokedCommandSessionID function
 
 void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
