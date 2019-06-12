@@ -182,6 +182,10 @@ void ReleaseCommandSession(void* pvCommandSession) {
     return;  // Required parameter
   }
 
+  /* Free the contents of the  multiline data, if there */
+  FreeStringArray(GetCommandSessionMultilineData(lpCS),
+      GetCommandSessionMultilineDataLineCount(lpCS));
+
   // TODO: Add implementation code here
 }
 
