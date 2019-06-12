@@ -83,6 +83,15 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
     LPCLIENTSTRUCT lpClient, const char *pszCommandString);
 
 /**
+ * @name GetCommandSessionID
+ * @brief Gets the value of the commandSessionID member.
+ * @param lpCommandSession Address of an instance of COMMANDSESSION.
+ * @return Address of the commandSessionID member of the COMMANDSESSION
+ * instance specified by lpCommandSession, or NULL if it cannot be found.
+ */
+UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession);
+
+/**
  * @name SetCommandSessionClient
  * @brief Sets the lpClient member of the COMMANDSESSION struct to the
  * address that lpClient is initialized to.
