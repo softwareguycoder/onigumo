@@ -8,6 +8,23 @@
 #include "command_session.h"
 
 ///////////////////////////////////////////////////////////////////////////////
+// Internal-use-only functions
+
+///////////////////////////////////////////////////////////////////////////////
+// GenerateNewCommandSessionID function
+
+void GenerateNewCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
+  if (lpCommandSession == NULL) {
+    return; // Required parameter
+  }
+
+  UUID newUUID;
+  GenerateNewUUID(&newUUID);
+
+  CopyUUID(&(lpCommandSession->commandSessionID), &newUUID);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Publicly-exposed functions
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,10 +51,6 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
 
   memset(*lppCommandSession, 0, 1 * sizeof(COMMANDSESSION));
 
-  UUID newUUID;
-  GenerateNewUUID(&newUUID);
-
-  CopyUUID(&((*lppCommandSession)->commandSessionID), &newUUID);
 
   strncpy((*lppCommandSession)->szCommand,
       pszCommandString, MAX_LINE_LENGTH);
