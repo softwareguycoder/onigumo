@@ -23,14 +23,14 @@ void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
       UUIDToString(GetCommandSessionID(lpCommandSession));
   if (IsNullOrWhiteSpace(pszCommandSessionID)) {
 
-    FreeBuffer((void**)&pszCommandSessionID);   // just in case
+    FreeBuffer((void**) &pszCommandSessionID);   // just in case
 
     return;
   }
 
   fprintf(stdout, CLIENT_ID_FORMAT, pszCommandSessionID);
 
-  FreeBuffer((void**)&pszCommandSessionID);
+  FreeBuffer((void**) &pszCommandSessionID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,10 +114,19 @@ UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// GetCommandSessionMultilineData function
+
+char*** GetCommandSessionMultilineData(LPCOMMANDSESSION lpCommandSession) {
+  // TODO: Add implementation code here
+
+  return NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // GetCommandSessionMultilineDataLineCount function
 
 int GetCommandSessionMultilineDataLineCount(
-    LPCOMMANDSESSION lpCommandSession){
+    LPCOMMANDSESSION lpCommandSession) {
   int nResult = INT_MIN;
   if (lpCommandSession == NULL) {
     return nResult;
@@ -139,7 +148,7 @@ BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
   }
 
   if (!IsClientStructValid(
-      (void*)GetCommandSessionClient(lpCommandSession))) {
+      (void*) GetCommandSessionClient(lpCommandSession))) {
     return FALSE; // Must be associated with a client
   }
 
@@ -160,7 +169,7 @@ void ReleaseCommandSession(void* pvCommandSession) {
     return; // Required parameter
   }
 
-  LPCOMMANDSESSION lpCS = (LPCOMMANDSESSION)pvCommandSession;
+  LPCOMMANDSESSION lpCS = (LPCOMMANDSESSION) pvCommandSession;
   if (lpCS == NULL) {
     return;  // Required parameter
   }
