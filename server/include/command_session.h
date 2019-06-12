@@ -181,4 +181,16 @@ void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
 void SetCommandSessionCommand(LPCOMMANDSESSION lpCommandSession,
     const char* pszCommandString);
 
+/**
+ * @name SetCommandSessionInvocationStatus
+ * @brief Updates the value of the invocationStatus member of the instance
+ * of COMMANDSESSION pointed to by lpCommandSession.
+ * @param lpCommandSession Address of an instance of COMMANDSESSION whose
+ * invocationStatus member is to be updated.
+ * @param status New status value. Must be one of the INVOCATIONSTATUS values.
+ * @return The prior value of the invocationStatus member.
+ */
+INVOCATIONSTATUS SetCommandSessionInvocationStatus(
+    LPCOMMANDSESSION lpCommandSession, INVOCATIONSTATUS status);
+
 #endif //__COMMAND_SESSION_H__
