@@ -32,7 +32,7 @@ void GenerateNewCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 // CreateCommandSession function
 
 void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
-    LPCLIENTSTRUCT lpClient, const char *pszCommandString){
+    LPCLIENTSTRUCT lpClient, const char *pszCommandString) {
   if (lppCommandSession == NULL) {
     return; // Required parameter
   }
@@ -45,7 +45,7 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
     return; // Required parameter
   }
 
-  *lppCommandSession = (LPCOMMANDSESSION)malloc(1 * sizeof(COMMANDSESSION));
+  *lppCommandSession = (LPCOMMANDSESSION) malloc(1 * sizeof(COMMANDSESSION));
   if (*lppCommandSession == NULL) {
     ThrowOutOfMemoryException(FAILED_ALLOCATE_COMMAND_SESSION);
   }
@@ -58,6 +58,28 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
       pszCommandString, MAX_LINE_LENGTH);
 
   (*lppCommandSession)->lpClient = lpClient;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// SetCommandSessionCommand function
+
+void SetCommandSessionCommand(LPCOMMANDSESSION lpCommandSession,
+    const char* pszCommandString) {
+  if (lpCommandSession == NULL) {
+    return; // Required parameter
+  }
+
+  if (IsNullOrWhiteSpace(pszCommandString)) {
+    return; // Required parameter
+  }
+
+  /* clear out any previous value of szCommand */
+  memset(lpCommandSession->szCommand, 0, MAX_LINE_LENGTH + 1);
+
+  /* copy the chars from pszCommandString into szCommand, but only
+   * do MAX_LINE_LENGTH of them */
+  strncpy(lpCommandSession->szCommand,
+      pszCommandString, MAX_LINE_LENGTH);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
