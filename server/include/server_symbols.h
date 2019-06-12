@@ -50,6 +50,11 @@
   "Failed to allocate new instance of COMMANDSESSION.\n"
 #endif //FAILED_ALLOCATE_COMMAND_SESSION
 
+#ifndef ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION
+#define ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION \
+  "ERROR: Failed to establish new command invocation session.\n"
+#endif //ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION
+
 #ifndef ERROR_DIR_COULD_NOT_BE_LISTED
 #define ERROR_DIR_COULD_NOT_BE_LISTED \
   "509 Failed. Directory not found or is not a folder.\n"
