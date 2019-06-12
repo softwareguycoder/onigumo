@@ -153,6 +153,13 @@ BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// ReleaseCommandSession function
+
+void ReleaseCommandSession(void* pvCommandSession) {
+  // TODO: Add implementation code here
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // SetCommandSessionClient function
 
 void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
