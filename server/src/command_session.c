@@ -80,12 +80,12 @@ void SetCommandSessionCommand(LPCOMMANDSESSION lpCommandSession,
     return; // Required parameter
   }
 
+  /* clear out any previous value of szCommand */
+  memset(lpCommandSession->szCommand, 0, MAX_LINE_LENGTH + 1);
+
   if (IsNullOrWhiteSpace(pszCommandString)) {
     return; // Required parameter
   }
-
-  /* clear out any previous value of szCommand */
-  memset(lpCommandSession->szCommand, 0, MAX_LINE_LENGTH + 1);
 
   /* copy the chars from pszCommandString into szCommand, but only
    * do MAX_LINE_LENGTH of them */
