@@ -39,6 +39,33 @@ void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// DisplayEndedCommandSessionMessage function
+
+void DisplayEndedCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
+  if (!IsCommandSessionValid(lpCommandSession)) {
+    return;
+  }
+
+  if (!IsDiagnosticMode()) {
+    return;
+  }
+
+  char *pszCommandSessionID =
+      UUIDToString(GetCommandSessionID(lpCommandSession));
+  if (IsNullOrWhiteSpace(pszCommandSessionID)) {
+
+    FreeBuffer((void**) &pszCommandSessionID);   // just in case
+
+    return;
+  }
+
+  fprintf(stdout, ENDED_COMMAND_INVOCATION_SESSION_FORMAT,
+      pszCommandSessionID);
+
+  FreeBuffer((void**) &pszCommandSessionID);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // GenerateNewCommandSessionID function
 
 /**
