@@ -69,7 +69,6 @@ typedef struct _tagCOMMANDSESSION {
   int nMultilineDataLineCount;
 } COMMANDSESSION, *LPCOMMANDSESSION, **LPPCOMMANDSESSION;
 
-
 /**
  * @name CreateCommandSession
  * @brief Creates a new instance of COMMANDSESSION, initializes it, and then
@@ -82,6 +81,16 @@ typedef struct _tagCOMMANDSESSION {
  */
 void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
     LPCLIENTSTRUCT lpClient, const char *pszCommandString);
+
+/**
+ * @name SetCommandSessionClient
+ * @brief Sets the lpClient member of the COMMANDSESSION struct to the
+ * address that lpClient is initialized to.
+ * @param lpClient Address of an instance of CLIENTSTRUCT that refers to the
+ * client who sent the command.
+ */
+void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
+    LPCLIENTSTRUCT lpClient);
 
 /**
  * @name SetCommandSessionCommand

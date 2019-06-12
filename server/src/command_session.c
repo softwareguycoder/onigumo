@@ -59,6 +59,14 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
   (*lppCommandSession)->lpClient = lpClient;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// SetCommandSessionClient function
+
+void SetCommandSessionClient(LPCOMMANDSESSION lpCommandSession,
+    LPCLIENTSTRUCT lpClient) {
+  // TODO: Add code here
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // SetCommandSessionCommand function
 
