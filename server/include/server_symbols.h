@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef COMMAND_INVOCATION_SESSION_MULTILINE_END
+#define COMMAND_INVOCATION_SESSION_MULTILINE_END \
+  "S: Command invocation session '{%s}': Multiline data transmission completed.\n"
+#endif //COMMAND_INVOCATION_SESSION_MULTILINE_END
+
 #ifndef COMMAND_INVOCATION_SESSION_MULTILINE_START
 #define COMMAND_INVOCATION_SESSION_MULTILINE_START \
   "S: Command invocation session '{%s}': Starting multiline data transmission...\n"
