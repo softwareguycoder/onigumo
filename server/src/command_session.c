@@ -156,6 +156,15 @@ BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
 // ReleaseCommandSession function
 
 void ReleaseCommandSession(void* pvCommandSession) {
+  if (pvCommandSession == NULL) {
+    return; // Required parameter
+  }
+
+  LPCOMMANDSESSION lpCS = (LPCOMMANDSESSION)pvCommandSession;
+  if (lpCS == NULL) {
+    return;  // Required parameter
+  }
+
   // TODO: Add implementation code here
 }
 
