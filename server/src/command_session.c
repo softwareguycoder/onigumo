@@ -160,6 +160,13 @@ void CreateCommandSession(LPPCOMMANDSESSION lppCommandSession,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// EndCommandSession function
+
+void EndCommandSession(LPPCOMMANDSESSION lppCommandSession) {
+  // TODO: Add implementation code here
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // GetCommandSessionClient function
 
 LPCLIENTSTRUCT GetCommandSessionClient(LPCOMMANDSESSION lpCommandSession) {
