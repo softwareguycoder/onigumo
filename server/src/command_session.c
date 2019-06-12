@@ -253,4 +253,15 @@ void SetCommandSessionCommand(LPCOMMANDSESSION lpCommandSession,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// SetCommandSessionInvocationStatus function
+
+INVOCATIONSTATUS SetCommandSessionInvocationStatus(
+    LPCOMMANDSESSION lpCommandSession, INVOCATIONSTATUS status) {
+  INVOCATIONSTATUS previousStatus = INVOCATION_STATUS_UNKNOWN;
+
+  // TODO: Add implementation code here
+
+  return previousStatus;
+}
+///////////////////////////////////////////////////////////////////////////////
 
