@@ -166,6 +166,19 @@ void EndCommandSession(LPPCOMMANDSESSION lppCommandSession) {
   if (lppCommandSession == NULL) {
     return;   // Required parameter; nothing to do.
   }
+
+  if (*lppCommandSession == NULL) {
+    return;   // Required parameter; nothing to do.
+  }
+
+  INVOCATIONSTATUS status =
+      GetCommandSessionInvocationStatus(*lppCommandSession);
+  if (INVOCATION_STATUS_UNKNOWN == status) {
+    return; // Could not determine the current session status
+  }
+
+  ReleaseCommandSession((void*)(*lppCommandSession));
+  *lppCommandSession = NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -199,9 +212,11 @@ UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 
 INVOCATIONSTATUS GetCommandSessionInvocationStatus(
     LPCOMMANDSESSION lpCommandSession) {
-  // TODO: Add implementation code here
+  if (lpCommandSession == NULL){
+    return INVOCATION_STATUS_UNKNOWN; // Required parameter
+  }
 
-  return INVOCATION_STATUS_UNKNOWN;
+  return lpCommandSession->invocationStatus;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -286,6 +301,8 @@ void ReleaseCommandSession(void* pvCommandSession) {
   if (!IsUUIDValid(GetCommandSessionID(lpCS))) {
     return; // Must have valid command session ID at least
   }
+
+  SetCommandSessionInvocationStatus(lpCS, SESSIONCLOSED);
 
   DisplayEndingCommandSessionMessage(lpCS);
 
