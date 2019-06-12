@@ -9,6 +9,8 @@
 #define __CLIENT_STRUCT_H__
 
 #include "stdafx.h"
+
+#include "command_session.h"
 #include "server_symbols.h"
 
 /**
