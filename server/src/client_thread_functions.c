@@ -20,6 +20,7 @@
 #include "client_list_manager.h"
 #include "client_thread.h"
 #include "client_thread_functions.h"
+#include "command_session.h"
 #include "directory_lister.h"
 #include "server_functions.h"
 
