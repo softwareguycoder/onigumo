@@ -29,6 +29,14 @@ typedef struct _tagCLIENTSTRUCT {
 	char szIPAddress[IPADDRLEN];
 
 	/**
+	 * @name lpCommandSession
+	 * @brief Address of an instance of a COMMANDSESSION struct that is
+	 * tracking the progress of a server protocol command issued by this
+	 * client.
+	 */
+	LPCOMMANDSESSION lpCommandSession;
+
+	/**
 	 * @name nSocket
 	 * @brief Value of the socket file descriptor to use when communicating
 	 * with this client.

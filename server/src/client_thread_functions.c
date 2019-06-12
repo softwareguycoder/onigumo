@@ -912,7 +912,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
    * connected or some such. */
   if (!AreTooManyClientsConnected()) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-    OK_WELCOME);
+        OK_WELCOME);
 
     EndCommandSession(&lpSession);
 
@@ -928,6 +928,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
   lpSendingClient->bConnected = FALSE;
 
   EndCommandSession(&lpSession);
+
   /*
    * Make sure to end the client's session and remove the session from
    * the linked list.
