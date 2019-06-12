@@ -118,9 +118,16 @@ UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 // GetCommandSessionMultilineData function
 
 char*** GetCommandSessionMultilineData(LPCOMMANDSESSION lpCommandSession) {
-  // TODO: Add implementation code here
+  if (lpCommandSession == NULL) {
+    return NULL;
+  }
 
-  return NULL;
+  if (lpCommandSession->ppszMultilineReplyData == NULL
+      || GetCommandSessionMultilineDataLineCount(lpCommandSession) <= 0) {
+    return NULL;
+  }
+
+  return &(lpCommandSession->ppszMultilineReplyData);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
