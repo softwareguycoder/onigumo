@@ -161,10 +161,6 @@ void DisplayEndingCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
     return;
   }
 
-  if (!IsDiagnosticMode()) {
-    return;
-  }
-
   char *pszCommandSessionID =
       UUIDToString(GetCommandSessionID(lpCommandSession));
   if (IsNullOrWhiteSpace(pszCommandSessionID)) {
@@ -174,8 +170,13 @@ void DisplayEndingCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
     return;
   }
 
-  fprintf(stdout, ENDING_COMMAND_INVOCATION_SESSION_FORMAT,
-      pszCommandSessionID);
+  if (GetLogFileHandle() != stdout) {
+    LogDebug(ENDING_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
+  }
+  if (IsDiagnosticMode()) {
+    fprintf(stdout, ENDING_COMMAND_INVOCATION_SESSION_FORMAT,
+        pszCommandSessionID);
+  }
 
   FreeBuffer((void**) &pszCommandSessionID);
 }
@@ -188,10 +189,6 @@ void DisplayEndedCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
     return;
   }
 
-  if (!IsDiagnosticMode()) {
-    return;
-  }
-
   char *pszCommandSessionID =
       UUIDToString(GetCommandSessionID(lpCommandSession));
   if (IsNullOrWhiteSpace(pszCommandSessionID)) {
@@ -201,8 +198,13 @@ void DisplayEndedCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
     return;
   }
 
-  fprintf(stdout, ENDED_COMMAND_INVOCATION_SESSION_FORMAT,
-      pszCommandSessionID);
+  if (GetLogFileHandle() != stdout) {
+    LogDebug(ENDED_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
+  }
+  if (IsDiagnosticMode()) {
+    fprintf(stdout, ENDED_COMMAND_INVOCATION_SESSION_FORMAT,
+        pszCommandSessionID);
+  }
 
   FreeBuffer((void**) &pszCommandSessionID);
 }
