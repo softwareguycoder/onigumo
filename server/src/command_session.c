@@ -147,9 +147,11 @@ int GetCommandSessionMultilineDataLineCount(
 // IsCommandSessionEnded function
 
 BOOL IsCommandSessionEnded(LPCOMMANDSESSION lpCommandSession) {
-  // TODO: Add implementation code here
+  if (lpCommandSession == NULL) {
+    return FALSE;
+  }
 
-  return FALSE;
+  return lpCommandSession->invocationStatus == SESSIONCLOSED;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
