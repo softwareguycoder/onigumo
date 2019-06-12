@@ -9,6 +9,7 @@ typedef enum {
   WAITING, /* command engine waiting for new input from user/client */
   MULTILINE_START,   /* starting a multiline reply */
   MULITLINE_END,     /* ending a multiline reply */
+  INVOCATION_STATUS_UNKNOWN            /* catch-all */
 }  INVOCATIONSTATUS, *LPINVOCATIONSTATUS;
 
 #endif //__INVOCATION_STATUS_H__
