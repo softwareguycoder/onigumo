@@ -86,6 +86,19 @@ UUID* GetCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// GetCommandSessionMultilineDataLineCount function
+
+int GetCommandSessionMultilineDataLineCount(
+    LPCOMMANDSESSION lpCommandSession){
+  int nResult = INT_MIN;
+  if (lpCommandSession == NULL) {
+    return nResult;
+  }
+
+  return lpCommandSession->nMultilineDataLineCount;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // IsCommandSessionValid function
 
 BOOL IsCommandSessionValid(LPCOMMANDSESSION lpCommandSession) {
