@@ -138,7 +138,12 @@
     "C[%s:%d]: <disconnected>\n"
 #endif //CLIENT_DISCONNECTED
 
-#define CLIENT_ID_FORMAT        "C[%s:%d] Client ID is '{%s}'.\n"
+#define CLIENT_ID_FORMAT        "C[%s:%d]: Client ID is '{%s}'.\n"
+
+#ifndef BEGAN_COMMAND_INVOCATION_SESSION_FORMAT
+#define BEGAN_COMMAND_INVOCATION_SESSION_FORMAT \
+  "S: Began command invocation session '{%s}'.\n"
+#endif //BEGAN_COMMAND_INVOCATION_SESSION_FORMAT
 
 #ifndef CLIENT_IP_ADDR_UNK
 #define CLIENT_IP_ADDR_UNK		"server: Client IP address not known.\n"
