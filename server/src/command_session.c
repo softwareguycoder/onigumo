@@ -26,7 +26,7 @@ void DisplayCommandSessionInvocationStatus(
   switch (status) {
   case INVOCATION_STATUS_UNKNOWN:
     if (!IsDiagnosticMode()) {
-      LogDebug(COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN,
+      LogInfo(COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN,
           pszCommandSessionID);
       break;
     }
@@ -38,7 +38,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONCLOSED:
     if (GetLogFileHandle() != stdout) {
-      LogDebug(COMMAND_INVOCATION_SESSION_CLOSED,
+      LogInfo(COMMAND_INVOCATION_SESSION_CLOSED,
           pszCommandSessionID);
     }
     if (IsDiagnosticMode()) {
@@ -50,7 +50,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONOPENED:
     if (GetLogFileHandle() != stdout) {
-      LogDebug(COMMAND_INVOCATION_SESSION_OPENED,
+      LogInfo(COMMAND_INVOCATION_SESSION_OPENED,
           pszCommandSessionID);
     }
     if (IsDiagnosticMode()) {
@@ -62,7 +62,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONERROR:
     if (GetLogFileHandle() != stdout) {
-      LogDebug(COMMAND_INVOCATION_SESSION_ERROR,
+      LogInfo(COMMAND_INVOCATION_SESSION_ERROR,
           pszCommandSessionID);
     }
     if (IsDiagnosticMode()) {
@@ -74,7 +74,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONWARNING:
     if (GetLogFileHandle() != stdout) {
-      LogDebug(COMMAND_INVOCATION_SESSION_WARNING,
+      LogInfo(COMMAND_INVOCATION_SESSION_WARNING,
           pszCommandSessionID);
     }
     if (IsDiagnosticMode()) {
@@ -86,7 +86,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSIONWAITING:
     if (GetLogFileHandle() != stdout) {
-      LogDebug(COMMAND_INVOCATION_SESSION_WAITING,
+      LogInfo(COMMAND_INVOCATION_SESSION_WAITING,
           pszCommandSessionID);
     }
     if (IsDiagnosticMode()) {
@@ -98,7 +98,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSION_MULTILINE_START:
     if (GetLogFileHandle() != stdout) {
-      LogDebug(COMMAND_INVOCATION_SESSION_MULTILINE_START,
+      LogInfo(COMMAND_INVOCATION_SESSION_MULTILINE_START,
           pszCommandSessionID);
     }
     if (IsDiagnosticMode()) {
@@ -110,7 +110,7 @@ void DisplayCommandSessionInvocationStatus(
 
   case SESSION_MULITLINE_END:
     if (GetLogFileHandle() != stdout) {
-      LogDebug(COMMAND_INVOCATION_SESSION_MULTILINE_END,
+      LogInfo(COMMAND_INVOCATION_SESSION_MULTILINE_END,
           pszCommandSessionID);
     }
     if (IsDiagnosticMode()) {
@@ -143,7 +143,7 @@ void DisplayInvokedCommandSessionID(LPCOMMANDSESSION lpCommandSession) {
   }
 
   if (GetLogFileHandle() != stdout) {
-    LogDebug(BEGAN_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
+    LogInfo(BEGAN_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
   }
   if (IsDiagnosticMode()) {
     fprintf(stdout, BEGAN_COMMAND_INVOCATION_SESSION_FORMAT,
@@ -171,7 +171,7 @@ void DisplayEndingCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
   }
 
   if (GetLogFileHandle() != stdout) {
-    LogDebug(ENDING_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
+    LogInfo(ENDING_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
   }
   if (IsDiagnosticMode()) {
     fprintf(stdout, ENDING_COMMAND_INVOCATION_SESSION_FORMAT,
@@ -199,7 +199,7 @@ void DisplayEndedCommandSessionMessage(LPCOMMANDSESSION lpCommandSession) {
   }
 
   if (GetLogFileHandle() != stdout) {
-    LogDebug(ENDED_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
+    LogInfo(ENDED_COMMAND_INVOCATION_SESSION_FORMAT, pszCommandSessionID);
   }
   if (IsDiagnosticMode()) {
     fprintf(stdout, ENDED_COMMAND_INVOCATION_SESSION_FORMAT,
