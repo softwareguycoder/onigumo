@@ -94,6 +94,18 @@ LPCLIENTSTRUCT CreateClientStruct(int nClientSocket,
 void FreeClient(void* pClientStruct);
 
 /**
+ * @name GetCommandSession
+ * @brief Gets the address of the COMMANDSESSION instance that this client
+ * is tracking for the currently-issued protocol command.  Can be NULL, which
+ * means that the server is not curently processing a command sent by the
+ * server at this time.
+ * @param lpClientStruct Address of a CLIENTSTRUCT instance from whose member
+ * to obtain the value sought.
+ * @return NULL or the address of the COMMANDSTRUCT instance.
+ */
+LPCOMMANDSESSION GetCommandSession(LPCLIENTSTRUCT lpClientStruct);
+
+/**
  * @brief Determines whether the client referenced is in the connnected state.
  * @remarks Connected state is defined as (a) being connected over TCP and
  * (b) having successfully issued the HELO protocol command.
