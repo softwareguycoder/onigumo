@@ -92,4 +92,14 @@ void FreeClient(void* pClientStruct);
  */
 BOOL IsClientConnected(void* pvClientStruct);
 
+/**
+ * @name IsClientStructValid
+ * @brief Validates the CLIENTSTRUCT instance passed to it.
+ * @param lpClientStruct Address of an instance of CLIENTSTRUCT whose
+ * members' data needs to be validated.
+ * @return TRUE if the CLIENTSTRUCT instance referred to by lpClientStruct
+ * contains valid information in its members.
+ */
+BOOL IsClientStructValid(LPCLIENTSTRUCT lpClientStruct);
+
 #endif /* __CLIENT_STRUCT_H__ */
