@@ -549,6 +549,8 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
   if (IsNullOrWhiteSpace(pszBuffer)) {
     // Buffer containing the command we are handling is blank.
     // Nothing to do.
+    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+        ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
     return FALSE;
   }
 
@@ -827,12 +829,14 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   JoinAllShellCodeBytes(lpSendingClient,
       &pszEncodedShellCode, &nTotalEncodedShellCodeBytes);
   if (nTotalEncodedShellCodeBytes <= 0) {
+    ClearClientShellCodeLines(lpSendingClient);
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
   if (IsNullOrWhiteSpace(pszEncodedShellCode)) {
+    ClearClientShellCodeLines(lpSendingClient);
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
@@ -840,6 +844,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
 
   int nDecodedBytes = GetBase64DecodedDataSize(pszEncodedShellCode);
   if (nDecodedBytes <= 0) {
+    ClearClientShellCodeLines(lpSendingClient);
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
@@ -848,7 +853,13 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   unsigned char szDecodedBytes[nDecodedBytes];
   memset(szDecodedBytes, 0, nDecodedBytes);
 
-  Base64Decode(pszEncodedShellCode, szDecodedBytes, nDecodedBytes);
+  if (!Base64Decode(pszEncodedShellCode, szDecodedBytes, nDecodedBytes)) {
+    memset(szDecodedBytes, 0, nDecodedBytes); // to prevent malware execution
+    ClearClientShellCodeLines(lpSendingClient);
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_DECODE_SHELLCODE);
+    return;
+  }
 
   void *pShellCodeBytes = NULL;
 
@@ -858,6 +869,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
       ExecShellCode2Async(szDecodedBytes, nDecodedBytes, nShellCodeArgument,
           &pShellCodeBytes);
   if (INVALID_HANDLE_VALUE == hShellCodeThread) {
+    ClearClientShellCodeLines(lpSendingClient);
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;

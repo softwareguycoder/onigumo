@@ -5,56 +5,6 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
-#ifndef COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN
-#define COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN \
-  "S: Command invocation session '{%s}': Unknown status.\n"
-#endif //COMMAND_INVOCATION_SESSION_STATUS_UNKNOWN
-
-#ifndef COMMAND_INVOCATION_SESSION_MULTILINE_END
-#define COMMAND_INVOCATION_SESSION_MULTILINE_END \
-  "S: Command invocation session '{%s}': Multiline data transmission completed.\n"
-#endif //COMMAND_INVOCATION_SESSION_MULTILINE_END
-
-#ifndef COMMAND_INVOCATION_SESSION_MULTILINE_START
-#define COMMAND_INVOCATION_SESSION_MULTILINE_START \
-  "S: Command invocation session '{%s}': Starting multiline data transmission...\n"
-#endif //COMMAND_INVOCATION_SESSION_MULTILINE_START
-
-#ifndef COMMAND_INVOCATION_SESSION_WAITING
-#define COMMAND_INVOCATION_SESSION_WAITING \
-  "S: Command invocation session '{%s}': Waiting for further input.\n"
-#endif //"S: Command invocation session '{%s}': Waiting for further input.\n"
-
-#ifndef COMMAND_INVOCATION_SESSION_WARNING
-#define COMMAND_INVOCATION_SESSION_WARNING \
-  "S: Command invocation session '{%s}': Warning issued.\n"
-#endif //COMMAND_INVOCATION_SESSION_WARNING
-
-#ifndef COMMAND_INVOCATION_SESSION_ERROR
-#define COMMAND_INVOCATION_SESSION_ERROR \
-  "S: Command invocation session '{%s}': Error.\n"
-#endif //COMMAND_INVOCATION_SESSION_ERROR
-
-#ifndef COMMAND_INVOCATION_SESSION_OPENED
-#define COMMAND_INVOCATION_SESSION_OPENED \
-  "S: Command invocation session '{%s}': Opened.\n"
-#endif //COMMAND_INVOCATION_SESSION_OPENED
-
-#ifndef COMMAND_INVOCATION_SESSION_CLOSED
-#define COMMAND_INVOCATION_SESSION_CLOSED \
-  "S: Command invocation session '{%s}': Closed.\n"
-#endif //COMMAND_INVOCATION_SESSION_CLOSED
-
-#ifndef FAILED_ALLOCATE_COMMAND_SESSION
-#define FAILED_ALLOCATE_COMMAND_SESSION \
-  "Failed to allocate new instance of COMMANDSESSION.\n"
-#endif //FAILED_ALLOCATE_COMMAND_SESSION
-
-#ifndef ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION
-#define ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION \
-  "ERROR: Failed to establish new command invocation session.\n"
-#endif //ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION
-
 #ifndef ERROR_DIR_COULD_NOT_BE_LISTED
 #define ERROR_DIR_COULD_NOT_BE_LISTED \
   "509 Failed. Directory not found or is not a folder.\n"
@@ -306,8 +256,15 @@
 
 #ifndef ERROR_FAILED_TO_PARSE_STRING
 #define ERROR_FAILED_TO_PARSE_STRING \
-    "401 Failed.  Cannot parse input as string argument.\n"
+    "402 Failed.  Cannot parse input as string argument.\n"
 #endif //ERROR_FAILED_TO_PARSE_STRING
+
+#ifndef ERROR_FAILED_TO_DECODE_SHELLCODE
+#define ERROR_FAILED_TO_DECODE_SHELLCODE \
+  "403 Failed.  Data sent with CODE command was not of a " \
+  "recognizable format.\n"
+#endif //ERROR_FAILED_TO_DECODE_SHELLCODE
+
 
 #ifndef ERROR_TOO_MANY_CLIENTS
 #define ERROR_TOO_MANY_CLIENTS \

@@ -31,9 +31,6 @@ BOOL IsLineLengthLimitExceeded(LPCLIENTSTRUCT lpSendingClient,
    * restricted to 255 characters in length or less (including the
    * terminating <LF> character but excluding the null-terminator. */
   if (strlen(pszData) >= MAX_LINE_LENGTH + 1) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient,
-            ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED);
     return TRUE;
   }
 
@@ -76,7 +73,21 @@ void *ClientThread(void* pData) {
     if ((nBytesReceived = ReceiveFromClient(lpSendingClient, &pszData))
         > 0) {
 
+      /* If the client transmitted whitespace, reject it and
+       * tell the client that it's wrong. We're not a SMTP server (
+       * where blank lines might be acceptable, i.e., when the server is
+       * receiving the text of an e-mail message. */
+      if (IsNullOrWhiteSpace(pszData)) {
+        lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+                ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
+        FreeBuffer((void**) &pszData);
+        continue;
+      }
+
       if (IsLineLengthLimitExceeded(lpSendingClient, pszData)) {
+        lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+            ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED);
+        FreeBuffer((void**) &pszData);
         continue;
       }
 
@@ -84,8 +95,12 @@ void *ClientThread(void* pData) {
        * next loop. We know if this is a protocol command rather than a
        * chat message because the HandleProtocolCommand returns a value
        * of TRUE in this case. */
-      if (HandleProtocolCommand(lpSendingClient, pszData))
+      if (HandleProtocolCommand(lpSendingClient, pszData)) {
+        FreeBuffer((void**) &pszData);
         continue;
+      }
+
+      // TODO: Add any processing of freeform data here
 
       /* Free the received data so it does not leak memory */
       FreeBuffer((void**) &pszData);
