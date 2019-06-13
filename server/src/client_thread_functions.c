@@ -152,6 +152,18 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
     return 0L;
   }
 
+  /* We exepct that the ASCII string representation of a postive,
+   * 32-bit integer is what is present in ppszStrings[1].  If this
+   * is not the case, then give up.
+   */
+  if (!IsNumbersOnly(ppszStrings[1])) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
+
+    FreeStringArray(&ppszStrings, nStringCount);
+    return 0L;
+  }
+
   /* We expect ppszStrings[1] to hold the ASCII representation of a
    * positive, 32-bit integer. Convert it to a long, just in case
    * the string is a really big number */
@@ -593,7 +605,14 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     // Buffer containing the command we are handling is blank.
     // Nothing to do.
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-        ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
+    ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
+    return FALSE;
+  }
+
+  if (!lpSendingClient->bReceivingMultilineData
+      && !IsProtocolCommand(pszBuffer)) {
+    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+    ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
     return FALSE;
   }
 
@@ -674,11 +693,6 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     ProcessInfoCommand(lpSendingClient);
 
     return TRUE;
-  }
-
-  if (!lpSendingClient->bReceivingMultilineData) {
-    lpSendingClient->nBytesSent =
-        ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
   }
 
   return FALSE;
@@ -798,8 +812,6 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
   long lShellcodeBytes = GetCommandIntegerArgument(lpSendingClient,
       pszBuffer);
   if (lShellcodeBytes == 0L) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
     return;
   }
 
@@ -858,8 +870,6 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   int nShellCodeArgument =
       (int) GetCommandIntegerArgument(lpSendingClient, pszBuffer);
   if (nShellCodeArgument == 0) {  // no PID has the value zero
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
     return;
   }
 
@@ -874,7 +884,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   if (nTotalEncodedShellCodeBytes <= 0) {
     ClearClientShellCodeLines(lpSendingClient);
     lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+        ReplyToClient(lpSendingClient, ERROR_NO_SHELLCODE_TO_RUN);
     return;
   }
 
