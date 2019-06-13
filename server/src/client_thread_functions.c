@@ -20,8 +20,8 @@
 #include "client_list_manager.h"
 #include "client_thread.h"
 #include "client_thread_functions.h"
-#include "command_session.h"
 #include "directory_lister.h"
+#include "invocation_status.h"
 #include "server_functions.h"
 
 #include "shell_code_info.h"
@@ -240,8 +240,17 @@ void GetCommandStringArgument(LPCLIENTSTRUCT lpSendingClient,
 ///////////////////////////////////////////////////////////////////////////////
 // IsMultilineResponseTerminator function
 
-BOOL IsMultilineResponseTerminator(void* pvUserState /* not used */,
+BOOL IsMultilineResponseTerminator(void* pvUserState,
     const char* pszMessage) {
+  if (pvUserState == NULL) {
+    return FALSE;
+  }
+
+  LPCLIENTSTRUCT lpCS = (LPCLIENTSTRUCT) pvUserState;
+  if (lpCS == NULL) {
+    return FALSE;
+  }
+
   if (IsNullOrWhiteSpace(pszMessage)) {
     return FALSE;
   }
@@ -561,7 +570,9 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
   /* per protocol, client says bye bye server by sending the QUIT
    * command */
   if (Equals(pszBuffer, PROTOCOL_QUIT_COMMAND)) {
-    return EndClientSession(lpSendingClient);
+    BOOL bResult = EndClientSession(lpSendingClient);
+
+    return bResult;
   }
 
   /* Check whether the sending client is in the connected state.
@@ -572,6 +583,7 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
   if (lpSendingClient->bConnected == FALSE) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_MUST_SAY_HELLO_FIRST);
+
     return TRUE; /* command or thing handled by telling client they
      need to say HELO first */
   }
@@ -617,6 +629,11 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
     ProcessInfoCommand(lpSendingClient);
 
     return TRUE;
+  }
+
+  if (!lpSendingClient->bReceivingMultilineData) {
+    lpSendingClient->nBytesSent =
+        ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
   }
 
   return FALSE;
@@ -678,7 +695,7 @@ void LogClientID(LPCLIENTSTRUCT lpCS) {
   if (IsNullOrWhiteSpace(pszClientID)) {
     fprintf(stderr, "Client ID has not been initialized.\n");
 
-    FreeBuffer((void**)&pszClientID);
+    FreeBuffer((void**) &pszClientID);
 
     CleanupServer(ERROR);
   }
@@ -686,7 +703,7 @@ void LogClientID(LPCLIENTSTRUCT lpCS) {
   if (IsNullOrWhiteSpace(lpCS->szIPAddress)) {
     fprintf(stderr, "Client IP address is not intialized.\n");
 
-    FreeBuffer((void**)&pszClientID);
+    FreeBuffer((void**) &pszClientID);
 
     CleanupServer(ERROR);
   }
@@ -694,7 +711,7 @@ void LogClientID(LPCLIENTSTRUCT lpCS) {
   if (!IsSocketValid(lpCS->nSocket)) {
     fprintf(stderr, "Client socket file descriptor is not valid.\n");
 
-    FreeBuffer((void**)&pszClientID);
+    FreeBuffer((void**) &pszClientID);
 
     CleanupServer(ERROR);
   }
@@ -706,7 +723,7 @@ void LogClientID(LPCLIENTSTRUCT lpCS) {
     CLIENT_ID_FORMAT, lpCS->szIPAddress, lpCS->nSocket, pszClientID);
   }
 
-  FreeBuffer((void**)&pszClientID);
+  FreeBuffer((void**) &pszClientID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -735,9 +752,16 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
    */
   long lShellcodeBytes = GetCommandIntegerArgument(lpSendingClient,
       pszBuffer);
+  if (lShellcodeBytes == 0L) {
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
+    return;
+  }
 
   lpSendingClient->nBytesSent +=
       ReplyToClient(lpSendingClient, OK_SEND_SHELLCODE);
+
+  lpSendingClient->bReceivingMultilineData = TRUE;
 
   /* Receive multiline data from the client.  Stop receiving when
    * data is a period followed by a LF. */
@@ -746,6 +770,8 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
       ReceiveFromClient,
       GatherShellCodeLine,
       IsMultilineResponseTerminator);
+
+  lpSendingClient->bReceivingMultilineData = FALSE;
 
   VerifyShellcodeBytesReceived(lpSendingClient,
       lShellcodeBytes);
@@ -776,6 +802,20 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return; // Required parameter
+  }
+
+  /* Get the argument passed to the EXEC command. This argument
+   * will be passed to the shellcode. The GetCommandLineIntegerArgument
+   * generically returns a long (since it wants to use as much space in
+   * memory to represent a nice range of values) but we will cast its
+   * return value to an int since that is what shellcode typically reserves
+   * room for in memory. */
+  int nShellCodeArgument =
+      (int) GetCommandIntegerArgument(lpSendingClient, pszBuffer);
+  if (nShellCodeArgument == 0) {  // no PID has the value zero
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
+    return;
   }
 
   int nTotalEncodedShellCodeBytes = 0;
@@ -811,15 +851,6 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   Base64Decode(pszEncodedShellCode, szDecodedBytes, nDecodedBytes);
 
   void *pShellCodeBytes = NULL;
-
-  /* Get the argument passed to the EXEC command. This argument
-   * will be passed to the shellcode. The GetCommandLineIntegerArgument
-   * generically returns a long (since it wants to use as much space in
-   * memory to represent a nice range of values) but we will cast its
-   * return value to an int since that is what shellcode typically reserves
-   * room for in memory. */
-  int nShellCodeArgument =
-      (int) GetCommandIntegerArgument(lpSendingClient, pszBuffer);
 
   LPSHELLCODEUSERSTATE lpUserState = NULL;
 
@@ -896,14 +927,6 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
-  LPCOMMANDSESSION lpSession =
-      BeginCommandSession(PROTOCOL_HELO_COMMAND);
-  if (lpSession == NULL) {
-    fprintf(stderr, ERROR_FAILED_BEGIN_NEW_COMMAND_SESSION);
-    CleanupServer(EXIT_FAILURE);
-    return;
-  }
-
   /* mark the current client as connected */
   lpSendingClient->bConnected = TRUE;
 
@@ -912,9 +935,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
    * connected or some such. */
   if (!AreTooManyClientsConnected()) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-        OK_WELCOME);
-
-    EndCommandSession(&lpSession);
+    OK_WELCOME);
 
     return;
   }
@@ -926,8 +947,6 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
    * flag.
    */
   lpSendingClient->bConnected = FALSE;
-
-  EndCommandSession(&lpSession);
 
   /*
    * Make sure to end the client's session and remove the session from

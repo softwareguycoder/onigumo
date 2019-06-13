@@ -10,67 +10,61 @@
 
 #include "stdafx.h"
 
-#include "command_session.h"
 #include "server_symbols.h"
 
 /**
  * @brief Structure that contains information about connected clients.
  */
 typedef struct _tagCLIENTSTRUCT {
-	/**
-	 * @name clientID
-	 * @brief Holds a UUID value that uniquely identifies this client.
-	 */
-    UUID clientID;
+  /**
+   * @name clientID
+   * @brief Holds a UUID value that uniquely identifies this client.
+   */
+  UUID clientID;
 
-    /**
-     * @name szIPAddress
-     * @brief Buffer to hold a string that identifies which IP address the
-     * client is coming from.
-     */
-	char szIPAddress[IPADDRLEN];
+  /**
+   * @name szIPAddress
+   * @brief Buffer to hold a string that identifies which IP address the
+   * client is coming from.
+   */
+  char szIPAddress[IPADDRLEN];
 
-	/**
-	 * @name lpCommandSession
-	 * @brief Address of an instance of a COMMANDSESSION struct that is
-	 * tracking the progress of a server protocol command issued by this
-	 * client.
-	 */
-	LPCOMMANDSESSION lpCommandSession;
+  /**
+   * @name nSocket
+   * @brief Value of the socket file descriptor to use when communicating
+   * with this client.
+   */
+  int nSocket;
 
-	/**
-	 * @name nSocket
-	 * @brief Value of the socket file descriptor to use when communicating
-	 * with this client.
-	 */
-	int nSocket;
+  /**
+   * @name hClientThread
+   * @brief HTHREAD handle to the thread over which communications with
+   * this client take place.
+   */
+  HTHREAD hClientThread; /* handle to the thread this client is chatting on */
 
-	/**
-	 * @name hClientThread
-	 * @brief HTHREAD handle to the thread over which communications with
-	 * this client take place.
-	 */
-	HTHREAD hClientThread; /* handle to the thread this client is chatting on */
+  /**
+   * @name nBytesReceived
+   * @brief Set this member to the total number of bytes received from the
+   * client.
+   */
+  long long nBytesReceived;
 
-	/**
-	 * @name nBytesReceived
-	 * @brief Set this member to the total number of bytes received from the
-	 * client.
-	 */
-	long long nBytesReceived;
+  /**
+   * @name nBytesSent
+   * @brief Set this member to the total number of bytes sent to the client.
+   */
+  long long nBytesSent;
 
-	/**
-	 * @name nBytesSent
-	 * @brief Set this member to the total number of bytes sent to the client.
-	 */
-	long long nBytesSent;
+  /**
+   * @name bConnected
+   * @brief Flag that indicates whether this client is in the connected
+   * state.
+   */
+  BOOL bConnected;
 
-	/**
-	 * @name bConnected
-	 * @brief Flag that indicates whether this client is in the connected
-	 * state.
-	 */
-	BOOL bConnected;
+  BOOL bReceivingMultilineData;
+
 } CLIENTSTRUCT, *LPCLIENTSTRUCT;
 
 /**
@@ -85,7 +79,7 @@ typedef struct _tagCLIENTSTRUCT {
  * chat messages.
  */
 LPCLIENTSTRUCT CreateClientStruct(int nClientSocket,
-		const char* pszClientIPAddress);
+    const char* pszClientIPAddress);
 
 /**
  * @brief Releases the memory allocated for a client structure pointer back
@@ -94,18 +88,6 @@ LPCLIENTSTRUCT CreateClientStruct(int nClientSocket,
  * be freed.
  */
 void FreeClient(void* pClientStruct);
-
-/**
- * @name GetCommandSession
- * @brief Gets the address of the COMMANDSESSION instance that this client
- * is tracking for the currently-issued protocol command.  Can be NULL, which
- * means that the server is not curently processing a command sent by the
- * server at this time.
- * @param lpClientStruct Address of a CLIENTSTRUCT instance from whose member
- * to obtain the value sought.
- * @return NULL or the address of the COMMANDSTRUCT instance.
- */
-LPCOMMANDSESSION GetCommandSession(LPCLIENTSTRUCT lpClientStruct);
 
 /**
  * @brief Determines whether the client referenced is in the connnected state.
@@ -123,18 +105,5 @@ BOOL IsClientConnected(void* pvClientStruct);
  * contains valid information in its members.
  */
 BOOL IsClientStructValid(void* pvClientStruct);
-
-/**
- * @name SetCommandSession
- * @brief Sets the address of the COMMANDSESSION instance that is being used
- * by the server to track the progress of its own handling of the protocol
- * command that has just been issued by this client.
- * @param lpClientStruct Address of the CLIENTSTRUCT instance whose member
- * should be set to the value provided.
- * @param lpCommandSession Address of the COMMANDSTRUCT instance to assign
- * to the lpCommandSession member of CLIENTSTRUCT.
- */
-void SetCommandSession(LPCLIENTSTRUCT lpClientStruct,
-    LPCOMMANDSESSION lpCommandSession);
 
 #endif /* __CLIENT_STRUCT_H__ */

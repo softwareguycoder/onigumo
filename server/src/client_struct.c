@@ -59,6 +59,8 @@ LPCLIENTSTRUCT CreateClientStruct(int nClientSocket,
    * being sent other chatters' messages. */
   lpClientStruct->bConnected = FALSE;
 
+  lpClientStruct->bReceivingMultilineData = FALSE;
+
   /* Write the client ID out to the console and log */
   LogClientID(lpClientStruct);
 
@@ -77,16 +79,6 @@ void FreeClient(void* pvClientStruct) {
   }
 
   free(pvClientStruct);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// GetCommmandSession function
-
-LPCOMMANDSESSION GetCommandSession(LPCLIENTSTRUCT lpClientStruct) {
-  if (lpClientStruct == NULL) {
-    return NULL;  // Required parameter
-  }
-  return lpClientStruct->lpCommandSession;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,19 +137,8 @@ BOOL IsClientStructValid(void* pvClientStruct) {
 
   if (!IsHostnameValid(lpCS->szIPAddress)) {
     return FALSE; // szIPAddress member initialized, but not set to a valid
-                    // Internet or local network host name or IP address
+                  // Internet or local network host name or IP address
   }
 
   return TRUE;  // CLIENTSTRUCT instance passed is valid
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// SetCommandSession function
-
-void SetCommandSession(LPCLIENTSTRUCT lpClientStruct,
-    LPCOMMANDSESSION lpCommandSession) {
-  if (lpClientStruct == NULL) {
-    return;  // Required parameter
-  }
-  lpClientStruct->lpCommandSession = lpCommandSession;
 }

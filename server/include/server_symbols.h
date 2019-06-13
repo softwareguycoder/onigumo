@@ -60,6 +60,9 @@
   "509 Failed. Directory not found or is not a folder.\n"
 #endif //ERROR_DIR_COULD_NOT_BE_LISTED
 
+#define ERROR_COMMAND_OR_DATA_UNRECOGNIZED \
+  "510 Failed. Command and/or data unrecognized.\n"
+
 #ifndef ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED
 #define ERROR_FORMAT_SHELLCODE_SYSCALL_EXECUTION_FAILED \
   "407 Failed. Shellcode syscall executed.  Return value: %d, errno: %d.\n"
