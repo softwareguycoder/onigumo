@@ -238,6 +238,14 @@ void GetCommandStringArgument(LPCLIENTSTRUCT lpSendingClient,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// IsProtocolCommand function
+
+BOOL IsProtocolCommand(const char* pszBuffer) {
+  // TODO: Add implementation code here
+  return FALSE;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // IsMultilineResponseTerminator function
 
 BOOL IsMultilineResponseTerminator(void* pvUserState,
