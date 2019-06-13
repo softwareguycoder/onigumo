@@ -241,7 +241,42 @@ void GetCommandStringArgument(LPCLIENTSTRUCT lpSendingClient,
 // IsProtocolCommand function
 
 BOOL IsProtocolCommand(const char* pszBuffer) {
-  // TODO: Add implementation code here
+  if (IsNullOrWhiteSpace(pszBuffer)) {
+    return FALSE;
+  }
+
+  if (Equals(pszBuffer, PROTOCOL_HELO_COMMAND)) {
+    return TRUE;
+  }
+
+  if (Equals(pszBuffer, PROTOCOL_QUIT_COMMAND)) {
+    return TRUE;
+  }
+
+  if (Equals(pszBuffer, PROTOCOL_LIST_COMMAND)) {
+    return TRUE;
+  }
+
+  if (StartsWith(pszBuffer, PROTOCOL_CODE_COMMAND)) {
+    return TRUE;
+  }
+
+  if (StartsWith(pszBuffer, PROTOCOL_EXEC_COMMAND)) {
+    return TRUE;
+  }
+
+  if (StartsWith(pszBuffer, PROTOCOL_LDIR_COMMAND)) {
+    return TRUE;
+  }
+
+  if (Equals(pszBuffer, PROTOCOL_PURG_COMMAND)) {
+    return TRUE;
+  }
+
+  if (Equals(pszBuffer, PROTOCOL_INFO_COMMAND)) {
+    return TRUE;
+  }
+
   return FALSE;
 }
 
