@@ -7,7 +7,7 @@
 
 #ifndef ERROR_NO_SHELLCODE_TO_RUN
 #define ERROR_NO_SHELLCODE_TO_RUN \
-  "513 Failed.  Send me some shellcode first before calling EXEC.\n"
+  "512 Failed.  Send me some shellcode first before calling EXEC.\n"
 #endif //ERROR_NO_SHELLCODE_TO_RUN
 
 #ifndef ERROR_DIR_COULD_NOT_BE_LISTED
