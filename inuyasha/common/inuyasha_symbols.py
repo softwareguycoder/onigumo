@@ -168,10 +168,10 @@ TEMP_ASM_FILENAME = '~/tmp/asmcode/asmcode.asm'
 
 SERVER_DATA_FORMAT = \
     "S: {} ({} B received)"
-SERVER_ADDRESS_PROMPT_FORMAT = \
-    "> Server address [{}]: > "
-SERVER_PORT_PROMPT_FORMAT = \
-    "> Server port [{}]: > "
+SERVER_ADDRESS_PROMPT = \
+    "Server address"
+SERVER_PORT_PROMPT= \
+    "Server port"
 SHELLCODE_EXECUTION_SUCCEEDED = \
     ">>> SUCCESS: The execution of the shellcode succeeded!"
 SHELLCODE_EXECUTION_RESPONSE_ERROR_STATUS = '4'    

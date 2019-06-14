@@ -6,8 +6,7 @@ from common.inuyasha_symbols import EXIT_FAILURE, \
     EXIT_SUCCESS, CHOICE_GET_CPU_INFO, CHOICE_LIST_DIR, CHOICE_KILL_PROC, \
     CHOICE_EXIT, INVALID_CHOICE_VALUE, ERROR_INVALID_MAIN_MENU_CHOICE
 from menus.main_menu import MainMenu
-from console.console_class import Console
-from common.gui_utilities import Banner, ThankYouMessagePrinter, Footer
+from common.exit_handler import ExitHandler
 
 
 class InuyashaApp(object):
@@ -22,19 +21,8 @@ class InuyashaApp(object):
                 print(ERROR_FAILED_CONNECT_TO_SERVER)
                 self.ExitInstance(EXIT_FAILURE, self.__session)
         except KeyboardInterrupt:
-            self.ExitInstance(EXIT_FAILURE, None)
+            ExitHandler.ExitApp(EXIT_FAILURE, None)
         pass
- 
-    def ExitInstance(self, nExitCode, sessionObject):
-        if sessionObject is not None:
-            sessionObject.End(nExitCode)
-            return
-        
-        Console.Clear()
-        Banner.Print()
-        ThankYouMessagePrinter.Print()
-        Footer.Print()
-        exit(nExitCode)
    
     def PickMainMenuChoice(self):
         nChoice = INVALID_CHOICE_VALUE

@@ -1,7 +1,8 @@
 from sockets.socket_wrapper import SocketWrapper
 from console.console_class import Console
 from common.gui_utilities import Banner, WelcomePrinter, Footer, \
-    WaitForEnterToContinue, ThankYouMessagePrinter, PressEnterToReturnToMainMenu
+    WaitForEnterToContinue, ThankYouMessagePrinter, PressEnterToReturnToMainMenu,\
+    BlankLinePrinter
 from factories.machine_info_factory import MachineInfoFactory
 from common.inuyasha_symbols import ERROR_FAILED_CONNECT_TO_SERVER_FORMAT, \
     EXIT_FAILURE, PROTOCOL_HELO_COMMAND, ERROR_FAILED_ESTABLISH_SESSION, \
@@ -75,6 +76,9 @@ class Session(object):
             exit(EXIT_FAILURE)
         if not self.__connected:
             print(ERROR_FAILED_CONNECT_TO_SERVER)
+            BlankLinePrinter.Print()
+            ThankYouMessagePrinter.Print()
+            Footer.Print()
             exit(EXIT_FAILURE)
 
         self.GetSocket().Send(PROTOCOL_QUIT_COMMAND)
