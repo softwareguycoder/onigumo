@@ -14,6 +14,14 @@
 #define SERVER_SOCKET_REQUIRED          "You should have passed the server " \
                                         "socket file descriptor to the MAT.\n"
 
+/**
+ * @name g_bShouldTerminateMasterThread
+ * @brief Value indicating whether the MAT should terminate its receive loop.
+ * @remarks Set by the TerminateMasterThread function when the thread is
+ * singalled to die by the main thread.
+ */
+extern BOOL g_bShouldTerminateMasterThread;
+
 void AddNewlyConnectedClientToList(LPCLIENTSTRUCT lpCS);
 
 void CleanupMasterAcceptorThread();
@@ -23,6 +31,8 @@ int GetServerSocketFileDescriptor(void* pThreadData);
 BOOL IsClientCountZero();
 
 void MakeServerEndpointReusable(int nServerSocket);
+
+BOOL ShouldTerminateMasterThread();
 
 void TerminateMasterThread(int signum);
 
