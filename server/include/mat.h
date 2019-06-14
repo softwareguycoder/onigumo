@@ -7,8 +7,6 @@
 #ifndef __MAT_H__
 #define __MAT_H__
 
-extern BOOL g_bShouldTerminateMasterThread;
-
 /* This is the 'big daddy' thread that accepts all new client connections
  * and then passes each client connection off to its own little 'sub-thread' */
 void* MasterAcceptorThread(void* pThreadData);
