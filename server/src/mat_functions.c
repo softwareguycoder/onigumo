@@ -267,7 +267,6 @@ LPCLIENTSTRUCT WaitForNewClientConnection(int nServerSocket) {
 
   if (!IsSocketValid(nServerSocket)) {
     fprintf(stderr, INVALID_SERVER_SOCKET_HANDLE);
-
     CleanupServer(ERROR);
   }
 
@@ -275,19 +274,8 @@ LPCLIENTSTRUCT WaitForNewClientConnection(int nServerSocket) {
 
   // Wait for a new client to connect
   int nClientSocket = AcceptSocket(nServerSocket, &clientAddress);
-
   if (!IsSocketValid(nClientSocket)) {
-    if (EBADF != errno) {
-      //fprintf(stdout, "errno = %d\n", errno);
-
-      //fprintf(stderr, INVALID_CLIENT_SOCKET_HANDLE);
-
-      return NULL;
-    } else {
-      // Getting EBADF from doing an accept() on the server's socket
-      // means it's time to quit
-      return NULL;
-    }
+    return NULL;
   }
 
   char* pszClientIPAddress = inet_ntoa(clientAddress.sin_addr);
@@ -300,10 +288,10 @@ LPCLIENTSTRUCT WaitForNewClientConnection(int nServerSocket) {
   }
 
   // if we are here then we have a brand-new client connection
-  LPCLIENTSTRUCT lpCS = CreateClientStruct(nClientSocket, pszClientIPAddress);
+  LPCLIENTSTRUCT lpCS =
+      CreateClientStruct(nClientSocket, pszClientIPAddress);
   if (NULL == lpCS) {
     fprintf(stderr, FAILED_CREATE_NEW_CLIENT);
-
     CleanupServer(ERROR);
   }
 
