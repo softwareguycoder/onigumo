@@ -1,6 +1,5 @@
 from common.string_utils import StringUtilities
 from common.list_utils import ListUtilities
-from _elementtree import ParseError
 
 ERROR_RESPONSE_MUST_BE_YES_OR_NO = \
     "ERROR: Only 'Y' for yes or 'N' for no is allowed (lower case is okay too)."
@@ -22,6 +21,9 @@ class Prompter(object):
             strPromptFormat = strPromptFormat.replace("[{}]", '')
         if not len(choiceValueSet):
             strPromptFormat = strPromptFormat.replace("({})", '')
+        if not "[{}]" in strPromptFormat \
+            and not "({})" in strPromptFormat:
+            strPromptFormat = strPromptFormat.replace(" :", ":")
         if pvDefault is None:
             if not len(choiceValueSet):
                 strDisplayedPrompt = strPromptFormat.format(strPrompt)
@@ -47,7 +49,7 @@ class Prompter(object):
     def __DoDisplayPrompt(strPrompt, pvDefault=None, choiceValueSet=[], 
                         keyboardInterruptHandler=None, inputValidator=None, 
                         invalidInputHandler=None, invalidChoiceHandler=None,
-                        pvInvalidValue=None, parseErrorHandler=None):
+                        pvInvalidValue=None):
         global PROMPT_FORMAT
         try:
             if StringUtilities.IsNullOrWhiteSpace(strPrompt):
@@ -57,8 +59,8 @@ class Prompter(object):
                     choiceValueSet))
             if not theResult:
                 theResult = pvDefault
-                if not choiceValueSet and isinstance(theResult, str):
-                    return theResult
+            if theResult is None:
+                return theResult
             if inputValidator is not None:
                 if not inputValidator(theResult, choiceValueSet) \
                     and invalidInputHandler is not None:
@@ -79,19 +81,14 @@ class Prompter(object):
         except KeyboardInterrupt:
             if keyboardInterruptHandler is not None:
                 keyboardInterruptHandler() 
-        except:
-            if parseErrorHandler:
-                parseErrorHandler()
-            theResult = pvInvalidValue
     
     @staticmethod
-    def PromptForString(strPrompt, strDefault, choiceValueSet=[], 
+    def PromptForString(strPrompt, strDefault=None, choiceValueSet=[], 
                         keyboardInterruptHandler=None, inputValidator=None, 
-                        invalidInputHandler=None, parseErrorHandler=None):
+                        invalidInputHandler=None):
         theResult = Prompter.__DoDisplayPrompt(strPrompt, strDefault, 
             choiceValueSet, keyboardInterruptHandler, inputValidator, 
-            invalidInputHandler, invalidChoiceHandler=None,
-            pvInvalidValue=None, parseErrorHandler=parseErrorHandler)
+            invalidInputHandler)
         if theResult is None or not len(theResult.strip()):
             theResult = strDefault
         return theResult
@@ -126,6 +123,13 @@ class Prompter(object):
                     theResult = nInvalidValue
                 else:
                     return nInvalidValue
+    
+    @staticmethod
+    def PressAnyKeyToContinue(strPrompt="Press ENTER key to continue:",
+        keyboardInterruptHandler=None):
+        _ = Prompter.PromptForString(strPrompt, 
+            keyboardInterruptHandler=keyboardInterruptHandler)
+        pass
     
     @staticmethod
     def __YesNoValidator(theResult, choiceValueSet):  # @UnusedVariable
