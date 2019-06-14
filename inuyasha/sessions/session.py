@@ -88,36 +88,37 @@ class Session(object):
         pass
     
     def __init__(self):
-        self.__connected = False
-        self.__socket = None
+        try:
+            self.__connected = False
+            self.__socket = None
+            
+            Console.Clear()
+            Banner.Print()
+            WelcomePrinter.Print()
+            self.__machineInfo = MachineInfoFactory.Make()
+            self.__socket = SocketWrapper()
+            if self.__socket is None:
+                print(ERROR_FAILED_ESTABLISH_SESSION)
+                self.End(EXIT_FAILURE)
+                
+            if not self.__socket.Connect(self.__machineInfo.GetHostName(),
+                self.__machineInfo.GetPort()):
+                self.End(EXIT_FAILURE)
+                
+            if 0 == self.__socket.Send(PROTOCOL_HELO_COMMAND):
+                print(ERROR_FAILED_ESTABLISH_SESSION)
+                self.End(EXIT_FAILURE)
+                
+            status = self.__socket.Receive()
+            if not status.startswith('2'):
+                print(ERROR_FAILED_ESTABLISH_SESSION)
+                self.End(EXIT_FAILURE)
         
-        Console.Clear()
-        Banner.Print()
-        WelcomePrinter.Print()
-        self.__machineInfo = MachineInfoFactory.Make()
-        self.__socket = SocketWrapper()
-        if self.__socket is None:
-            print(ERROR_FAILED_ESTABLISH_SESSION)
-            exit(EXIT_FAILURE)
-            
-        if not self.__socket.Connect(self.__machineInfo.GetHostName(),
-            self.__machineInfo.GetPort()):
-            print(ERROR_FAILED_CONNECT_TO_SERVER_FORMAT.format(
-                self.__machineInfo.GetHostName(), self.__machineInfo.GetPort()))
-            exit(EXIT_FAILURE)
-            
-        if 0 == self.__socket.Send(PROTOCOL_HELO_COMMAND):
-            print(ERROR_FAILED_ESTABLISH_SESSION)
-            exit(EXIT_FAILURE)
-            
-        status = self.__socket.Receive()
-        if not status.startswith('2'):
-            print(ERROR_FAILED_ESTABLISH_SESSION)
-            exit(EXIT_FAILURE)
-    
-        self.__connected = True
-        Announcer.AnnounceConnectedToServer()
-        Footer.Print()
-        WaitForEnterToContinue.Print()
+            self.__connected = True
+            Announcer.AnnounceConnectedToServer()
+            Footer.Print()
+            WaitForEnterToContinue.Print()
+        except:
+            self.End(EXIT_FAILURE)
         pass
     

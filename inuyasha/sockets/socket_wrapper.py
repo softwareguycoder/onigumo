@@ -51,7 +51,7 @@ class SocketWrapper(object):
             self.__clientSocket.connect((hostname, port))
         except Exception as e:
             print(ERROR_FAILED_CONNECT_TO_SERVER_FORMAT.format(
-                hostname, port, e))
+                hostname, port, e.message()))
             result = False
         else:
             result = True

@@ -17,6 +17,8 @@ class MachineInfoFactory(object):
                 .format(DEFAULT_HOSTNAME))
             if not len(strHostName.strip()):
                 strHostName = DEFAULT_HOSTNAME
+        except KeyboardInterrupt as e:
+            raise e
         except:
             strHostName = DEFAULT_HOSTNAME
         return strHostName
@@ -36,6 +38,8 @@ class MachineInfoFactory(object):
                         nPort = INVALID_PORT_NUMBER
                         print(ERROR_PORT_INVALID_VALUE)
                         continue
+                except KeyboardInterrupt as e:
+                    raise e
                 except:
                     nPort = INVALID_PORT_NUMBER
                     print(ERROR_PORT_INVALID_VALUE)
