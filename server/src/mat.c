@@ -45,7 +45,7 @@ void* MasterAcceptorThread(void* pThreadData) {
     }
 
     // If we have been signaled to stop, then abort
-    if (g_bShouldTerminateMasterThread) {
+    if (ShouldTerminateMasterThread()) {
       break;
     }
 
@@ -57,10 +57,10 @@ void* MasterAcceptorThread(void* pThreadData) {
     // is connected to the client.  The output of the function called
     // below is guaranteed to be valid.
     LPCLIENTSTRUCT lpCS = WaitForNewClientConnection(nServerSocket);
-    if (g_bShouldTerminateMasterThread) {
+    if (ShouldTerminateMasterThread()) {
       break;
     }
-    if (lpCS == NULL) {
+    if (!IsClientStructValid(lpCS)) {
       continue;
     }
 

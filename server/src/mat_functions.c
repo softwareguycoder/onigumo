@@ -213,7 +213,7 @@ BOOL ShouldTerminateMasterThread() {
 //
 
 void TerminateMasterThread(int signum) {
-  if (g_bShouldTerminateMasterThread) {
+  if (ShouldTerminateMasterThread()) {
     return;
   }
 
