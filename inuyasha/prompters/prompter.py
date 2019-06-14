@@ -11,7 +11,9 @@ ERROR_RESPONSE_MUST_BE_YES_OR_NO = \
 # the user presses the ENTER key without typing anything
 PROMPT_FORMAT = "> {} ({})[{}]: > "
 
+
 class Prompter(object):    
+
     @staticmethod
     def __GetDisplayedPrompt(strPrompt, pvDefault=None,
         choiceValueSet=[]):
@@ -46,8 +48,8 @@ class Prompter(object):
         return str(theResult) not in map(str, choiceValueSet)
     
     @staticmethod
-    def __DoDisplayPrompt(strPrompt, pvDefault=None, choiceValueSet=[], 
-                        keyboardInterruptHandler=None, inputValidator=None, 
+    def __DoDisplayPrompt(strPrompt, pvDefault=None, choiceValueSet=[],
+                        keyboardInterruptHandler=None, inputValidator=None,
                         invalidInputHandler=None, invalidChoiceHandler=None,
                         pvInvalidValue=None):
         global PROMPT_FORMAT
@@ -55,7 +57,7 @@ class Prompter(object):
             if StringUtilities.IsNullOrWhiteSpace(strPrompt):
                 return pvDefault
             theResult = input(
-                Prompter.__GetDisplayedPrompt(strPrompt, pvDefault, 
+                Prompter.__GetDisplayedPrompt(strPrompt, pvDefault,
                     choiceValueSet))
             if not theResult:
                 theResult = pvDefault
@@ -70,7 +72,7 @@ class Prompter(object):
                 theResult, choiceValueSet):
                 strChoiceDisplay = ListUtilities.FormatEltsSeparatedBy(
                     ", ", choiceValueSet);
-                strChoiceDisplay = StringUtilities.ReplaceFromRight(strChoiceDisplay, 
+                strChoiceDisplay = StringUtilities.ReplaceFromRight(strChoiceDisplay,
                     ", ", ", or ", 1)
                 if not invalidChoiceHandler:
                     print("ERROR: Please choose {}.".format(strChoiceDisplay))
@@ -83,11 +85,11 @@ class Prompter(object):
                 keyboardInterruptHandler() 
     
     @staticmethod
-    def PromptForString(strPrompt, strDefault=None, choiceValueSet=[], 
-                        keyboardInterruptHandler=None, inputValidator=None, 
+    def PromptForString(strPrompt, strDefault=None, choiceValueSet=[],
+                        keyboardInterruptHandler=None, inputValidator=None,
                         invalidInputHandler=None):
-        theResult = Prompter.__DoDisplayPrompt(strPrompt, strDefault, 
-            choiceValueSet, keyboardInterruptHandler, inputValidator, 
+        theResult = Prompter.__DoDisplayPrompt(strPrompt, strDefault,
+            choiceValueSet, keyboardInterruptHandler, inputValidator,
             invalidInputHandler)
         if theResult is None or not len(theResult.strip()):
             theResult = strDefault
@@ -95,19 +97,19 @@ class Prompter(object):
 
     @staticmethod
     def PromptForInt(strPrompt, nDefault, choiceValueSet=[],
-        keyboardInterruptHandler=None, inputValidator=None, 
+        keyboardInterruptHandler=None, inputValidator=None,
         invalidInputHandler=None, invalidChoiceHandler=None,
         nInvalidValue=0):
         theResult = nInvalidValue
         while theResult == nInvalidValue:
             try:
                 theResult = int(
-                    Prompter.__DoDisplayPrompt(strPrompt, nDefault, 
-                    choiceValueSet=choiceValueSet, 
+                    Prompter.__DoDisplayPrompt(strPrompt, nDefault,
+                    choiceValueSet=choiceValueSet,
                     keyboardInterruptHandler=keyboardInterruptHandler,
-                    inputValidator=inputValidator, 
+                    inputValidator=inputValidator,
                     invalidInputHandler=invalidInputHandler,
-                    invalidChoiceHandler=invalidChoiceHandler, 
+                    invalidChoiceHandler=invalidChoiceHandler,
                     pvInvalidValue=nInvalidValue)
                     )
                 if theResult == nInvalidValue:
@@ -115,7 +117,7 @@ class Prompter(object):
                 if theResult is None:
                     theResult = nDefault
                 return theResult
-            except KeyboardInterrupt: #parse error more likely
+            except KeyboardInterrupt:  # parse error more likely
                 return nInvalidValue
             except:
                 if invalidInputHandler is not None:
@@ -127,7 +129,7 @@ class Prompter(object):
     @staticmethod
     def PressAnyKeyToContinue(strPrompt="Press ENTER key to continue:",
         keyboardInterruptHandler=None):
-        _ = Prompter.PromptForString(strPrompt, 
+        _ = Prompter.PromptForString(strPrompt,
             keyboardInterruptHandler=keyboardInterruptHandler)
         pass
     
@@ -141,19 +143,17 @@ class Prompter(object):
     def __YesNoInvalidInputHandler(theResult):  # @UnusedVariable
         print(ERROR_RESPONSE_MUST_BE_YES_OR_NO)
         pass
-        
     
     @staticmethod
     def YesNoPrompt(strPrompt, bDefault, keyboardInterruptHandler,
                     pvInvalidInput=None):
         theResult = pvInvalidInput
         while theResult == pvInvalidInput:
-            theResult = Prompter.__DoDisplayPrompt(strPrompt, 
-                    "Y" if bDefault else "N", 
-                    ['Y','N'], keyboardInterruptHandler,
-                    Prompter.__YesNoValidator, 
+            theResult = Prompter.__DoDisplayPrompt(strPrompt,
+                    "Y" if bDefault else "N",
+                    ['Y', 'N'], keyboardInterruptHandler,
+                    Prompter.__YesNoValidator,
                     Prompter.__YesNoInvalidInputHandler,
                     pvInvalidInput)
         return str(theResult).lower() == 'y'
-    
     
