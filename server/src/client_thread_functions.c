@@ -380,9 +380,15 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
   char szCurLine[1035];
   memset(szCurLine, 0, 1035);
 
+  /* Tell the client, "OK, we've seen this command and it's valid, so
+   * we are now sending the listing." */
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-  OK_DIR_LIST_FOLLOWS);
+      OK_DIR_LIST_FOLLOWS);
 
+  /* Iterate through the lines of text returned by the shell command
+   * opened with popen() and send each line, one at a time, to the client.
+   * Then, when the content has all been sent, then send the terminating
+   * period on a line by itself and then close the file pointer. */
   while (NULL != fgets(szCurLine, 1035, fp)) {
     if (IsNullOrWhiteSpace(szCurLine)) {
       continue; // do not send blank lines back to the client.
@@ -394,10 +400,9 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
 
   memset(szCurLine, 0, 1035);
 
-  fclose(fp);
-  fp = NULL;
-
   SendMultilineDataTerminator(lpSendingClient);
+
+  CloseFile(&fp);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -813,7 +818,7 @@ BOOL PrepareToSendDirectoryListing(LPCLIENTSTRUCT lpSendingClient,
 
   if (!DirectoryExists(pszExpandedPathName)) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-        ERROR_DIR_COULD_NOT_BE_LISTED);
+    ERROR_DIR_COULD_NOT_BE_LISTED);
     fprintf(stderr, ERROR_FAILED_FIND_DIR,
         pszExpandedPathName);
     if (GetErrorLogFileHandle() != stderr) {
@@ -825,7 +830,7 @@ BOOL PrepareToSendDirectoryListing(LPCLIENTSTRUCT lpSendingClient,
 
   if (!SetCurrentWorkingDirectory(pszExpandedPathName)) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-        ERROR_DIR_COULD_NOT_BE_LISTED);
+    ERROR_DIR_COULD_NOT_BE_LISTED);
     fprintf(stderr, ERROR_FAILED_SET_WORKING_DIR,
         pszExpandedPathName);
     if (GetErrorLogFileHandle() != stderr) {
@@ -1085,6 +1090,14 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
+  /* Send a status response to the client indicating acknowledgement of
+   * the command.  Then, open the /proc/cpuinfo file for reading and,
+   * if the open operation succeeded, get the file content, line for line,
+   * and then send each line to the client one at a time, terminating with
+   * a . on a line by itself and then closing the file. */
+  lpSendingClient->nBytesSent += ReplyToClient(
+      lpSendingClient, OK_CPU_INFO_FOLLOWS);
+
   FILE* fp = fopen(CPUINFO_FILE, "r");
   if (fp == NULL) {
     fprintf(stderr, "ERROR: Failed to open file '%s' for reading.\n",
@@ -1108,8 +1121,7 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
 
   memset(szCurLine, 0, 1035);
 
-  fclose(fp);
-  fp = NULL;
+  CloseFile(&fp);
 
   SendMultilineDataTerminator(lpSendingClient);
 }
