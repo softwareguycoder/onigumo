@@ -5,6 +5,16 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef ERROR_FAILED_FIND_DIR
+#define ERROR_FAILED_FIND_DIR \
+    "ERROR: Directory '%s' could not be located.\n"
+#endif //ERROR_FAILED_FIND_DIR
+
+#ifndef ERROR_FAILED_SET_WORKING_DIR
+#define ERROR_FAILED_SET_WORKING_DIR \
+  "ERROR: Failed to set current working dir to '%s'.\n"
+#endif //ERROR_FAILED_SET_WORKING_DIR
+
 #ifndef ERROR_NO_SHELLCODE_TO_RUN
 #define ERROR_NO_SHELLCODE_TO_RUN \
   "512 Failed.  Send me some shellcode first before calling EXEC.\n"

@@ -203,6 +203,8 @@ void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient);
 void SendMultilineData(LPCLIENTSTRUCT lpSendingClient,
     char** ppszOutputLines, int nLineCount);
 
+void SendMultilineDataTerminator(LPCLIENTSTRUCT lpSendingClient);
+
 /**
  * @brief Sends the data in pszMessage to the client designated.
  * @param lpCurrentClient Pointer to a CLIENTSTRUCT that contains data about
