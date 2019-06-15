@@ -26,6 +26,8 @@ EMPTY_STRING = ''
 ERRNO_REMOTE_PROCESS_ACCESS_DENIED = 1
 ERRNO_REMOTE_PROCESS_NOT_EXISTS = 3
 
+ERROR_DIR_NAME_TOO_LONG = \
+    ">>> ERROR: Directory can only be {} characters in length at most."
 ERROR_FAILED_COMPILE_FILE = \
     ">>> ERROR: Compilation of file '{}' failed."
 ERROR_FAILED_CONNECT_TO_SERVER = \
@@ -146,6 +148,7 @@ INVALID_PORT_NUMBER = 0
 LF = '\n'
 LOWEST_VALID_USER_PORT = 1024
 
+MAX_DIR_LENGTH = 250
 MULTILINE_DATA_TERMINATOR = '.'
 
 NASM_SHELL_COMMAND_FORMAT = "nasm -f elf64 -F dwarf -g {}.asm -l {}.lst"

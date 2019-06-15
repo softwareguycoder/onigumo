@@ -34,7 +34,6 @@ class ShellcodeSender(object):
         Banner.Print()
 
         if not theSocket:
-            print("wah-wah-WAAAAHHHHH-9")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()

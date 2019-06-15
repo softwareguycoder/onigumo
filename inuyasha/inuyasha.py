@@ -56,10 +56,8 @@ class InuyashaApp(object):
                     continue
                 
                 if nChoice == CHOICE_EXIT:
-                    print("I am going to cry")
                     self.__session.End(EXIT_SUCCESS)
         except KeyboardInterrupt:
-            print("I hate Python!")
             self.__session.End(EXIT_FAILURE)    
         pass
 

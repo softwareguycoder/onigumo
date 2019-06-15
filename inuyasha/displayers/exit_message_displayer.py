@@ -8,7 +8,6 @@ class ExitMessageDisplayer(object):
 
     @staticmethod
     def Display():
-        print("no yay")
         Console.Clear()
         Banner.Print()
         ThankYouMessagePrinter.Print()

@@ -2,12 +2,14 @@ from console.console_class import Console
 from common.inuyasha_symbols import PROTOCOL_LDIR_COMMAND, \
     IDS_SERVER_DIR_PATH_PROMPT, \
     ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER, LF,\
-    DEFAULT_PAGE_LINE_COUNT, ERROR_FAILED_GET_DIR_LISTING_FORMAT
+    DEFAULT_PAGE_LINE_COUNT, ERROR_FAILED_GET_DIR_LISTING_FORMAT,\
+    ERROR_DIR_NAME_TOO_LONG, MAX_DIR_LENGTH
 from announcers.announcer import Announcer
 from paginators.paginator import Paginator
 from common.banner import Banner
 from common.footer import Footer
 from common.press_enter_to_return_to_main_menu import PressEnterToReturnToMainMenu
+from common.string_utils import StringUtilities
 
 
 class DirListing(object):
@@ -31,9 +33,16 @@ class DirListing(object):
         Console.Clear()
         Banner.Print()
         Announcer.AnnounceListServerDirectory()
-        strDirChosen = input(IDS_SERVER_DIR_PATH_PROMPT)
-        if not strDirChosen.strip():
-            strDirChosen = "~"
+        strDirChosen = ''
+        while StringUtilities.IsNullOrWhiteSpace(strDirChosen)\
+            or len(strDirChosen.strip()) > MAX_DIR_LENGTH:
+            strDirChosen = input(IDS_SERVER_DIR_PATH_PROMPT)
+            if not strDirChosen.strip():
+                strDirChosen = "~"
+            if len(strDirChosen.strip()) > MAX_DIR_LENGTH:
+                print(ERROR_DIR_NAME_TOO_LONG.format(
+                    MAX_DIR_LENGTH))
+                continue
         print()
         return strDirChosen
 
@@ -73,7 +82,6 @@ class DirListing(object):
         Banner.Print()
         Announcer.AnnounceListServerDirectory()
         if not theSocket:
-            print("wah-wah-WAAAAHHHHH-6")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()

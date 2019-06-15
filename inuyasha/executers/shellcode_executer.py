@@ -42,7 +42,6 @@ class ShellcodeExecuter(object):
     @staticmethod
     def Execute(theSocket, pid):
         if not theSocket:
-            print("wah-wah-WAAAAHHHHH-4")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()

@@ -13,7 +13,6 @@ class CpuInfo(object):
     @staticmethod
     def Get(theSocket, isConnected):
         if not theSocket:
-            print("wah-wah-WAAAAHHHHH-5")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             exit(EXIT_FAILURE)
         if not isConnected:
@@ -29,10 +28,6 @@ class CpuInfo(object):
             Announcer.AnnounceServerCPUInfo()
             lines = theSocket.ReceiveAllLines()
             Paginator.Paginate(iter(lines))
-#             for line in lines:
-#                 if not line.strip():
-#                     continue
-#                 print(line.strip())
             print()
         else:
             print(ERROR_FAILED_GET_CPU_INFO)

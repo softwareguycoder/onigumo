@@ -29,7 +29,6 @@ class Session(object):
    
     def GetCpuInfo(self):
         if not self.IsValid():
-            print("wah-wah-WAAAAHHHHH-10")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()
@@ -39,7 +38,6 @@ class Session(object):
     
     def GetDirListing(self):
         if not self.IsValid():
-            print("Calling Session.End in GetDirListing")
             self.End(EXIT_FAILURE)
 
         DirListing.Get(self.GetSocket(), self.IsConnected())
@@ -78,7 +76,6 @@ class Session(object):
     
     def End(self, nExitCode):
         if not self.__socket:
-            print("wah-wah-WAAAAHHHHH-11")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             exit(EXIT_FAILURE)
         if not self.__connected:
@@ -109,7 +106,6 @@ class Session(object):
             self.__machineInfo = MachineInfoFactory.Make()
             self.__socket = SocketWrapper()
             if self.__socket is None:
-                print("wah-wah-WAAAAHHHHH-1")
                 print(ERROR_FAILED_ESTABLISH_SESSION)
                 self.End(EXIT_FAILURE)
                 
@@ -118,13 +114,11 @@ class Session(object):
                 self.End(EXIT_FAILURE)
                 
             if 0 == self.__socket.Send(PROTOCOL_HELO_COMMAND):
-                print("wah-wah-WAAAAHHHHH-2")
                 print(ERROR_FAILED_ESTABLISH_SESSION)
                 self.End(EXIT_FAILURE)
                 
             status = self.__socket.Receive()
             if not status.startswith('2'):
-                print("wah-wah-WAAAAHHHHH-3")
                 print(ERROR_FAILED_ESTABLISH_SESSION)
                 self.End(EXIT_FAILURE)
         
@@ -133,7 +127,6 @@ class Session(object):
             Footer.Print()
             WaitForEnterToContinue.Print()
         except:
-            print("Poo poo")
             self.End(EXIT_FAILURE)
         pass
     

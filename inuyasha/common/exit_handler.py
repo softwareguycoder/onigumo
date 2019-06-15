@@ -9,14 +9,12 @@ class ExitHandler(object):
     def ExitApp(nExitCode=EXIT_SUCCESS, sessionObject=None, 
                 exitMessageDisplayer=None):
         if sessionObject is not None:
-            print("Session object detected.")
             sessionObject.End(nExitCode)
             return
-        else:
-            print("Session object NOT detected.")
-        
-        if exitMessageDisplayer is not None:
-            exitMessageDisplayer()
-        else:
-            ExitMessageDisplayer.Display()
-        os._exit(nExitCode)
+        else:       
+            if exitMessageDisplayer is not None:
+                exitMessageDisplayer()
+            else:
+                ExitMessageDisplayer.Display()
+            os._exit(nExitCode)
+        pass

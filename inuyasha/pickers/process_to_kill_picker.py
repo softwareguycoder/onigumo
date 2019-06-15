@@ -24,7 +24,6 @@ class ProcessToKillPicker(object):
     @staticmethod
     def __DoListProcessesOnRemoteMachine(theSocket):
         if not theSocket:
-            print("wah-wah-WAAAAHHHHH-7")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             return
         BlankLinePrinter.Print()
@@ -88,7 +87,6 @@ class ProcessToKillPicker(object):
     @staticmethod
     def PickAndKillProc(theSocket, isConnected):
         if not theSocket:
-            print("wah-wah-WAAAAHHHHH-8")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             return -1
         if not isConnected:
