@@ -115,7 +115,7 @@ IDS_PICK_PROCESS_TO_KILL = "Pick a process to kill"
 IDS_PICK_PROCESS_TO_KILL_HEADER = \
     "         *** Run Some Shellcode that Will Kill A Process ***"
 IDS_PRESS_ENTER_TO_CONTINUE = \
-    "Press ENTER to continue..."
+    "Press ENTER to continue"
 IDS_PRESS_ENTER_TO_RETURN_TO_MAIN_MENU = \
     "Press ENTER to go back to Main Menu"
 IDS_PRESS_ENTER_TO_PICK_PROC_TO_KILL = \

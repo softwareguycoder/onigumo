@@ -2,13 +2,14 @@ from common.inuyasha_symbols import IDS_ASSEMBLY_CODE_PATH_PROMPT_FORMAT, \
     ASM_CODE_PATH, ERROR_FAILED_FIND_SHELLCODE_SOURCE_FORMAT,\
     IDS_COMPILING_FILE_FORMAT, ERROR_OBJECT_CODE_NOT_EXISTS_FORMAT,\
     ERROR_FAILED_COMPILE_FILE
-from common.gui_utilities import BlankLinePrinter, Footer,\
-    PressEnterToReturnToMainMenu
 import os
 from common.file_utilities import FileUtilities
 from compilers.asm_compiler import AsmCompiler
 from parsers.object_code_parser import ObjectCodeParser
 from announcers.announcer import Announcer
+from common.blank_line_printer import BlankLinePrinter
+from common.footer import Footer
+from common.press_enter_to_return_to_main_menu import PressEnterToReturnToMainMenu
 
 
 class ShellcodeExtractor(object):

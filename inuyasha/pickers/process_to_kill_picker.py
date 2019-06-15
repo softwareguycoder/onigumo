@@ -1,6 +1,4 @@
 from console.console_class import Console
-from common.gui_utilities import Banner, PressEnterToPickProcToKill, \
-    PressEnterToReturnToMainMenu, Footer, BlankLinePrinter
 from common.inuyasha_symbols import PROTOCOL_LIST_COMMAND, \
     ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER, \
     ERROR_MUST_PICK_PID, SHOULD_PROC_LIST_BE_PAGINATED_PROMPT,\
@@ -8,6 +6,11 @@ from common.inuyasha_symbols import PROTOCOL_LIST_COMMAND, \
 from announcers.announcer import Announcer
 from validators.yes_no_input_validator import YesNoInputValidator
 from paginators.paginator import Paginator
+from common.banner import Banner
+from common.blank_line_printer import BlankLinePrinter
+from common.press_enter_to_pick_proc_to_kill import PressEnterToPickProcToKill
+from common.footer import Footer
+from common.press_enter_to_return_to_main_menu import PressEnterToReturnToMainMenu
 
 
 class ProcessToKillPicker(object):
@@ -21,6 +24,7 @@ class ProcessToKillPicker(object):
     @staticmethod
     def __DoListProcessesOnRemoteMachine(theSocket):
         if not theSocket:
+            print("wah-wah-WAAAAHHHHH-7")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             return
         BlankLinePrinter.Print()
@@ -84,6 +88,7 @@ class ProcessToKillPicker(object):
     @staticmethod
     def PickAndKillProc(theSocket, isConnected):
         if not theSocket:
+            print("wah-wah-WAAAAHHHHH-8")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             return -1
         if not isConnected:

@@ -1,11 +1,13 @@
 from console.console_class import Console
-from common.gui_utilities import Banner, Footer, PressEnterToReturnToMainMenu
 from common.inuyasha_symbols import ERROR_FAILED_ESTABLISH_SESSION, \
     PROTOCOL_CODE_COMMAND_FORMAT
 from announcers.announcer import Announcer
 from extractors.shellcode_extractor import ShellcodeExtractor
 from serializers.shellcode_serializer import ShellcodeSerializer
 from validators.shellcode_tuple_validator import ShellcodeTupleValidator
+from common.banner import Banner
+from common.footer import Footer
+from common.press_enter_to_return_to_main_menu import PressEnterToReturnToMainMenu
 
 
 class ShellcodeSender(object):
@@ -32,6 +34,7 @@ class ShellcodeSender(object):
         Banner.Print()
 
         if not theSocket:
+            print("wah-wah-WAAAAHHHHH-9")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()

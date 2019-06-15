@@ -45,6 +45,8 @@ class Prompter(object):
 
     @staticmethod
     def __IsChoiceNotInValueSet(theResult, choiceValueSet=[]):
+        if not choiceValueSet or not len(choiceValueSet):
+            return False
         return str(theResult) not in map(str, choiceValueSet)
     
     @staticmethod
@@ -83,7 +85,9 @@ class Prompter(object):
         except KeyboardInterrupt:
             if keyboardInterruptHandler is not None:
                 keyboardInterruptHandler() 
-    
+            else:
+                print("No keyboard interrupt handler installed")            
+                
     @staticmethod
     def PromptForString(strPrompt, strDefault=None, choiceValueSet=[],
                         keyboardInterruptHandler=None, inputValidator=None,

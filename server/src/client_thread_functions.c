@@ -20,8 +20,6 @@
 #include "client_list_manager.h"
 #include "client_thread.h"
 #include "client_thread_functions.h"
-#include "directory_lister.h"
-#include "invocation_status.h"
 #include "server_functions.h"
 
 #include "shell_code_info.h"
@@ -142,7 +140,8 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
 
   Trim(szCommand, MAX_LINE_LENGTH + 1, pszBuffer);
 
-  Split(szCommand, " ", &ppszStrings, &nStringCount);
+  Split(szCommand, MAX_LINE_LENGTH + 1,
+      " ", &ppszStrings, &nStringCount);
 
   if (ppszStrings == NULL || nStringCount <= 1) {
     lpSendingClient->nBytesSent +=
@@ -194,59 +193,34 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
 // GetCommandStringArgument function
 
 void GetCommandStringArgument(LPCLIENTSTRUCT lpSendingClient,
-    const char *pszBuffer, char** ppszOutputBuffer) {
-  int nStringCount = 0;
-  char **ppszStrings = NULL;
-
+    char* pszCommandText, char* pszOutputBuffer) {
   if (lpSendingClient == NULL) {
     return;
   }
 
-  if (IsNullOrWhiteSpace(pszBuffer)) {
-    return;
-  }
-
-  if (ppszOutputBuffer == NULL) {
-    return;
-  }
-
-  char szCommand[MAX_LINE_LENGTH + 1];
-  memset(szCommand, 0, MAX_LINE_LENGTH + 1);
-
-  strcpy(szCommand, pszBuffer);
-
-  Split(szCommand, " ", &ppszStrings, &nStringCount);
-
-  if (ppszStrings == NULL || nStringCount <= 1) {
+  if (IsNullOrWhiteSpace(pszCommandText)) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_STRING);
-
-    FreeStringArray(&ppszStrings, nStringCount);
     return;
   }
 
-  *ppszStrings = "";  // Set the first element to the empty string
-
-  /* We exepct the 1th through the (N-1)th (where N is the number of
-   * elements) elements to, collectively, hold the directory path (
-   * delimited by forward slashes of course) */
-  int nDirectoryPathLength = 0;
-  char* pszOutputBuffer = NULL;
-
-  JoinStrings(ppszStrings, nStringCount, &pszOutputBuffer,
-      &nDirectoryPathLength);
-
-  if (IsNullOrWhiteSpace(pszOutputBuffer)) {
+  if (pszOutputBuffer == NULL) {
     lpSendingClient->nBytesSent +=
         ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_STRING);
-
-    FreeStringArray(&ppszStrings, nStringCount);
     return;
   }
 
-  *ppszOutputBuffer = pszOutputBuffer;
+  char* pszToken = strtok(pszCommandText, " ");
 
-  FreeStringArray(&ppszStrings, nStringCount);
+  do {
+    pszToken = strtok(NULL, " ");
+    if (pszToken == NULL)
+      break;
+    strcat(pszOutputBuffer, pszToken);
+    if (pszOutputBuffer[strlen(pszOutputBuffer) - 1] == '\\') {
+      strcat(pszOutputBuffer, " ");
+    }
+  } while (pszToken != NULL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1032,39 +1006,33 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
-  int nFileSize = 0;
-  int nLineCount = 0;
-  char *pszOutputBuffer = NULL;
-
-  ReadAllText(CPUINFO_FILE, &pszOutputBuffer, &nFileSize);
-
-  char** ppszOutputLines = NULL;
-
-  Split(pszOutputBuffer, "\n", &ppszOutputLines, &nLineCount);
-
-  if (ppszOutputLines == NULL || nLineCount <= 0) {
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-    HOST_OSINFO_ACCESS_DENIED);
-    return;
+  FILE* fp = fopen(CPUINFO_FILE, "r");
+  if (fp == NULL) {
+    fprintf(stderr, "ERROR: Failed to open file '%s' for reading.\n",
+    CPUINFO_FILE);
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+     return;
   }
 
-  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-  OK_CPU_INFO_FOLLOWS);
+  char szCurLine[1035];
+  memset(szCurLine, 0, 1035);
 
-  for (int i = 0; i < nLineCount; i++) {
-    if (IsNullOrWhiteSpace(ppszOutputLines[i])) {
-      continue; // skip any blank lines
+  while (NULL != fgets(szCurLine, 1035, fp)) {
+    if (IsNullOrWhiteSpace(szCurLine)) {
+      continue; // do not send blank lines back to the client.
     }
-
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-        strcat(ppszOutputLines[i], "\n"));
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, szCurLine);
+    memset(szCurLine, 0, 1035);
   }
+
+  memset(szCurLine, 0, 1035);
+
+  fclose(fp);
+  fp = NULL;
 
   SendMultilineDataTerminator(lpSendingClient);
-
-  /* release the memory occupied by the output */
-  FreeStringArray(&ppszOutputLines, nLineCount);
-  ppszOutputLines = NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1088,57 +1056,80 @@ void ProcessLDirCommand(LPCLIENTSTRUCT lpSendingClient,
     return;
   }
 
-  int nLineCount = 0;
-  BOOL bShouldDeallocateDirectoryPathBuffer = FALSE;
-  char* pszDirectoryPath = NULL;
-  char** ppszOutputLines = NULL;
+  char szDirectoryPath[MAX_LINE_LENGTH + 1];
 
   char szCommandWithNoArgs[MAX_LINE_LENGTH + 1];
   memset(szCommandWithNoArgs, 0, MAX_LINE_LENGTH + 1);
   sprintf(szCommandWithNoArgs, "%s\n", PROTOCOL_LDIR_COMMAND);
 
+  // Copy the full command text, with argument, into a mutable
+  // character array
+  char szCommandText[MAX_LINE_LENGTH + 1];
+  memset(szCommandText, 0, MAX_LINE_LENGTH + 1);
+  strcpy(szCommandText, pszBuffer);
+
+  // Now, do a Trim operation on the text to throw away, e.g., the
+  // terminating LF on the end.
+  char szTrimmedCommandText[MAX_LINE_LENGTH + 1];
+  memset(szTrimmedCommandText, 0, MAX_LINE_LENGTH + 1);
+  Trim(szTrimmedCommandText, MAX_LINE_LENGTH + 1, szCommandText);
+
   if (!Equals(pszBuffer, szCommandWithNoArgs)) {
+
     GetCommandStringArgument(lpSendingClient,
-        pszBuffer, &pszDirectoryPath);
-    bShouldDeallocateDirectoryPathBuffer = TRUE;
+        szTrimmedCommandText, szDirectoryPath);
   } else {
     /* If just LDIR<LF> was transmitted by the client,
      * then the home directory of the user that is executing
      * this process should be listed, as the default. */
-    GetHomeDirectoryPath(&pszDirectoryPath);
-    bShouldDeallocateDirectoryPathBuffer = FALSE;
+    GetHomeDirectoryPath(szDirectoryPath);
   }
 
-  char szTrimmedDirectoryName[PATH_MAX + 1];
-  memset(szTrimmedDirectoryName, 0, PATH_MAX + 1);
-  Trim(szTrimmedDirectoryName, PATH_MAX + 1, pszDirectoryPath);
+  char szTrimmedDirectoryName[MAX_LINE_LENGTH + 1];
+  memset(szTrimmedDirectoryName, 0, MAX_LINE_LENGTH + 1);
+  Trim(szTrimmedDirectoryName, MAX_LINE_LENGTH + 1, szDirectoryPath);
 
-  if (!ListDirectory(szTrimmedDirectoryName, &ppszOutputLines, &nLineCount)) {
+  /* Be sure to expand the path name string just like Bash would */
+  char szExpandedPathName[MAX_PATH + 1];
+  memset(szExpandedPathName, 0, MAX_PATH + 1);
+  ShellExpand(szDirectoryPath, szExpandedPathName, MAX_PATH + 1);
+
+  if (!DirectoryExists(szExpandedPathName)) {
     lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
     ERROR_DIR_COULD_NOT_BE_LISTED);
-    goto cleanup;
+    return;
   }
 
-  if (ppszOutputLines == NULL || nLineCount <= 0) {
+  FILE* fp = popen(LINUX_DIRECTORY_LIST_COMMAND, "r");
+  if (fp == NULL) {
+    fprintf(stderr, "ERROR: Failed to run shell command '%s'.\n",
+        LINUX_DIRECTORY_LIST_COMMAND);
     lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient,
-        ERROR_FAILED_TO_PARSE_STRING);
-    goto cleanup;
+        ReplyToClient(lpSendingClient, ERROR_DIR_COULD_NOT_BE_LISTED);
+    return;
   }
+
+  char szCurLine[1035];
+  memset(szCurLine, 0, 1035);
 
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-  OK_DIR_LIST_FOLLOWS);
+      OK_DIR_LIST_FOLLOWS);
 
-  SendMultilineData(lpSendingClient, ppszOutputLines, nLineCount);
-
-  cleanup:
-  /* release the memory occupied by the output */
-  if (bShouldDeallocateDirectoryPathBuffer)
-    FreeBuffer((void**) &pszDirectoryPath);
-  if (ppszOutputLines != NULL) {
-    FreeStringArray(&ppszOutputLines, nLineCount);
-    ppszOutputLines = NULL;
+  while (NULL != fgets(szCurLine, 1035, fp)) {
+    if (IsNullOrWhiteSpace(szCurLine)) {
+      continue; // do not send blank lines back to the client.
+    }
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, szCurLine);
+    memset(szCurLine, 0, 1035);
   }
+
+  memset(szCurLine, 0, 1035);
+
+  fclose(fp);
+  fp = NULL;
+
+  SendMultilineDataTerminator(lpSendingClient);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1153,30 +1144,36 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
-  int nLineCount = 0;
-  char** ppszOutputLines = NULL;
-
-  GetSystemCommandOutput(PS_SHELL_COMMAND, &ppszOutputLines, &nLineCount);
-
-  if (ppszOutputLines == NULL || nLineCount <= 0) {
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-    HOST_PROC_LIST_ACCESS_DENIED);
-    if (ppszOutputLines != NULL) {
-      /* release the memory occupied by the output */
-      FreeStringArray(&ppszOutputLines, nLineCount);
-      ppszOutputLines = NULL;
-    }
+  FILE* fp = popen(PS_SHELL_COMMAND, "r");
+  if (fp == NULL) {
+    fprintf(stderr, "ERROR: Failed to run shell command '%s'.\n",
+        PS_SHELL_COMMAND);
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, HOST_PROC_LIST_ACCESS_DENIED);
     return;
   }
 
+  char szCurLine[1035];
+  memset(szCurLine, 0, 1035);
+
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-  OK_PROC_LIST_FOLLOWS);
+      OK_PROC_LIST_FOLLOWS);
 
-  SendMultilineData(lpSendingClient, ppszOutputLines, nLineCount);
+  while (NULL != fgets(szCurLine, 1035, fp)) {
+    if (IsNullOrWhiteSpace(szCurLine)) {
+      continue; // do not send blank lines back to the client.
+    }
+    lpSendingClient->nBytesSent +=
+        ReplyToClient(lpSendingClient, szCurLine);
+    memset(szCurLine, 0, 1035);
+  }
 
-  /* release the memory occupied by the output */
-  FreeStringArray(&ppszOutputLines, nLineCount);
-  ppszOutputLines = NULL;
+  memset(szCurLine, 0, 1035);
+
+  fclose(fp);
+  fp = NULL;
+
+  SendMultilineDataTerminator(lpSendingClient);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1340,11 +1337,11 @@ int SendToClient(LPCLIENTSTRUCT lpCurrentClient, const char* pszMessage) {
     return ERROR;
   }
 
-  if (IsNullOrWhiteSpace(pszMessage)) {
+  if (!IsSocketValid(lpCurrentClient->nSocket)) {
     return ERROR;
   }
 
-  if (!IsSocketValid(lpCurrentClient->nSocket)) {
+  if (pszMessage == NULL || pszMessage[0] == '\0') {
     return ERROR;
   }
 

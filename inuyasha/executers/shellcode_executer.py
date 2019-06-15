@@ -3,9 +3,10 @@ from common.inuyasha_symbols import PROTOCOL_EXEC_COMMAND_FORMAT, \
     ERRNO_REMOTE_PROCESS_ACCESS_DENIED, \
     ERRNO_REMOTE_PROCESS_NOT_EXISTS, SHELLCODE_EXECUTION_RESPONSE_ERROR_STATUS, \
     OK, SHELLCODE_EXECUTION_RESPONSE_SUCCESS_STATUS, INVALID_PID_VALUE
-from common.gui_utilities import Footer, PressEnterToReturnToMainMenu
 from announcers.announcer import Announcer
 from parsers.exec_response_parser import ExecResponseParser
+from common.footer import Footer
+from common.press_enter_to_return_to_main_menu import PressEnterToReturnToMainMenu
 
 
 class ShellcodeExecuter(object):
@@ -41,6 +42,7 @@ class ShellcodeExecuter(object):
     @staticmethod
     def Execute(theSocket, pid):
         if not theSocket:
+            print("wah-wah-WAAAAHHHHH-4")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()

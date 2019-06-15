@@ -1,5 +1,4 @@
 from machines.machine_info import MachineInfo
-from common.gui_utilities import WelcomePrinter, Banner
 from console.console_class import Console
 from common.inuyasha_symbols import DEFAULT_HOSTNAME, DEFAULT_PORT, \
     ERROR_PORT_INVALID_VALUE, SERVER_ADDRESS_PROMPT, EXIT_SUCCESS,\
@@ -7,16 +6,24 @@ from common.inuyasha_symbols import DEFAULT_HOSTNAME, DEFAULT_PORT, \
 from validators.port_number_validator import PortNumberValidator
 from prompters.prompter import Prompter
 from common.exit_handler import ExitHandler
+from common.banner import Banner
+from common.welcome_printer import WelcomePrinter
 
 
 class MachineInfoFactory(object):
             
     @staticmethod
+    def Taco():
+        print("barf")
+        pass
+    
+    @staticmethod
     def __PromptHostname():
-        strHostName = Prompter.PromptForString(strPrompt=SERVER_ADDRESS_PROMPT,
+        strHostName = Prompter.PromptForString(
+            strPrompt=SERVER_ADDRESS_PROMPT,
             strDefault=DEFAULT_HOSTNAME, 
-            keyboardInterruptHandler=lambda: ExitHandler\
-                .ExitApp(EXIT_SUCCESS, None))
+            keyboardInterruptHandler=lambda: ExitHandler.ExitApp(EXIT_SUCCESS,
+                exitMessageDisplayer=MachineInfoFactory.Taco))
         return strHostName
     
     @staticmethod
@@ -25,8 +32,7 @@ class MachineInfoFactory(object):
             DEFAULT_PORT, 
             inputValidator=lambda x, y:PortNumberValidator.IsValid(int(x)),
             invalidInputHandler=lambda x:print(ERROR_PORT_INVALID_VALUE),
-            keyboardInterruptHandler=lambda: ExitHandler\
-                .ExitApp(EXIT_SUCCESS, None))
+            keyboardInterruptHandler=ExitHandler.ExitApp)
         return nPort
         
     @staticmethod

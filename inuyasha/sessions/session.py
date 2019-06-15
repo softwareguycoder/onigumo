@@ -1,10 +1,7 @@
 from sockets.socket_wrapper import SocketWrapper
 from console.console_class import Console
-from common.gui_utilities import Banner, WelcomePrinter, Footer, \
-    WaitForEnterToContinue, ThankYouMessagePrinter, PressEnterToReturnToMainMenu,\
-    BlankLinePrinter
 from factories.machine_info_factory import MachineInfoFactory
-from common.inuyasha_symbols import ERROR_FAILED_CONNECT_TO_SERVER_FORMAT, \
+from common.inuyasha_symbols import \
     EXIT_FAILURE, PROTOCOL_HELO_COMMAND, ERROR_FAILED_ESTABLISH_SESSION, \
     PROTOCOL_QUIT_COMMAND, ERROR_FAILED_CONNECT_TO_SERVER
 from announcers.announcer import Announcer
@@ -13,6 +10,13 @@ from info_getters.dir_listing import DirListing
 from pickers.process_to_kill_picker import ProcessToKillPicker
 from senders.shellcode_sender import ShellcodeSender
 from executers.shellcode_executer import ShellcodeExecuter
+from common.footer import Footer
+from common.press_enter_to_return_to_main_menu import PressEnterToReturnToMainMenu
+from common.thank_you_message_printer import ThankYouMessagePrinter
+from common.blank_line_printer import BlankLinePrinter
+from common.banner import Banner
+from common.welcome_printer import WelcomePrinter
+from common.wait_for_enter_to_continue import WaitForEnterToContinue
 
 
 class Session(object):
@@ -25,6 +29,7 @@ class Session(object):
    
     def GetCpuInfo(self):
         if not self.IsValid():
+            print("wah-wah-WAAAAHHHHH-10")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()
@@ -34,6 +39,7 @@ class Session(object):
     
     def GetDirListing(self):
         if not self.IsValid():
+            print("Calling Session.End in GetDirListing")
             self.End(EXIT_FAILURE)
 
         DirListing.Get(self.GetSocket(), self.IsConnected())
@@ -72,6 +78,7 @@ class Session(object):
     
     def End(self, nExitCode):
         if not self.__socket:
+            print("wah-wah-WAAAAHHHHH-11")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             exit(EXIT_FAILURE)
         if not self.__connected:
@@ -102,6 +109,7 @@ class Session(object):
             self.__machineInfo = MachineInfoFactory.Make()
             self.__socket = SocketWrapper()
             if self.__socket is None:
+                print("wah-wah-WAAAAHHHHH-1")
                 print(ERROR_FAILED_ESTABLISH_SESSION)
                 self.End(EXIT_FAILURE)
                 
@@ -110,11 +118,13 @@ class Session(object):
                 self.End(EXIT_FAILURE)
                 
             if 0 == self.__socket.Send(PROTOCOL_HELO_COMMAND):
+                print("wah-wah-WAAAAHHHHH-2")
                 print(ERROR_FAILED_ESTABLISH_SESSION)
                 self.End(EXIT_FAILURE)
                 
             status = self.__socket.Receive()
             if not status.startswith('2'):
+                print("wah-wah-WAAAAHHHHH-3")
                 print(ERROR_FAILED_ESTABLISH_SESSION)
                 self.End(EXIT_FAILURE)
         
@@ -123,6 +133,7 @@ class Session(object):
             Footer.Print()
             WaitForEnterToContinue.Print()
         except:
+            print("Poo poo")
             self.End(EXIT_FAILURE)
         pass
     

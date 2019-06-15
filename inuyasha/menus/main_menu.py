@@ -1,7 +1,7 @@
 from console.console_class import Console
-from common.gui_utilities import Banner
 from common.inuyasha_symbols import INVALID_CHOICE_VALUE,\
     ERROR_INVALID_MAIN_MENU_CHOICE
+from common.banner import Banner
 
 
 class MainMenu(object):

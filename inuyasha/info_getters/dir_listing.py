@@ -1,11 +1,13 @@
 from console.console_class import Console
-from common.gui_utilities import Banner, Footer, PressEnterToReturnToMainMenu
 from common.inuyasha_symbols import PROTOCOL_LDIR_COMMAND, \
     IDS_SERVER_DIR_PATH_PROMPT, \
     ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER, LF,\
     DEFAULT_PAGE_LINE_COUNT, ERROR_FAILED_GET_DIR_LISTING_FORMAT
 from announcers.announcer import Announcer
 from paginators.paginator import Paginator
+from common.banner import Banner
+from common.footer import Footer
+from common.press_enter_to_return_to_main_menu import PressEnterToReturnToMainMenu
 
 
 class DirListing(object):
@@ -71,6 +73,7 @@ class DirListing(object):
         Banner.Print()
         Announcer.AnnounceListServerDirectory()
         if not theSocket:
+            print("wah-wah-WAAAAHHHHH-6")
             print(ERROR_FAILED_ESTABLISH_SESSION)
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()

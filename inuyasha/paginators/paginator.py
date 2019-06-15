@@ -1,7 +1,7 @@
 from common.inuyasha_symbols import CONTINUATION_PROMPT, LF,\
     DEFAULT_PAGE_LINE_COUNT
 from console.console_class import Console
-from common.gui_utilities import Banner
+from common.banner import Banner
 
 
 class Paginator(object):
