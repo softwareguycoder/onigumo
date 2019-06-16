@@ -5,6 +5,27 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+/**
+ * @brief Standardized size for buffers.
+ */
+#ifndef BUFLEN
+#define BUFLEN          1024
+#endif //BUFLEN
+
+#ifndef CALLING_CLEANUP_HANDLER
+#define CALLING_CLEANUP_HANDLER \
+  "\nserver: Calling cleanup handler...\n"
+#endif //CALLING_CLEANUP_HANDLER
+
+/**
+ * @brief Defines a format string for logging how many bytes were just
+ * received from a client.
+ */
+#ifndef CLIENT_BYTES_RECD_FORMAT
+#define CLIENT_BYTES_RECD_FORMAT \
+    "C[%s:%d]: %d B received.\n"
+#endif //CLIENT_BYTES_RECD_FORMAT
+
 #ifndef ERROR_FAILED_TO_SEND
 #define ERROR_FAILED_TO_SEND \
   "ERROR: Send has failed.\n"
@@ -79,10 +100,6 @@
     "INFO\n"
 #endif //PROTOCOL_INFO_COMMAND
 
-#ifndef CPUINFO_FILE
-#define CPUINFO_FILE "/proc/cpuinfo"
-#endif //CPUINFO_FILE
-
 #ifndef PROTOCOL_PURG_COMMAND
 #define PROTOCOL_PURG_COMMAND "PURG\n"
 #endif //PROTOCOL_PURG_COMMAND
@@ -113,27 +130,6 @@
   "ERROR: Failed to allocate memory for SHELLCODEINFO instance.\n"
 #endif //FAILED_ALLOC_SHELLCODEINFO
 
-/**
- * @brief Standardized size for buffers.
- */
-#ifndef BUFLEN
-#define BUFLEN					1024
-#endif //BUFLEN
-
-#ifndef CALLING_CLEANUP_HANDLER
-#define CALLING_CLEANUP_HANDLER \
-	"\nserver: Calling cleanup handler...\n"
-#endif //CALLING_CLEANUP_HANDLER
-
-/**
- * @brief Defines a format string for logging how many bytes were just
- * received from a client.
- */
-#ifndef CLIENT_BYTES_RECD_FORMAT
-#define CLIENT_BYTES_RECD_FORMAT \
-    "C[%s:%d]: %d B received.\n"
-#endif //CLIENT_BYTES_RECD_FORMAT
-
 #ifndef CLIENT_COUNT_ZERO
 #define CLIENT_COUNT_ZERO \
     "Client count has dropped to zero.  Waiting for more connections...\n"
@@ -161,21 +157,6 @@
   "C[%s:%d]: Client ID is '{%s}'.\n"
 #endif //CLIENT_ID_FORMAT
 
-#ifndef BEGAN_COMMAND_INVOCATION_SESSION_FORMAT
-#define BEGAN_COMMAND_INVOCATION_SESSION_FORMAT \
-  "S: Began command invocation session for '{%s}'.\n"
-#endif //BEGAN_COMMAND_INVOCATION_SESSION_FORMAT
-
-#ifndef ENDING_COMMAND_INVOCATION_SESSION_FORMAT
-#define ENDING_COMMAND_INVOCATION_SESSION_FORMAT \
-  "S: Ending command invocation session '{%s}'...\n"
-#endif //ENDING_COMMAND_INVOCATION_SESSION_FORMAT
-
-#ifndef ENDED_COMMAND_INVOCATION_SESSION_FORMAT
-#define ENDED_COMMAND_INVOCATION_SESSION_FORMAT \
-  "S: Ended command invocation session for '%s'.\n"
-#endif //ENDED_COMMAND_INVOCATION_SESSION_FORMAT
-
 #ifndef CLIENT_IP_ADDR_UNK
 #define CLIENT_IP_ADDR_UNK		"server: Client IP address not known.\n"
 #endif //CLIENT_IP_ADDR_UNK
@@ -195,17 +176,16 @@
   "server: Closing TCP endpoint...\n"
 #endif //CLOSING_SERVER_TCP_ENDPOINT
 
-#ifndef COMMAND_INCORRECT
-#define COMMAND_INCORRECT \
-  "500 Error.  Command syntax incorrect or server error.\n"
-#endif //COMMAND_INCORRECT
-
 /**
  * @brief Copyright message to display on the server's console.
  */
 #ifndef COPYRIGHT_MESSAGE
 #define COPYRIGHT_MESSAGE	"Copyright (c) 2018-19 by Brian Hart.\n\n"
 #endif //COPYRIGHT_MESSAGE
+
+#ifndef CPUINFO_FILE_PATH
+#define CPUINFO_FILE_PATH "/proc/cpuinfo"
+#endif //CPUINFO_FILE_PATH
 
 #ifndef DIAGNOSTIC_MODE_PARM_COUNT
 #define DIAGNOSTIC_MODE_PARM_COUNT		3
@@ -344,7 +324,7 @@
  * running on the host.
  * @remarks If the operation does not work, then it's most likely because the
  * user account under which the onigumo server is executing does not have
- * sufficient permissions to run ps -a.
+ * sufficient permissions to run ps -ef.
  */
 #ifndef HOST_PROC_LIST_ACCESS_DENIED
 #define HOST_PROC_LIST_ACCESS_DENIED \

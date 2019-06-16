@@ -59,13 +59,11 @@ void ForciblyDisconnectClient(LPCLIENTSTRUCT lpCS) {
 
 void ReplyToClient(LPCLIENTSTRUCT lpCS, const char* pszBuffer) {
   if (!IsClientStructValid(lpCS)) {
-    fprintf(stderr, "ERROR: Client structure invalid.\n");
     return;
   }
 
   int nBytesSent = SendToClient(lpCS, pszBuffer);
   if (nBytesSent < 0) {
-    fprintf(stderr, "ERROR: Send has failed.\n");
     perror("server[ReplyToClient]");
 
     FreeSocketMutex();

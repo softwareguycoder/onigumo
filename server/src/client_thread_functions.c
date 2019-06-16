@@ -1067,10 +1067,10 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
    * a . on a line by itself and then closing the file. */
   ReplyToClient(lpSendingClient, OK_CPU_INFO_FOLLOWS);
 
-  FILE* fp = fopen(CPUINFO_FILE, "r");
+  FILE* fp = fopen(CPUINFO_FILE_PATH, "r");
   if (fp == NULL) {
     fprintf(stderr, "ERROR: Failed to open file '%s' for reading.\n",
-    CPUINFO_FILE);
+    CPUINFO_FILE_PATH);
 
     ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
@@ -1186,7 +1186,7 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
   memset(szCurLine, 0, 1035);
 
   ReplyToClient(lpSendingClient,
-  OK_PROC_LIST_FOLLOWS);
+      OK_PROC_LIST_FOLLOWS);
 
   while (NULL != fgets(szCurLine, 1035, fp)) {
     if (IsNullOrWhiteSpace(szCurLine)) {
@@ -1194,10 +1194,7 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
     }
 
     ReplyToClient(lpSendingClient, szCurLine);
-    memset(szCurLine, 0, 1035);
   }
-
-  memset(szCurLine, 0, 1035);
 
   fclose(fp);
   fp = NULL;
