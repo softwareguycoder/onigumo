@@ -112,7 +112,7 @@ int GetCurrentShellCodeInfoBytes(void* pvShellCodeInfo) {
 // GetCommandIntegerArgument function
 
 long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
-    const char *pszBuffer) {
+    const char *pszBuffer, BOOL bMustBePositive) {
   int nStringCount = 0;
   char **ppszStrings = NULL;
 
@@ -383,7 +383,7 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
   /* Tell the client, "OK, we've seen this command and it's valid, so
    * we are now sending the listing." */
   lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
-      OK_DIR_LIST_FOLLOWS);
+  OK_DIR_LIST_FOLLOWS);
 
   /* Iterate through the lines of text returned by the shell command
    * opened with popen() and send each line, one at a time, to the client.
@@ -438,8 +438,8 @@ void VerifyShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
     return;
   }
 
-  lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, OK_RECD_SHELLCODE_SUCCESSFULLY);
+  ReportNumShellcodeBytesReceived(lpSendingClient,
+      nTotalShellCodeBytesReceived);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -868,7 +868,7 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
    * CODE <integer> where <integer> is a positive 32-bit value.
    */
   long lShellcodeBytes = GetCommandIntegerArgument(lpSendingClient,
-      pszBuffer);
+      pszBuffer, TRUE /* must be positive */);
   if (lShellcodeBytes == 0L) {
     return;
   }
@@ -926,10 +926,8 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
    * return value to an int since that is what shellcode typically reserves
    * room for in memory. */
   int nShellCodeArgument =
-      (int) GetCommandIntegerArgument(lpSendingClient, pszBuffer);
-  if (nShellCodeArgument == 0) {  // no PID has the value zero
-    return;
-  }
+      (int) GetCommandIntegerArgument(lpSendingClient, pszBuffer,
+          FALSE /* does not have to be positive, in principle */);
 
   int nTotalEncodedShellCodeBytes = 0;
   char *pszEncodedShellCode = NULL;
@@ -1327,29 +1325,6 @@ int ReceiveFromClient(void* pvSendingClient, char** ppszReplyBuffer) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// ReportClientSessionStats function
-
-void ReportClientSessionStats(LPCLIENTSTRUCT lpSendingClient) {
-  if (lpSendingClient == NULL) {
-    return;
-  }
-
-  char *pszClientID = UUIDToString(&(lpSendingClient->clientID));
-
-  fprintf(stdout,
-  CLIENT_SESSION_STATS, pszClientID, lpSendingClient->nBytesReceived,
-      lpSendingClient->nBytesSent);
-
-  if (GetLogFileHandle() != stdout) {
-    LogInfo(
-    CLIENT_SESSION_STATS, pszClientID, lpSendingClient->nBytesReceived,
-        lpSendingClient->nBytesSent);
-  }
-
-  FreeBuffer((void**) &pszClientID);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // RemoveClientEntryFromList function
 
 void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient) {
@@ -1374,6 +1349,51 @@ void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient) {
         FreeClient);
   }
   UnlockMutex(GetClientListMutex());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ReportClientSessionStats function
+
+void ReportClientSessionStats(LPCLIENTSTRUCT lpSendingClient) {
+  if (lpSendingClient == NULL) {
+    return;
+  }
+
+  char *pszClientID = UUIDToString(&(lpSendingClient->clientID));
+
+  fprintf(stdout,
+  CLIENT_SESSION_STATS, pszClientID, lpSendingClient->nBytesReceived,
+      lpSendingClient->nBytesSent);
+
+  if (GetLogFileHandle() != stdout) {
+    LogInfo(
+    CLIENT_SESSION_STATS, pszClientID, lpSendingClient->nBytesReceived,
+        lpSendingClient->nBytesSent);
+  }
+
+  FreeBuffer((void**) &pszClientID);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ReportNumShellcodeBytesReceived function
+
+void ReportNumShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
+    int nTotalShellCodeBytesReceived) {
+  if (!IsClientStructValid(lpSendingClient)) {
+    return; // Required parameter.
+  }
+
+  if (nTotalShellCodeBytesReceived <= 0) {
+    return; // Required parameter.
+  }
+
+  char szReplyText[MAX_LINE_LENGTH + 1];
+  memset(szReplyText, 0, MAX_LINE_LENGTH + 1);
+  sprintf(szReplyText, OK_RECD_SHELLCODE_SUCCESSFULLY,
+      nTotalShellCodeBytesReceived);
+
+  lpSendingClient->nBytesSent +=
+      ReplyToClient(lpSendingClient, szReplyText);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

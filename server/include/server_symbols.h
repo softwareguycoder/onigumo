@@ -35,12 +35,12 @@
 
 #ifndef OK_SHELLCODE_SYSCALL_EXECUTED_FORMAT
 #define OK_SHELLCODE_SYSCALL_EXECUTED_FORMAT \
-  "207 OK. Shellcode executed.  Return value: %d.\n"
+  "202 OK.  Shellcode executed.  Return value: %d.\n"
 #endif //OK_SHELLCODE_SYSCALL_EXECUTED_FORMAT
 
 #ifndef ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED
 #define ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED \
-  "508 Failed. Input string or command is limited to 255 characters including <LF>.\n"
+  "508 Failed.  Input string or command is limited to 255 characters including <LF>.\n"
 #endif //ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED
 
 #ifndef LINUX_DIRECTORY_LIST_COMMAND
@@ -65,7 +65,7 @@
 
 #ifndef ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES
 #define ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES \
-  "507 Failed. The CODE command argument is number of Base64-encoded " \
+  "507 Failed.  The CODE command argument is number of Base64-encoded " \
   "shellcode bytes.\n"
 #endif //ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES
 
@@ -84,13 +84,13 @@
 
 #ifndef OK_PURGD_SUCCESSFULLY
 #define OK_PURGD_SUCCESSFULLY \
-  "203 OK. All shellcode lines being stored for this client " \
+  "207 OK.  All shellcode lines being stored for this client " \
   "have been purged.\n"
 #endif //OK_PURGD_SUCCESSFULLY
 
 #ifndef RECD_SHELLCODE_SUCCESSFULLY
 #define OK_RECD_SHELLCODE_SUCCESSFULLY \
-  "202 OK. Encoded shellcode bytes received successfully.\n"
+  "201 OK.  %d bytes of shellcode received.\n"
 #endif //RECD_SHELLCODE_SUCCESSFULLY
 
 #ifndef FAILED_ADD_SHELLCODE_BLOCK
@@ -226,18 +226,18 @@
  * has been forcibly terminated by its console interactive user.
  */
 #ifndef ERROR_FORCED_DISCONNECT
-#define ERROR_FORCED_DISCONNECT		"503 Server forcibly shut down by its " \
-									"operator.\n"
+#define ERROR_FORCED_DISCONNECT \
+  "503 Failed.  Server forcibly shut down by its console's operator.\n"
 #endif //ERROR_FORCED_DISCONNECT
 
 #ifndef ERROR_GENERAL_SERVER_FAILURE
 #define ERROR_GENERAL_SERVER_FAILURE \
-  "550 Failed. Unknown server or OS error.\n"
+  "550 Failed.  Unknown server or OS error.\n"
 #endif //ERROR_GENERAL_SERVER_FAILURE
 
 #ifndef ERROR_MUST_SAY_HELLO_FIRST
 #define ERROR_MUST_SAY_HELLO_FIRST \
-  "504 Failed. Must issue HELO command to begin client session.\n"
+  "504 Failed.  Must issue HELO command to begin client session.\n"
 #endif //ERROR_MUST_SAY_HELLO_FIRST
 
 /**
@@ -247,7 +247,7 @@
  */
 #ifndef ERROR_MAX_CONNECTIONS_EXCEEDED
 #define ERROR_MAX_CONNECTIONS_EXCEEDED \
-    "502 The maximum count of connected clients has been exceeded.\n"
+    "501 Failed.  The maximum count of connected clients has been exceeded.\n"
 #endif //ERROR_MAX_CONNECTIONS_EXCEEDED
 
 /**
@@ -261,25 +261,24 @@
 
 #ifndef ERROR_QTY_MUST_BE_POS_32BIT_INT
 #define ERROR_QTY_MUST_BE_POS_32BIT_INT \
-  "502 Failed.  Integer argument must be a positive, 32-bit quanity.\n"
+  "402 Failed.  Integer argument must be a positive, 32-bit quanity.\n"
 #endif //ERROR_QTY_MUST_BE_POS_32BIT_INT
 
 #ifndef ERROR_FAILED_TO_PARSE_INT
 #define ERROR_FAILED_TO_PARSE_INT \
-    "401 Failed.  Cannot parse input as integer.\n"
+    "401 Failed.  Cannot parse input as 32-bit signed integer.\n"
 #endif //ERROR_FAILED_TO_PARSE_INT
 
 #ifndef ERROR_FAILED_TO_PARSE_STRING
 #define ERROR_FAILED_TO_PARSE_STRING \
-    "402 Failed.  Cannot parse input as string argument.\n"
+    "403 Failed.  Cannot parse input as string argument.\n"
 #endif //ERROR_FAILED_TO_PARSE_STRING
 
 #ifndef ERROR_FAILED_TO_DECODE_SHELLCODE
 #define ERROR_FAILED_TO_DECODE_SHELLCODE \
-  "403 Failed.  Data sent with CODE command was not of a " \
+  "404 Failed.  Data sent with CODE command was not of a " \
   "recognizable format.\n"
 #endif //ERROR_FAILED_TO_DECODE_SHELLCODE
-
 
 #ifndef ERROR_TOO_MANY_CLIENTS
 #define ERROR_TOO_MANY_CLIENTS \
@@ -312,8 +311,8 @@
 #endif //ERROR_CLIENT_ENTRY_COUNT_EXCEEDED
 
 #ifndef FAILED_LAUNCH_CLIENT_THREAD
-#define FAILED_LAUNCH_CLIENT_THREAD	"server: Failed to launch client comm " \
-									"channel.\n"
+#define FAILED_LAUNCH_CLIENT_THREAD	\
+  "server: Failed to launch client comm channel.\n"
 #endif //FAILED_LAUNCH_CLIENT_THREAD
 
 #ifndef FAILED_OPEN_LOG_FILE
@@ -432,25 +431,11 @@
 #endif //MSG_TERMINATOR
 
 /**
- * @brief Server's administrative message saying a new chatter joined.
- */
-#ifndef NEW_CHATTER_JOINED
-#define NEW_CHATTER_JOINED			"!@%s joined the chat room.\n"
-#endif //NEW_CHATTER_JOINED
-
-/**
- * @brief Server's administrative message saying a chatter left.
- */
-#ifndef NEW_CHATTER_LEFT
-#define NEW_CHATTER_LEFT			"!@%s left the chat room.\n"
-#endif //NEW_CHATTER_LEFT
-
-/**
  * @brief Message to print or log indicating new client connection detected.
  */
 #ifndef NEW_CLIENT_CONN
-#define NEW_CLIENT_CONN				"S: <New client connection detected " \
-									"from %s.>\n"
+#define NEW_CLIENT_CONN \
+  "S: <New client connection detected from %s.>\n"
 #endif //NEW_CLIENT_CONN
 
 /**
@@ -463,7 +448,7 @@
  */
 #ifndef OK_WELCOME
 #define OK_WELCOME \
-    "200 OK. Welcome to the onigumo server.  Be careful what you wish for!\n"
+    "200 OK.  Welcome to the onigumo server.  Be careful what you wish for!\n"
 #endif //OK_WELCOME
 
 /**
@@ -472,12 +457,12 @@
  * server that their user is done chatting.
  */
 #ifndef OK_GOODBYE
-#define OK_GOODBYE					"206 Goodbye.\n"
+#define OK_GOODBYE					"205 Goodbye.\n"
 #endif //OK_GOODBYE
 
 #ifndef OK_CPU_INFO_FOLLOWS
 #define OK_CPU_INFO_FOLLOWS \
-  "205 OK. Following lines contain host machine CPU info.  Terminated by .\n"
+  "204 OK.  Following lines contain host machine CPU info.  Terminated by .\n"
 #endif //OK_CPU_INFO_FOLLOWS
 
 /**
@@ -490,17 +475,17 @@
  */
 #ifndef OK_PROC_LIST_FOLLOWS
 #define OK_PROC_LIST_FOLLOWS \
-	"204 OK. List of processes running on this machine follows.\n"
+	"203 OK.  List of processes running on this machine follows.\n"
 #endif //OK_PROC_LIST_FOLLOWS
 
 #ifndef OK_DIR_LIST_FOLLOWS
 #define OK_DIR_LIST_FOLLOWS \
-  "204 OK. Directory listing follows.\n"
+  "203 OK.  Directory listing follows.\n"
 #endif //OK_DIR_LIST_FOLLOWS
 
 #ifndef OK_SEND_SHELLCODE
 #define OK_SEND_SHELLCODE \
-  "301 OK. Send your shellcode.  Terminate with a '.' on a line by itself.\n"
+  "301 OK.  Send your shellcode.  Terminate with a '.' on a line by itself.\n"
 #endif //OK_SEND_SHELLCODE
 
 #ifndef OUT_OF_MEMORY

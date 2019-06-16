@@ -189,6 +189,8 @@ void ProcessPurgCommand(LPCLIENTSTRUCT lpSendingClient);
  */
 int ReceiveFromClient(void* pvSendingClient, char** ppszReplyBuffer);
 
+void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient);
+
 /**
  * @brief Reports statistics to the server log and console for the client
  * whose chat session just ended, like how many total bytes were sent and
@@ -198,7 +200,8 @@ int ReceiveFromClient(void* pvSendingClient, char** ppszReplyBuffer);
  */
 void ReportClientSessionStats(LPCLIENTSTRUCT lpSendingClient);
 
-void RemoveClientEntryFromList(LPCLIENTSTRUCT lpSendingClient);
+void ReportNumShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
+    int nTotalShellCodeBytesReceived);
 
 void SendMultilineData(LPCLIENTSTRUCT lpSendingClient,
     char** ppszOutputLines, int nLineCount);
