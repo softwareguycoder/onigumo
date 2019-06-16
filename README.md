@@ -1,5 +1,5 @@
-# onigumo TCP/IP Server **WIP**
-(C/64-bit/Linux) Server to enable the remote execution of shellcode and to gain knowledge of the user's system.
+# onigumo TCP/IP Server and inuyasha TCP/IP Client (this Readme is WIP)
+(C/64-bit x86/Linux) Server to enable the remote execution of shellcode and to gain knowledge of the user's system.
 
 ## I.  Introduction
 onigumo is a server that facilitates the execution of shellcode on a remote machine.  Up to 20 clients can connect simulatenously to an instance of an ongiumo server.
