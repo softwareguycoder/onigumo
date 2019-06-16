@@ -69,6 +69,8 @@
   "508 Failed.  Input string or command is limited to 255 characters including <LF>.\n"
 #endif //ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED
 
+#define LINE_BUFFER_SIZE 1024
+
 #ifndef LINUX_DIRECTORY_LIST_COMMAND
 #define LINUX_DIRECTORY_LIST_COMMAND \
   "ls -al"

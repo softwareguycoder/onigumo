@@ -369,8 +369,8 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
     return;
   }
 
-  char szCurLine[1035];
-  memset(szCurLine, 0, 1035);
+  char szCurLine[LINE_BUFFER_SIZE + 1];
+  memset(szCurLine, 0, LINE_BUFFER_SIZE + 1);
 
   /* Tell the client, "OK, we've seen this command and it's valid, so
    * we are now sending the listing." */
@@ -380,15 +380,15 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
    * opened with popen() and send each line, one at a time, to the client.
    * Then, when the content has all been sent, then send the terminating
    * period on a line by itself and then close the file pointer. */
-  while (NULL != fgets(szCurLine, 1035, fp)) {
+  while (NULL != fgets(szCurLine, LINE_BUFFER_SIZE + 1, fp)) {
     if (IsNullOrWhiteSpace(szCurLine)) {
       continue; // do not send blank lines back to the client.
     }
     ReplyToClient(lpSendingClient, szCurLine);
-    memset(szCurLine, 0, 1035);
+    memset(szCurLine, 0, LINE_BUFFER_SIZE + 1);
   }
 
-  memset(szCurLine, 0, 1035);
+  memset(szCurLine, 0, LINE_BUFFER_SIZE + 1);
 
   SendMultilineDataTerminator(lpSendingClient);
 
@@ -1076,19 +1076,19 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
-  char szCurLine[1035];
-  memset(szCurLine, 0, 1035);
+  char szCurLine[LINE_BUFFER_SIZE + 1];
+  memset(szCurLine, 0, LINE_BUFFER_SIZE + 1);
 
-  while (NULL != fgets(szCurLine, 1035, fp)) {
+  while (NULL != fgets(szCurLine, LINE_BUFFER_SIZE + 1, fp)) {
     if (IsNullOrWhiteSpace(szCurLine)) {
       continue; // do not send blank lines back to the client.
     }
 
     ReplyToClient(lpSendingClient, szCurLine);
-    memset(szCurLine, 0, 1035);
+    memset(szCurLine, 0, LINE_BUFFER_SIZE + 1);
   }
 
-  memset(szCurLine, 0, 1035);
+  memset(szCurLine, 0, LINE_BUFFER_SIZE + 1);
 
   CloseFile(&fp);
 
@@ -1182,13 +1182,13 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
-  char szCurLine[1035];
-  memset(szCurLine, 0, 1035);
+  char szCurLine[LINE_BUFFER_SIZE + 1];
+  memset(szCurLine, 0, LINE_BUFFER_SIZE + 1);
 
   ReplyToClient(lpSendingClient,
       OK_PROC_LIST_FOLLOWS);
 
-  while (NULL != fgets(szCurLine, 1035, fp)) {
+  while (NULL != fgets(szCurLine, LINE_BUFFER_SIZE + 1, fp)) {
     if (IsNullOrWhiteSpace(szCurLine)) {
       continue; // do not send blank lines back to the client.
     }
