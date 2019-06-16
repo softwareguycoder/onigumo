@@ -11,6 +11,6 @@
 #include "client_struct.h"
 
 void ForciblyDisconnectClient(LPCLIENTSTRUCT lpCS);
-int ReplyToClient(LPCLIENTSTRUCT lpCS, const char* pszBuffer);
+void ReplyToClient(LPCLIENTSTRUCT lpCS, const char* pszBuffer);
 
 #endif /* ___CLIENT_MANAGER_H__ */
