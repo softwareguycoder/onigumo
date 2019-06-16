@@ -1,4 +1,4 @@
-# onigumo TCP/IP Server (this Readme is WIP)
+# onigumo TCP/IP Server and inuyasha TCP/IP Client (this Readme is WIP)
 (C/64-bit x86/Linux) Server to enable the remote execution of shellcode and to gain knowledge of the user's system.
 
 ## I.  Introduction
