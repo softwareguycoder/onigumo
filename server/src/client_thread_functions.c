@@ -173,8 +173,7 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
   }
 
   if (lResult <= 0) {
-    ReplyToClient(lpSendingClient,
-    ERROR_QTY_MUST_BE_POS_32BIT_INT);
+    ReplyToClient(lpSendingClient, ERROR_QTY_MUST_BE_POS_32BIT_INT);
 
     FreeStringArray(&ppszStrings, nStringCount);
     return 0L;
@@ -375,8 +374,7 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
 
   /* Tell the client, "OK, we've seen this command and it's valid, so
    * we are now sending the listing." */
-  ReplyToClient(lpSendingClient,
-  OK_DIR_LIST_FOLLOWS);
+  ReplyToClient(lpSendingClient, OK_DIR_LIST_FOLLOWS);
 
   /* Iterate through the lines of text returned by the shell command
    * opened with popen() and send each line, one at a time, to the client.
@@ -550,8 +548,7 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
 
   /* Tell the client who told us they want to quit,
    * "Good bye sucka!" */
-  ReplyToClient(lpSendingClient,
-  OK_GOODBYE);
+  ReplyToClient(lpSendingClient, OK_GOODBYE);
 
   ClearClientShellCodeLines(lpSendingClient);
 
@@ -602,15 +599,13 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
   if (IsNullOrWhiteSpace(pszBuffer)) {
     // Buffer containing the command we are handling is blank.
     // Nothing to do.
-    ReplyToClient(lpSendingClient,
-    ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
+    ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
     return FALSE;
   }
 
   if (!lpSendingClient->bReceivingMultilineData
       && !IsProtocolCommand(pszBuffer)) {
-    ReplyToClient(lpSendingClient,
-    ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
+    ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
     return FALSE;
   }
 
@@ -805,8 +800,7 @@ BOOL PrepareToSendDirectoryListing(LPCLIENTSTRUCT lpSendingClient,
   ShellExpand(pszTrimmedDirectoryName, pszExpandedPathName, MAX_PATH + 1);
 
   if (!DirectoryExists(pszExpandedPathName)) {
-    ReplyToClient(lpSendingClient,
-    ERROR_DIR_COULD_NOT_BE_LISTED);
+    ReplyToClient(lpSendingClient, ERROR_DIR_COULD_NOT_BE_LISTED);
     fprintf(stderr, ERROR_FAILED_FIND_DIR,
         pszExpandedPathName);
     if (GetErrorLogFileHandle() != stderr) {
@@ -817,8 +811,7 @@ BOOL PrepareToSendDirectoryListing(LPCLIENTSTRUCT lpSendingClient,
   }
 
   if (!SetCurrentWorkingDirectory(pszExpandedPathName)) {
-    ReplyToClient(lpSendingClient,
-    ERROR_DIR_COULD_NOT_BE_LISTED);
+    ReplyToClient(lpSendingClient, ERROR_DIR_COULD_NOT_BE_LISTED);
     fprintf(stderr, ERROR_FAILED_SET_WORKING_DIR,
         pszExpandedPathName);
     if (GetErrorLogFileHandle() != stderr) {
@@ -1035,8 +1028,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
    * clients is exceeded; in this case reply to the client 501 Max clients
    * connected or some such. */
   if (!AreTooManyClientsConnected()) {
-    ReplyToClient(lpSendingClient,
-    OK_WELCOME);
+    ReplyToClient(lpSendingClient, OK_WELCOME);
 
     return;
   }
@@ -1073,8 +1065,7 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
    * if the open operation succeeded, get the file content, line for line,
    * and then send each line to the client one at a time, terminating with
    * a . on a line by itself and then closing the file. */
-  ReplyToClient(
-      lpSendingClient, OK_CPU_INFO_FOLLOWS);
+  ReplyToClient(lpSendingClient, OK_CPU_INFO_FOLLOWS);
 
   FILE* fp = fopen(CPUINFO_FILE, "r");
   if (fp == NULL) {
@@ -1392,8 +1383,7 @@ void SendMultilineData(LPCLIENTSTRUCT lpSendingClient,
   }
 
   for (int i = 0; i < nLineCount; i++) {
-    ReplyToClient(lpSendingClient,
-        ppszOutputLines[i]);
+    ReplyToClient(lpSendingClient, ppszOutputLines[i]);
   }
 
   SendMultilineDataTerminator(lpSendingClient);
@@ -1451,8 +1441,7 @@ void TellClientTooManyPeopleConnected(LPCLIENTSTRUCT lpSendingClient) {
     fprintf(stderr, ERROR_TOO_MANY_CLIENTS, MAX_ALLOWED_CONNECTIONS);
   }
 
-  ReplyToClient(lpSendingClient,
-  ERROR_MAX_CONNECTIONS_EXCEEDED);
+  ReplyToClient(lpSendingClient, ERROR_MAX_CONNECTIONS_EXCEEDED);
 
   // Make the current client not connected
   lpSendingClient->bConnected = FALSE;

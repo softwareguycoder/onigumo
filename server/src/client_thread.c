@@ -78,8 +78,7 @@ void *ClientThread(void* pData) {
        * where blank lines might be acceptable, i.e., when the server is
        * receiving the text of an e-mail message. */
       if (IsNullOrWhiteSpace(pszData)) {
-        ReplyToClient(lpSendingClient,
-                ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
+        ReplyToClient(lpSendingClient, ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
         FreeBuffer((void**) &pszData);
         continue;
       }
