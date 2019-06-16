@@ -5,6 +5,11 @@
 #ifndef __SERVER_SYMBOLS_H__
 #define __SERVER_SYMBOLS_H__
 
+#ifndef ERROR_FAILED_TO_SEND
+#define ERROR_FAILED_TO_SEND \
+  "ERROR: Send has failed.\n"
+#endif //ERROR_FAILED_TO_SEND
+
 #ifndef ERROR_FAILED_FIND_DIR
 #define ERROR_FAILED_FIND_DIR \
     "ERROR: Directory '%s' could not be located.\n"
