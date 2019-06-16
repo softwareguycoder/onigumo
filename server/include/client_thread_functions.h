@@ -203,9 +203,6 @@ void ReportClientSessionStats(LPCLIENTSTRUCT lpSendingClient);
 void ReportNumShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
     int nTotalShellCodeBytesReceived);
 
-void SendMultilineData(LPCLIENTSTRUCT lpSendingClient,
-    char** ppszOutputLines, int nLineCount);
-
 void SendMultilineDataTerminator(LPCLIENTSTRUCT lpSendingClient);
 
 /**

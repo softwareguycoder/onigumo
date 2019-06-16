@@ -1366,30 +1366,6 @@ void ReportNumShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// SendMultilineData function
-
-void SendMultilineData(LPCLIENTSTRUCT lpSendingClient,
-    char** ppszOutputLines, int nLineCount) {
-  if (lpSendingClient == NULL) {
-    return;
-  }
-
-  if (ppszOutputLines == NULL) {
-    return;
-  }
-
-  if (nLineCount <= 0) {
-    return;
-  }
-
-  for (int i = 0; i < nLineCount; i++) {
-    ReplyToClient(lpSendingClient, ppszOutputLines[i]);
-  }
-
-  SendMultilineDataTerminator(lpSendingClient);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // SendMultilineDataTerminator function
 
 void SendMultilineDataTerminator(LPCLIENTSTRUCT lpSendingClient) {
