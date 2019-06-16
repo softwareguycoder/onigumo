@@ -78,14 +78,14 @@ void *ClientThread(void* pData) {
        * where blank lines might be acceptable, i.e., when the server is
        * receiving the text of an e-mail message. */
       if (IsNullOrWhiteSpace(pszData)) {
-        lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+        ReplyToClient(lpSendingClient,
                 ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
         FreeBuffer((void**) &pszData);
         continue;
       }
 
       if (IsLineLengthLimitExceeded(lpSendingClient, pszData)) {
-        lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+        ReplyToClient(lpSendingClient,
             ERROR_FAILED_LINE_LENGTH_LIMIT_EXCEEDED);
         FreeBuffer((void**) &pszData);
         continue;

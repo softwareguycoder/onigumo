@@ -144,8 +144,7 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
       " ", &ppszStrings, &nStringCount);
 
   if (ppszStrings == NULL || nStringCount <= 1) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
+    ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
 
     FreeStringArray(&ppszStrings, nStringCount);
     return 0L;
@@ -156,8 +155,7 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
    * is not the case, then give up.
    */
   if (!IsNumbersOnly(ppszStrings[1])) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
+    ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
 
     FreeStringArray(&ppszStrings, nStringCount);
     return 0L;
@@ -168,17 +166,15 @@ long GetCommandIntegerArgument(LPCLIENTSTRUCT lpSendingClient,
    * the string is a really big number */
   long lResult = 0L;
   if (0 > StringToLong(ppszStrings[1], &lResult)) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
+    ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_INT);
 
     FreeStringArray(&ppszStrings, nStringCount);
     return 0L;
   }
 
   if (lResult <= 0) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient,
-        ERROR_QTY_MUST_BE_POS_32BIT_INT);
+    ReplyToClient(lpSendingClient,
+    ERROR_QTY_MUST_BE_POS_32BIT_INT);
 
     FreeStringArray(&ppszStrings, nStringCount);
     return 0L;
@@ -199,14 +195,12 @@ void GetCommandStringArgument(LPCLIENTSTRUCT lpSendingClient,
   }
 
   if (IsNullOrWhiteSpace(pszCommandText)) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_STRING);
+    ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_STRING);
     return;
   }
 
   if (pszOutputBuffer == NULL) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_STRING);
+    ReplyToClient(lpSendingClient, ERROR_FAILED_TO_PARSE_STRING);
     return;
   }
 
@@ -372,8 +366,7 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
   if (fp == NULL) {
     fprintf(stderr, "ERROR: Failed to run shell command '%s'.\n",
     LINUX_DIRECTORY_LIST_COMMAND);
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_DIR_COULD_NOT_BE_LISTED);
+    ReplyToClient(lpSendingClient, ERROR_DIR_COULD_NOT_BE_LISTED);
     return;
   }
 
@@ -382,7 +375,7 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
 
   /* Tell the client, "OK, we've seen this command and it's valid, so
    * we are now sending the listing." */
-  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+  ReplyToClient(lpSendingClient,
   OK_DIR_LIST_FOLLOWS);
 
   /* Iterate through the lines of text returned by the shell command
@@ -393,8 +386,7 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
     if (IsNullOrWhiteSpace(szCurLine)) {
       continue; // do not send blank lines back to the client.
     }
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, szCurLine);
+    ReplyToClient(lpSendingClient, szCurLine);
     memset(szCurLine, 0, 1035);
   }
 
@@ -411,14 +403,12 @@ void SendDirectoryListingToClient(LPCLIENTSTRUCT lpSendingClient,
 void VerifyShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
     long lShellcodeBytes) {
   if (lpSendingClient == NULL) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
   if (lShellcodeBytes <= 0) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
@@ -432,8 +422,7 @@ void VerifyShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
   if (nTotalShellCodeBytesReceived == -1
       || nTotalShellCodeBytesReceived != (int) lShellcodeBytes) {
     // Unknown error during computation of total bytes received.
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES);
+    ReplyToClient(lpSendingClient, ERROR_CONFIRM_ENCODED_SHELLCODE_BYTES);
     ClearClientShellCodeLines(lpSendingClient);
     return;
   }
@@ -561,7 +550,7 @@ BOOL EndClientSession(LPCLIENTSTRUCT lpSendingClient) {
 
   /* Tell the client who told us they want to quit,
    * "Good bye sucka!" */
-  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+  ReplyToClient(lpSendingClient,
   OK_GOODBYE);
 
   ClearClientShellCodeLines(lpSendingClient);
@@ -613,14 +602,14 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
   if (IsNullOrWhiteSpace(pszBuffer)) {
     // Buffer containing the command we are handling is blank.
     // Nothing to do.
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+    ReplyToClient(lpSendingClient,
     ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
     return FALSE;
   }
 
   if (!lpSendingClient->bReceivingMultilineData
       && !IsProtocolCommand(pszBuffer)) {
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+    ReplyToClient(lpSendingClient,
     ERROR_COMMAND_OR_DATA_UNRECOGNIZED);
     return FALSE;
   }
@@ -654,8 +643,7 @@ BOOL HandleProtocolCommand(LPCLIENTSTRUCT lpSendingClient,
    * non-connected client can even send. Otherwise, do not accept any further
    * protocol commands until a client has said HELO ("Hello!") to us. */
   if (lpSendingClient->bConnected == FALSE) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_MUST_SAY_HELLO_FIRST);
+    ReplyToClient(lpSendingClient, ERROR_MUST_SAY_HELLO_FIRST);
 
     return TRUE; /* command or thing handled by telling client they
      need to say HELO first */
@@ -817,7 +805,7 @@ BOOL PrepareToSendDirectoryListing(LPCLIENTSTRUCT lpSendingClient,
   ShellExpand(pszTrimmedDirectoryName, pszExpandedPathName, MAX_PATH + 1);
 
   if (!DirectoryExists(pszExpandedPathName)) {
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+    ReplyToClient(lpSendingClient,
     ERROR_DIR_COULD_NOT_BE_LISTED);
     fprintf(stderr, ERROR_FAILED_FIND_DIR,
         pszExpandedPathName);
@@ -829,7 +817,7 @@ BOOL PrepareToSendDirectoryListing(LPCLIENTSTRUCT lpSendingClient,
   }
 
   if (!SetCurrentWorkingDirectory(pszExpandedPathName)) {
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+    ReplyToClient(lpSendingClient,
     ERROR_DIR_COULD_NOT_BE_LISTED);
     fprintf(stderr, ERROR_FAILED_SET_WORKING_DIR,
         pszExpandedPathName);
@@ -873,8 +861,7 @@ void ProcessCodeCommand(LPCLIENTSTRUCT lpSendingClient,
     return;
   }
 
-  lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, OK_SEND_SHELLCODE);
+  ReplyToClient(lpSendingClient, OK_SEND_SHELLCODE);
 
   lpSendingClient->bReceivingMultilineData = TRUE;
 
@@ -914,8 +901,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   }
 
   if (!IsUUIDValid(&(lpSendingClient->clientID))) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return; // Required parameter
   }
 
@@ -939,23 +925,20 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
       &pszEncodedShellCode, &nTotalEncodedShellCodeBytes);
   if (nTotalEncodedShellCodeBytes <= 0) {
     ClearClientShellCodeLines(lpSendingClient);
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_NO_SHELLCODE_TO_RUN);
+    ReplyToClient(lpSendingClient, ERROR_NO_SHELLCODE_TO_RUN);
     return;
   }
 
   if (IsNullOrWhiteSpace(pszEncodedShellCode)) {
     ClearClientShellCodeLines(lpSendingClient);
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
   int nDecodedBytes = GetBase64DecodedDataSize(pszEncodedShellCode);
   if (nDecodedBytes <= 0) {
     ClearClientShellCodeLines(lpSendingClient);
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
@@ -965,8 +948,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
   if (!Base64Decode(pszEncodedShellCode, szDecodedBytes, nDecodedBytes)) {
     memset(szDecodedBytes, 0, nDecodedBytes); // to prevent malware execution
     ClearClientShellCodeLines(lpSendingClient);
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_FAILED_TO_DECODE_SHELLCODE);
+    ReplyToClient(lpSendingClient, ERROR_FAILED_TO_DECODE_SHELLCODE);
     return;
   }
 
@@ -979,8 +961,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
           &pShellCodeBytes);
   if (INVALID_HANDLE_VALUE == hShellCodeThread) {
     ClearClientShellCodeLines(lpSendingClient);
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+    ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
@@ -1032,8 +1013,7 @@ void ProcessExecCommand(LPCLIENTSTRUCT lpSendingClient,
         shellCodeResults.nSyscallReturnValue);
   }
 
-  lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, szReplyBuffer);
+  ReplyToClient(lpSendingClient, szReplyBuffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1055,7 +1035,7 @@ void ProcessHeloCommand(LPCLIENTSTRUCT lpSendingClient) {
    * clients is exceeded; in this case reply to the client 501 Max clients
    * connected or some such. */
   if (!AreTooManyClientsConnected()) {
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+    ReplyToClient(lpSendingClient,
     OK_WELCOME);
 
     return;
@@ -1093,15 +1073,15 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
    * if the open operation succeeded, get the file content, line for line,
    * and then send each line to the client one at a time, terminating with
    * a . on a line by itself and then closing the file. */
-  lpSendingClient->nBytesSent += ReplyToClient(
+  ReplyToClient(
       lpSendingClient, OK_CPU_INFO_FOLLOWS);
 
   FILE* fp = fopen(CPUINFO_FILE, "r");
   if (fp == NULL) {
     fprintf(stderr, "ERROR: Failed to open file '%s' for reading.\n",
     CPUINFO_FILE);
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+
+    ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
 
@@ -1112,8 +1092,8 @@ void ProcessInfoCommand(LPCLIENTSTRUCT lpSendingClient) {
     if (IsNullOrWhiteSpace(szCurLine)) {
       continue; // do not send blank lines back to the client.
     }
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, szCurLine);
+
+    ReplyToClient(lpSendingClient, szCurLine);
     memset(szCurLine, 0, 1035);
   }
 
@@ -1206,23 +1186,23 @@ void ProcessListCommand(LPCLIENTSTRUCT lpSendingClient) {
   if (fp == NULL) {
     fprintf(stderr, "ERROR: Failed to run shell command '%s'.\n",
     PS_SHELL_COMMAND);
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, HOST_PROC_LIST_ACCESS_DENIED);
+
+    ReplyToClient(lpSendingClient, HOST_PROC_LIST_ACCESS_DENIED);
     return;
   }
 
   char szCurLine[1035];
   memset(szCurLine, 0, 1035);
 
-  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+  ReplyToClient(lpSendingClient,
   OK_PROC_LIST_FOLLOWS);
 
   while (NULL != fgets(szCurLine, 1035, fp)) {
     if (IsNullOrWhiteSpace(szCurLine)) {
       continue; // do not send blank lines back to the client.
     }
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, szCurLine);
+
+    ReplyToClient(lpSendingClient, szCurLine);
     memset(szCurLine, 0, 1035);
   }
 
@@ -1247,12 +1227,11 @@ void ProcessPurgCommand(LPCLIENTSTRUCT lpSendingClient) {
   }
 
   if (!ClearClientShellCodeLines(lpSendingClient)) {
-    lpSendingClient->nBytesSent +=
-        ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
+
+    ReplyToClient(lpSendingClient, ERROR_GENERAL_SERVER_FAILURE);
     return;
   }
-  lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
+  ReplyToClient(lpSendingClient, OK_PURGD_SUCCESSFULLY);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1392,8 +1371,7 @@ void ReportNumShellcodeBytesReceived(LPCLIENTSTRUCT lpSendingClient,
   sprintf(szReplyText, OK_RECD_SHELLCODE_SUCCESSFULLY,
       nTotalShellCodeBytesReceived);
 
-  lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, szReplyText);
+  ReplyToClient(lpSendingClient, szReplyText);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1414,7 +1392,7 @@ void SendMultilineData(LPCLIENTSTRUCT lpSendingClient,
   }
 
   for (int i = 0; i < nLineCount; i++) {
-    lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+    ReplyToClient(lpSendingClient,
         ppszOutputLines[i]);
   }
 
@@ -1429,8 +1407,7 @@ void SendMultilineDataTerminator(LPCLIENTSTRUCT lpSendingClient) {
     return;
   }
 
-  lpSendingClient->nBytesSent +=
-      ReplyToClient(lpSendingClient, MSG_TERMINATOR); // end of data
+  ReplyToClient(lpSendingClient, MSG_TERMINATOR); // end of data
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1474,7 +1451,7 @@ void TellClientTooManyPeopleConnected(LPCLIENTSTRUCT lpSendingClient) {
     fprintf(stderr, ERROR_TOO_MANY_CLIENTS, MAX_ALLOWED_CONNECTIONS);
   }
 
-  lpSendingClient->nBytesSent += ReplyToClient(lpSendingClient,
+  ReplyToClient(lpSendingClient,
   ERROR_MAX_CONNECTIONS_EXCEEDED);
 
   // Make the current client not connected
