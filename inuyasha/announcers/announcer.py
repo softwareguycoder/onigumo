@@ -6,7 +6,9 @@ from common.inuyasha_symbols import IDS_SERVER_CPU_INFO_HEADER, \
     ERROR_FAILED_KILL_REMOTE_PROCESS, SHELLCODE_EXECUTION_SUCCEEDED, \
     ERROR_REMOTE_PROCESS_ACCESS_DENIED, ERROR_REMOTE_PROCESS_NOT_EXISTS, \
     ERROR_FAILED_EXECUTE_SHELLCODE, IDS_ATTEMPTING_SERIALIZE_SHELLCODE, \
-    IDS_ATTEMPTING_EXTRACT_SHELLCODE_BYTES, IDS_ATTEMPTING_COMPILE_SHELLCODE
+    IDS_ATTEMPTING_EXTRACT_SHELLCODE_BYTES, IDS_ATTEMPTING_COMPILE_SHELLCODE,\
+    ERROR_FAILED_LIST_REMOTE_PROCESSES, ERROR_NO_RESPONSE_LINES,\
+    ERROR_MUST_PICK_PID
 
 
 class Announcer(object):
@@ -111,4 +113,31 @@ class Announcer(object):
         print(ERROR_FAILED_SEND_SHELLCODE)
         print()
         pass
+
+    
+    @staticmethod
+    def AnnounceFailedListRemoteProcesses():
+        print(ERROR_FAILED_LIST_REMOTE_PROCESSES)
+        print()
+        pass
+
+    
+    @staticmethod
+    def AnnounceNoResponseLines():
+        print(ERROR_NO_RESPONSE_LINES)
+        print()
+        pass
+
+    
+    @staticmethod
+    def AnnonceMustPickPID():
+        print(ERROR_MUST_PICK_PID)
+        print()
+        pass
+    
+    
+    
+    
+    
+    
     

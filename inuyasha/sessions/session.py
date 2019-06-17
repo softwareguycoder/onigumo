@@ -3,7 +3,7 @@ from console.console_class import Console
 from factories.machine_info_factory import MachineInfoFactory
 from common.inuyasha_symbols import \
     EXIT_FAILURE, PROTOCOL_HELO_COMMAND, ERROR_FAILED_ESTABLISH_SESSION, \
-    PROTOCOL_QUIT_COMMAND, ERROR_FAILED_CONNECT_TO_SERVER
+    PROTOCOL_QUIT_COMMAND, ERROR_FAILED_CONNECT_TO_SERVER, INVALID_PID_VALUE
 from announcers.announcer import Announcer
 from info_getters.cpu_info_getter import CpuInfo
 from info_getters.dir_listing import DirListing
@@ -23,6 +23,9 @@ class Session(object):
        
     def IsConnected(self):
         return self.__connected
+    
+    def IsTerminating(self):
+        return self.__terminating;
     
     def IsValid(self):
         return self.__socket and self.__connected
@@ -46,22 +49,23 @@ class Session(object):
         return self.__socket
     
     def KillSpecifiedProcess(self):
-        pid = ProcessToKillPicker.PickAndKillProc(
+        nPID = ProcessToKillPicker.PickAndKillProc(
             self.GetSocket(), self.IsConnected())
-        if pid <= 0:
+        if nPID <= INVALID_PID_VALUE:
+            exit()
+            quit()
+            return
+        
+        Announcer.AnnounceTryingToKillProcWithPid(nPID)
+
+        if not ShellcodeSender.Send(self.GetSocket()):
             Announcer.AnnounceFailedKillProcess()
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()
             return
         
-        Announcer.AnnounceTryingToKillProcWithPid(pid)
-
-        if not ShellcodeSender.Send(self.GetSocket()):
-            Footer.Print()
-            PressEnterToReturnToMainMenu.Print()
-            return
-        
-        if not ShellcodeExecuter.Execute(self.GetSocket(), pid):
+        if not ShellcodeExecuter.Execute(self.GetSocket(), nPID):
+            Announcer.AnnounceFailedKillProcess()
             Footer.Print()
             PressEnterToReturnToMainMenu.Print()
             return
@@ -85,6 +89,7 @@ class Session(object):
             Footer.Print()
             exit(EXIT_FAILURE)
 
+        self.__terminating = True
         self.GetSocket().Send(PROTOCOL_QUIT_COMMAND)
         _ = self.GetSocket().Receive()  # ignore response
         self.__connected = False
@@ -98,6 +103,7 @@ class Session(object):
     def __init__(self):
         try:
             self.__connected = False
+            self.__terminating = False
             self.__socket = None
             
             Console.Clear()

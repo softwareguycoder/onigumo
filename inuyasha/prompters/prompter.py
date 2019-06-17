@@ -1,5 +1,9 @@
 from common.string_utils import StringUtilities
 from common.list_utils import ListUtilities
+from common.inuyasha_symbols import ERROR_TYPE_Y_FOR_YES_OR_N_FOR_NO
+from validators.yes_no_input_validator import YesNoInputValidator
+import sys
+import traceback
 
 ERROR_RESPONSE_MUST_BE_YES_OR_NO = \
     "ERROR: Only 'Y' for yes or 'N' for no is allowed (lower case is okay too)."
@@ -63,6 +67,7 @@ class Prompter(object):
                     choiceValueSet))
             if not theResult:
                 theResult = pvDefault
+                return theResult
             if theResult is None:
                 return theResult
             if inputValidator is not None:
@@ -85,8 +90,6 @@ class Prompter(object):
         except KeyboardInterrupt:
             if keyboardInterruptHandler is not None:
                 keyboardInterruptHandler() 
-            else:
-                print("No keyboard interrupt handler installed")            
                 
     @staticmethod
     def PromptForString(strPrompt, strDefault=None, choiceValueSet=[],
@@ -116,19 +119,17 @@ class Prompter(object):
                     invalidChoiceHandler=invalidChoiceHandler,
                     pvInvalidValue=nInvalidValue)
                     )
-                if theResult == nInvalidValue:
-                    continue
                 if theResult is None:
                     theResult = nDefault
+                    break
                 return theResult
-            except KeyboardInterrupt:  # parse error more likely
+            except KeyboardInterrupt:
                 return nInvalidValue
-            except:
+            else:
                 if invalidInputHandler is not None:
                     invalidInputHandler(theResult)
                     theResult = nInvalidValue
-                else:
-                    return nInvalidValue
+                return nInvalidValue
     
     @staticmethod
     def PressAnyKeyToContinue(strPrompt="Press ENTER key to continue:",
@@ -139,25 +140,24 @@ class Prompter(object):
     
     @staticmethod
     def __YesNoValidator(theResult, choiceValueSet):  # @UnusedVariable
-        if not isinstance(theResult, str):
-            return False
-        return theResult.lower() == 'y' or theResult.lower() == 'n'
+        return YesNoInputValidator.IsValid(theResult)
     
     @staticmethod
     def __YesNoInvalidInputHandler(theResult):  # @UnusedVariable
-        print(ERROR_RESPONSE_MUST_BE_YES_OR_NO)
+        print(ERROR_TYPE_Y_FOR_YES_OR_N_FOR_NO)
         pass
     
     @staticmethod
-    def YesNoPrompt(strPrompt, bDefault, keyboardInterruptHandler,
-                    pvInvalidInput=None):
-        theResult = pvInvalidInput
-        while theResult == pvInvalidInput:
-            theResult = Prompter.__DoDisplayPrompt(strPrompt,
-                    "Y" if bDefault else "N",
-                    ['Y', 'N'], keyboardInterruptHandler,
-                    Prompter.__YesNoValidator,
-                    Prompter.__YesNoInvalidInputHandler,
-                    pvInvalidInput)
+    def YesNoPrompt(strPrompt, bYesIsDefault, keyboardInterruptHandler,
+                    pvInvalidValue=None):
+        theResult = pvInvalidValue
+        while theResult == pvInvalidValue:
+            theResult = Prompter.__DoDisplayPrompt(strPrompt=strPrompt,
+                    pvDefault="Y" if bYesIsDefault else "N",
+                    choiceValueSet=['Y', 'N', 'y', 'n'], 
+                    keyboardInterruptHandler=keyboardInterruptHandler,
+                    inputValidator=Prompter.__YesNoValidator,
+                    invalidInputHandler=Prompter.__YesNoInvalidInputHandler,
+                    pvInvalidValue=pvInvalidValue)
         return str(theResult).lower() == 'y'
     

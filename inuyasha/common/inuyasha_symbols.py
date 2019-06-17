@@ -52,6 +52,8 @@ ERROR_FAILED_GET_DIR_LISTING_FORMAT = \
     ">>> ERROR: Failed to get a listing of directory '{}'."
 ERROR_FAILED_KILL_REMOTE_PROCESS = \
     ">>> ERROR: Failed to kill a remote process."
+ERROR_FAILED_LIST_REMOTE_PROCESSES = \
+    ">>> ERROR: Unable to obtain a list of running processes."
 ERROR_FAILED_RECEIVE_FROM_SERVER_FORMAT = \
     ">>> ERROR:Failed to receive entities from the server.\n{}"
 ERROR_FAILED_REMOVE_TEMP_DIR = \
@@ -74,8 +76,10 @@ ERROR_NO_RESPONSE_LINES = \
     ">>> ERROR: No lines of response received from server."
 ERROR_OBJECT_CODE_NOT_EXISTS_FORMAT = \
     ">>> ERROR: Object code file '{}' not found."
-ERROR_PID_INVALID_VALUE = \
+ERROR_REQUESTED_PID_INVALID = \
     ">>> ERROR: The PID requested is invalid.  Must be 1 or greater."
+ERROR_PICK_PID_FROM_LIST = \
+    ">>> ERROR: Please type a number from the PID column above."
 ERROR_PORT_INVALID_VALUE = \
     ">>> ERROR: Port number must be in the range [1024-49151] inclusive."
 ERROR_PROCESS_INFO_NOT_VALID = \
@@ -84,6 +88,8 @@ ERROR_REMOTE_PROCESS_ACCESS_DENIED = \
     ">>> ERROR: Access to kill the remote process denied."
 ERROR_REMOTE_PROCESS_NOT_EXISTS = \
     ">>> ERROR: Remote process/process group does not exist, or is a zombie."
+ERROR_TYPE_Y_FOR_YES_OR_N_FOR_NO = \
+    ">>> ERROR: Type 'Y' for 'Yes' or 'N' for 'No'.  Case doesn't matter."
 EXIT_FAILURE = -1
 EXIT_SUCCESS = 0
 
@@ -113,15 +119,16 @@ IDS_LIST_SERVER_DIR_HEADER = \
     "                   ***   List Server Directory   ***"
 IDS_NOW_CONNECTED_TO_SERVER = \
     "               *** Now connected to the server!!! ***"
-IDS_PICK_PROCESS_TO_KILL = "Pick a process to kill"
 IDS_PICK_PROCESS_TO_KILL_HEADER = \
     "         *** Run Some Shellcode that Will Kill A Process ***"
+IDS_PICK_PROCESS_TO_KILL_PROMPT = \
+    "Process ID (PID) number of process to kill"
 IDS_PRESS_ENTER_TO_CONTINUE = \
     "Press ENTER to continue"
 IDS_PRESS_ENTER_TO_RETURN_TO_MAIN_MENU = \
     "Press ENTER to go back to Main Menu"
 IDS_PRESS_ENTER_TO_PICK_PROC_TO_KILL = \
-    "Press ENTER when ready to pick a process to kill..."
+    "Press ENTER when ready to pick a process to kill"
 IDS_REMOTE_PROCESS_LIST_HEADER = \
     "                *** Remote Machine Process List ***"
 IDS_SERVER_CPU_INFO_HEADER = \
@@ -180,7 +187,7 @@ SHELLCODE_EXECUTION_SUCCEEDED = \
 SHELLCODE_EXECUTION_RESPONSE_ERROR_STATUS = '4'    
 SHELLCODE_EXECUTION_RESPONSE_SUCCESS_STATUS = '2'
 SHOULD_PROC_LIST_BE_PAGINATED_PROMPT = \
-    "> Paginate the list of processes? (Y/N)[Y]: > "    
+    "Paginate the list of processes? "    
 
 SOCKET = None
 CONNECTED = False
