@@ -8,7 +8,8 @@ from common.inuyasha_symbols import IDS_SERVER_CPU_INFO_HEADER, \
     ERROR_FAILED_EXECUTE_SHELLCODE, IDS_ATTEMPTING_SERIALIZE_SHELLCODE, \
     IDS_ATTEMPTING_EXTRACT_SHELLCODE_BYTES, IDS_ATTEMPTING_COMPILE_SHELLCODE,\
     ERROR_FAILED_LIST_REMOTE_PROCESSES, ERROR_NO_RESPONSE_LINES,\
-    ERROR_MUST_PICK_PID
+    ERROR_MUST_PICK_PID, ERROR_FAILED_FIND_SHELLCODE_SOURCE_FORMAT
+from common.string_utils import StringUtilities
 
 
 class Announcer(object):
@@ -134,6 +135,17 @@ class Announcer(object):
         print(ERROR_MUST_PICK_PID)
         print()
         pass
+
+    
+    @staticmethod
+    def AnnounceFailedFindShellcodeSource(strCodePath):
+        if StringUtilities.IsNullOrWhiteSpace(strCodePath):
+            return
+        print(ERROR_FAILED_FIND_SHELLCODE_SOURCE_FORMAT.format(strCodePath))
+        print()
+        pass
+    
+    
     
     
     

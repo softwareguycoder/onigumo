@@ -1,8 +1,8 @@
 from console.console_class import Console
 from common.inuyasha_symbols import PROTOCOL_LIST_COMMAND, \
     ERROR_FAILED_ESTABLISH_SESSION, ERROR_FAILED_CONNECT_TO_SERVER, \
-    ERROR_MUST_PICK_PID, SHOULD_PROC_LIST_BE_PAGINATED_PROMPT,\
-    DEFAULT_PAGE_LINE_COUNT, EXIT_SUCCESS,\
+    ERROR_MUST_PICK_PID, SHOULD_PROC_LIST_BE_PAGINATED_PROMPT, \
+    DEFAULT_PAGE_LINE_COUNT, EXIT_SUCCESS, \
     IDS_PICK_PROCESS_TO_KILL_PROMPT, INVALID_PID_VALUE
 from announcers.announcer import Announcer
 from paginators.paginator import Paginator
@@ -49,8 +49,8 @@ class ProcessToKillPicker(object):
                     Announcer.AnnounceNoResponseLines()
                     return nPID
                 if bShouldPaginate:
-                    Paginator.Paginate(iter(lines),\
-                         ProcessToKillPicker.__OnDisplayNextPage, 
+                    Paginator.Paginate(iter(lines), \
+                         ProcessToKillPicker.__OnDisplayNextPage,
                          userState=None, nLineCount=9)
                 else:
                     for line in lines:
@@ -67,13 +67,12 @@ class ProcessToKillPicker(object):
                     inputValidator=ProcessIdValidator.IsValid,
                     invalidInputHandler=ProcessIdValidator.HandleInvalidChoice,
                     nInvalidValue=INVALID_PID_VALUE)
+                return nPID
         except KeyboardInterrupt:
             return INVALID_PID_VALUE
         else:
             Announcer.AnnounceFailedListRemoteProcesses()
-            return INVALID_PID_VALUE
-                       
-        return nPID
+            return INVALID_PID_VALUE            
     
     @staticmethod
     def __DoShowIntroScreen():
@@ -102,5 +101,4 @@ class ProcessToKillPicker(object):
         if not ProcessToKillPicker.__IsPidValid(nPID):
             return INVALID_PID_VALUE
         return nPID
-    
         

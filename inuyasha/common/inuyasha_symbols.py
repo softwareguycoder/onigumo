@@ -14,8 +14,7 @@ CLIENT_DATA_FORMAT = "C: {} ({} B sent)"
 CODE_DIR = "/home/bhart/code"
 CONTINUATION_PROMPT = "> Press any key to continue, or q to quit: > "
 
-ASM_CODE_PATH = "~/code/pidkiller.asm"
-
+DEFAULT_ASM_CODE_PATH = "~/code/pidkiller.asm"
 DEFAULT_HOSTNAME = "localhost"
 DEFAULT_PAGE_LINE_COUNT = 15
 DEFAULT_PORT = 9000
@@ -45,7 +44,7 @@ ERROR_FAILED_EXTRACT_SHELLCODE = \
 ERROR_FAILED_FIND_FILE_FORMAT = \
     ">>> ERROR: Failed to find the file '{}'."
 ERROR_FAILED_FIND_SHELLCODE_SOURCE_FORMAT = \
-    ">>> ERROR: Failed to find any shellcode source at '{}'."
+    ">>> ERROR: Failed to find any shellcode source at '{}'.  Using default code."
 ERROR_FAILED_GET_CPU_INFO = \
     ">>> ERROR: Failed to get CPU Info."
 ERROR_FAILED_GET_DIR_LISTING_FORMAT = \
@@ -103,8 +102,8 @@ IDM_BACK = "<< Back"
 IDM_CONNECT_REMOTE_MACHINE = "Connect to Remote Machine"
 IDM_SERVER_LIST_PROCESSES = "List Processes"
 
-IDS_ASSEMBLY_CODE_PATH_PROMPT_FORMAT = \
-    "> Path to assembly code to send as shellcode [{}]: > "
+IDS_ASSEMBLY_CODE_PATH_PROMPT = \
+    "Path to assembly code to send as shellcode"
 IDS_ATTEMPTING_COMPILE_SHELLCODE = \
     "Compiling shellcode source file '{}'..."
 IDS_ATTEMPTING_EXTRACT_SHELLCODE_BYTES = \

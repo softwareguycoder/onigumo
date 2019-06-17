@@ -57,6 +57,7 @@ class InuyashaApp(object):
                 
                 if nChoice == CHOICE_EXIT:
                     self.__session.End(EXIT_SUCCESS)
+                
         except KeyboardInterrupt:
             self.__session.End(EXIT_FAILURE)    
         pass

@@ -95,9 +95,13 @@ class Prompter(object):
     def PromptForString(strPrompt, strDefault=None, choiceValueSet=[],
                         keyboardInterruptHandler=None, inputValidator=None,
                         invalidInputHandler=None):
-        theResult = Prompter.__DoDisplayPrompt(strPrompt, strDefault,
-            choiceValueSet, keyboardInterruptHandler, inputValidator,
-            invalidInputHandler)
+        theResult = Prompter.__DoDisplayPrompt(
+            strPrompt=strPrompt, 
+            pvDefault=strDefault,
+            choiceValueSet=choiceValueSet, 
+            keyboardInterruptHandler=keyboardInterruptHandler, 
+            inputValidator=inputValidator,
+            invalidInputHandler=invalidInputHandler)
         if theResult is None or not len(theResult.strip()):
             theResult = strDefault
         return theResult
@@ -125,7 +129,7 @@ class Prompter(object):
                 return theResult
             except KeyboardInterrupt:
                 return nInvalidValue
-            else:
+            except:
                 if invalidInputHandler is not None:
                     invalidInputHandler(theResult)
                     theResult = nInvalidValue

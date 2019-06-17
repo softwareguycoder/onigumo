@@ -4,14 +4,16 @@ from common.inuyasha_symbols import INVALID_PID_VALUE, ERROR_PICK_PID_FROM_LIST
 class ProcessIdValidator(object):
     
     @staticmethod
-    def HandleInvalidChoice(nPID):
-        if not isinstance(nPID, int):
-            return
+    def HandleInvalidChoice(strPID):  # @UnusedVariable
         print(ERROR_PICK_PID_FROM_LIST)
         pass
         
     @staticmethod
-    def IsValid(nPID, choiceValueSet=[]):  # @UnusedVariable
-        if not isinstance(nPID, int):
+    def IsValid(strPID, choiceValueSet=[]):  # @UnusedVariable
+        nPID = INVALID_PID_VALUE
+        
+        try:
+            nPID = int(strPID)
+            return nPID > INVALID_PID_VALUE
+        except:
             return False
-        return nPID > INVALID_PID_VALUE
