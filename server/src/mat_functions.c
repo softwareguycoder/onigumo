@@ -111,7 +111,6 @@ void AddNewlyConnectedClientToList(LPCLIENTSTRUCT lpCS) {
  * value as assigned by the operating system.  -1 if an error occurred, such as
  * invalid user state data passed.
  */
-
 int GetServerSocketFileDescriptor(void* pThreadData) {
   // Validate the input. pThreadData must have a value (i.e., not be NULL),
   // is castable to int*, and then can be dereferenced to an int value (the
